@@ -18,7 +18,6 @@ const FIFA_RANK = {
 };
 const rank = (n) => FIFA_RANK[n] ? `#${FIFA_RANK[n]}` : null;
 
-// ── SCORERS (updated through Matchday 2) ─────────────────────────────────
 const SCORERS = [
   {name:"Lionel Messi",      team:"Argentina",  goals:5,hattricks:1,pos:"FW"},
   {name:"Kylian Mbappé",     team:"France",     goals:4,hattricks:0,pos:"FW"},
@@ -47,8 +46,8 @@ const SCORERS = [
   {name:"Julián Quiñones",   team:"Mexico",     goals:1,hattricks:0,pos:"FW"},
   {name:"Hwang In-Beom",     team:"Korea Republic",goals:1,hattricks:0,pos:"MF"},
   {name:"Oh Hyeon-Gyu",      team:"Korea Republic",goals:1,hattricks:0,pos:"FW"},
-  {name:"Jovo Lukić",        team:"Bosnia and Herzegovina",goals:1,hattricks:0,pos:"FW"},
-  {name:"Ladislav Krejčí",   team:"Czechia",    goals:1,hattricks:0,pos:"MF"},
+  {name:"Jovo Lukic",        team:"Bosnia and Herzegovina",goals:1,hattricks:0,pos:"FW"},
+  {name:"Ladislav Krejci",   team:"Czechia",    goals:1,hattricks:0,pos:"MF"},
   {name:"Mauricio",          team:"Paraguay",   goals:1,hattricks:0,pos:"FW"},
   {name:"Ayman Hussein",     team:"Iraq",       goals:1,hattricks:0,pos:"FW"},
   {name:"Elijah Just",       team:"New Zealand",goals:1,hattricks:0,pos:"FW"},
@@ -56,64 +55,63 @@ const SCORERS = [
   {name:"Granit Xhaka",      team:"Switzerland",goals:1,hattricks:0,pos:"MF"},
   {name:"Chris Wood",        team:"New Zealand",goals:1,hattricks:0,pos:"FW"},
   {name:"Michael Olise",     team:"France",     goals:1,hattricks:0,pos:"FW"},
-  {name:"João Cancelo",      team:"Portugal",   goals:1,hattricks:0,pos:"DF"},
+  {name:"Joao Cancelo",      team:"Portugal",   goals:1,hattricks:0,pos:"DF"},
   {name:"Felix Nmecha",      team:"Germany",    goals:1,hattricks:0,pos:"MF"},
-  {name:"Leroy Sané",        team:"Germany",    goals:1,hattricks:0,pos:"FW"},
+  {name:"Leroy Sane",        team:"Germany",    goals:1,hattricks:0,pos:"FW"},
   {name:"Serhou Guirassy",   team:"Germany",    goals:1,hattricks:0,pos:"FW"},
   {name:"Kai Havertz",       team:"Germany",    goals:1,hattricks:0,pos:"FW"},
 ];
 
-// ── TOP 3 PLAYERS PER TEAM ────────────────────────────────────────────────
 const TOP_PLAYERS = {
-  Argentina:   [{n:"Lionel Messi",p:"FW",goals:5,ht:1},{n:"Lautaro Martínez",p:"FW",goals:2,ht:0},{n:"Julián Álvarez",p:"FW",goals:2,ht:0}],
-  France:      [{n:"Kylian Mbappé",p:"FW",goals:4,ht:0},{n:"Ousmane Dembélé",p:"FW",goals:2,ht:0},{n:"Michael Olise",p:"FW",goals:1,ht:0}],
-  Norway:      [{n:"Erling Haaland",p:"FW",goals:4,ht:0},{n:"Martin Ødegaard",p:"MF",goals:0,ht:0},{n:"Alexander Sørloth",p:"FW",goals:0,ht:0}],
+  Argentina:   [{n:"Lionel Messi",p:"FW",goals:5,ht:1},{n:"Lautaro Martinez",p:"FW",goals:2,ht:0},{n:"Julian Alvarez",p:"FW",goals:2,ht:0}],
+  France:      [{n:"Kylian Mbappe",p:"FW",goals:4,ht:0},{n:"Ousmane Dembele",p:"FW",goals:2,ht:0},{n:"Michael Olise",p:"FW",goals:1,ht:0}],
+  Norway:      [{n:"Erling Haaland",p:"FW",goals:4,ht:0},{n:"Martin Odegaard",p:"MF",goals:0,ht:0},{n:"Alexander Sorloth",p:"FW",goals:0,ht:0}],
   England:     [{n:"Harry Kane",p:"FW",goals:3,ht:1},{n:"Bukayo Saka",p:"FW",goals:2,ht:0},{n:"Jude Bellingham",p:"MF",goals:2,ht:0}],
-  Portugal:    [{n:"Cristiano Ronaldo",p:"FW",goals:3,ht:0},{n:"João Cancelo",p:"DF",goals:1,ht:0},{n:"Bruno Fernandes",p:"MF",goals:0,ht:0}],
+  Portugal:    [{n:"Cristiano Ronaldo",p:"FW",goals:3,ht:0},{n:"Joao Cancelo",p:"DF",goals:1,ht:0},{n:"Bruno Fernandes",p:"MF",goals:0,ht:0}],
   Brazil:      [{n:"Vinicius Jr",p:"FW",goals:3,ht:0},{n:"Raphinha",p:"FW",goals:2,ht:0},{n:"Rodrygo",p:"FW",goals:0,ht:0}],
   Canada:      [{n:"Jonathan David",p:"FW",goals:3,ht:1},{n:"Cyle Larin",p:"FW",goals:1,ht:0},{n:"Alphonso Davies",p:"DF",goals:0,ht:0}],
   Spain:       [{n:"Lamine Yamal",p:"FW",goals:3,ht:0},{n:"Ferran Torres",p:"FW",goals:2,ht:0},{n:"Mikel Oyarzabal",p:"FW",goals:2,ht:0}],
   USA:         [{n:"Folarin Balogun",p:"FW",goals:2,ht:0},{n:"Christian Pulisic",p:"FW",goals:0,ht:0},{n:"Tyler Adams",p:"MF",goals:0,ht:0}],
   Netherlands: [{n:"Memphis Depay",p:"FW",goals:2,ht:0},{n:"Cody Gakpo",p:"FW",goals:2,ht:0},{n:"Virgil van Dijk",p:"DF",goals:0,ht:0}],
-  Germany:     [{n:"Deniz Undav",p:"FW",goals:2,ht:0},{n:"Leroy Sané",p:"FW",goals:1,ht:0},{n:"Kai Havertz",p:"FW",goals:1,ht:0}],
-  Mexico:      [{n:"Raúl Jiménez",p:"FW",goals:2,ht:0},{n:"Julián Quiñones",p:"FW",goals:1,ht:0},{n:"Hirving Lozano",p:"FW",goals:0,ht:0}],
+  Germany:     [{n:"Deniz Undav",p:"FW",goals:2,ht:0},{n:"Leroy Sane",p:"FW",goals:1,ht:0},{n:"Kai Havertz",p:"FW",goals:1,ht:0}],
+  Mexico:      [{n:"Raul Jimenez",p:"FW",goals:2,ht:0},{n:"Julian Quinones",p:"FW",goals:1,ht:0},{n:"Hirving Lozano",p:"FW",goals:0,ht:0}],
   Switzerland: [{n:"Johan Manzambi",p:"FW",goals:2,ht:0},{n:"Granit Xhaka",p:"MF",goals:1,ht:0},{n:"Xherdan Shaqiri",p:"FW",goals:0,ht:0}],
   Sweden:      [{n:"Alexander Isak",p:"FW",goals:2,ht:0},{n:"Dejan Kulusevski",p:"FW",goals:0,ht:0},{n:"Emil Forsberg",p:"MF",goals:0,ht:0}],
   Japan:       [{n:"Takumi Minamino",p:"FW",goals:0,ht:0},{n:"Ritsu Doan",p:"FW",goals:0,ht:0},{n:"Kaoru Mitoma",p:"FW",goals:0,ht:0}],
   Morocco:     [{n:"Hakim Ziyech",p:"MF",goals:0,ht:0},{n:"Youssef En-Nesyri",p:"FW",goals:0,ht:0},{n:"Sofiane Boufal",p:"FW",goals:0,ht:0}],
   Belgium:     [{n:"Romelu Lukaku",p:"FW",goals:0,ht:0},{n:"Kevin De Bruyne",p:"MF",goals:0,ht:0},{n:"Leandro Trossard",p:"FW",goals:0,ht:0}],
-  Colombia:    [{n:"Luis Díaz",p:"FW",goals:0,ht:0},{n:"James Rodríguez",p:"MF",goals:0,ht:0},{n:"Radamel Falcao",p:"FW",goals:0,ht:0}],
+  Colombia:    [{n:"Luis Diaz",p:"FW",goals:0,ht:0},{n:"James Rodriguez",p:"MF",goals:0,ht:0},{n:"Radamel Falcao",p:"FW",goals:0,ht:0}],
   Egypt:       [{n:"Mohamed Salah",p:"FW",goals:0,ht:0},{n:"Mostafa Mohamed",p:"FW",goals:0,ht:0},{n:"Trezeguet",p:"FW",goals:0,ht:0}],
   Iran:        [{n:"Sardar Azmoun",p:"FW",goals:0,ht:0},{n:"Mehdi Taremi",p:"FW",goals:0,ht:0},{n:"Alireza Jahanbakhsh",p:"FW",goals:0,ht:0}],
   "Korea Republic":[{n:"Hwang In-Beom",p:"MF",goals:1,ht:0},{n:"Oh Hyeon-Gyu",p:"FW",goals:1,ht:0},{n:"Son Heung-min",p:"FW",goals:0,ht:0}],
   Australia:   [{n:"Mitchell Duke",p:"FW",goals:0,ht:0},{n:"Ajdin Hrustic",p:"MF",goals:0,ht:0},{n:"Martin Boyle",p:"FW",goals:0,ht:0}],
-  Senegal:     [{n:"Sadio Mané",p:"FW",goals:0,ht:0},{n:"Ismaïla Sarr",p:"FW",goals:0,ht:0},{n:"Idrissa Gueye",p:"MF",goals:0,ht:0}],
-  Uruguay:     [{n:"Darwin Núñez",p:"FW",goals:0,ht:0},{n:"Federico Valverde",p:"MF",goals:0,ht:0},{n:"Luis Suárez",p:"FW",goals:0,ht:0}],
-  "Ivory Coast":[{n:"Sébastien Haller",p:"FW",goals:0,ht:0},{n:"Franck Kessie",p:"MF",goals:0,ht:0},{n:"Nicolas Pépé",p:"FW",goals:0,ht:0}],
-  Ecuador:     [{n:"Enner Valencia",p:"FW",goals:0,ht:0},{n:"Moisés Caicedo",p:"MF",goals:0,ht:0},{n:"Ángel Mena",p:"FW",goals:0,ht:0}],
-  Ghana:       [{n:"Jordan Ayew",p:"FW",goals:0,ht:0},{n:"Thomas Partey",p:"MF",goals:0,ht:0},{n:"André Ayew",p:"FW",goals:0,ht:0}],
-  Croatia:     [{n:"Luka Modrić",p:"MF",goals:0,ht:0},{n:"Ivan Perišić",p:"FW",goals:0,ht:0},{n:"Mateo Kovačić",p:"MF",goals:0,ht:0}],
-  Czechia:     [{n:"Ladislav Krejčí",p:"MF",goals:1,ht:0},{n:"Patrik Schick",p:"FW",goals:0,ht:0},{n:"Tomáš Souček",p:"MF",goals:0,ht:0}],
+  Senegal:     [{n:"Sadio Mane",p:"FW",goals:0,ht:0},{n:"Ismaila Sarr",p:"FW",goals:0,ht:0},{n:"Idrissa Gueye",p:"MF",goals:0,ht:0}],
+  Uruguay:     [{n:"Darwin Nunez",p:"FW",goals:0,ht:0},{n:"Federico Valverde",p:"MF",goals:0,ht:0},{n:"Luis Suarez",p:"FW",goals:0,ht:0}],
+  "Ivory Coast":[{n:"Sebastien Haller",p:"FW",goals:0,ht:0},{n:"Franck Kessie",p:"MF",goals:0,ht:0},{n:"Nicolas Pepe",p:"FW",goals:0,ht:0}],
+  Ecuador:     [{n:"Enner Valencia",p:"FW",goals:0,ht:0},{n:"Moises Caicedo",p:"MF",goals:0,ht:0},{n:"Angel Mena",p:"FW",goals:0,ht:0}],
+  Ghana:       [{n:"Jordan Ayew",p:"FW",goals:0,ht:0},{n:"Thomas Partey",p:"MF",goals:0,ht:0},{n:"Andre Ayew",p:"FW",goals:0,ht:0}],
+  Croatia:     [{n:"Luka Modric",p:"MF",goals:0,ht:0},{n:"Ivan Perisic",p:"FW",goals:0,ht:0},{n:"Mateo Kovacic",p:"MF",goals:0,ht:0}],
+  Czechia:     [{n:"Ladislav Krejci",p:"MF",goals:1,ht:0},{n:"Patrik Schick",p:"FW",goals:0,ht:0},{n:"Tomas Soucek",p:"MF",goals:0,ht:0}],
   "South Africa":[{n:"Percy Tau",p:"FW",goals:0,ht:0},{n:"Bongani Zungu",p:"MF",goals:0,ht:0},{n:"Lebo Mothiba",p:"FW",goals:0,ht:0}],
-  Panama:      [{n:"Rolando Blackburn",p:"FW",goals:0,ht:0},{n:"Adalberto Carrasquilla",p:"MF",goals:0,ht:0},{n:"José Fajardo",p:"FW",goals:0,ht:0}],
+  Panama:      [{n:"Rolando Blackburn",p:"FW",goals:0,ht:0},{n:"Adalberto Carrasquilla",p:"MF",goals:0,ht:0},{n:"Jose Fajardo",p:"FW",goals:0,ht:0}],
   "Saudi Arabia":[{n:"Salem Al-Dawsari",p:"FW",goals:0,ht:0},{n:"Firas Al-Buraikan",p:"FW",goals:0,ht:0},{n:"Sami Al-Najei",p:"MF",goals:0,ht:0}],
   "Cape Verde":[{n:"Garry Rodrigues",p:"FW",goals:0,ht:0},{n:"Ryan Mendes",p:"FW",goals:0,ht:0},{n:"Stopira",p:"DF",goals:0,ht:0}],
   Iraq:        [{n:"Ayman Hussein",p:"FW",goals:1,ht:0},{n:"Bashar Resan",p:"MF",goals:0,ht:0},{n:"Amjad Attwan",p:"FW",goals:0,ht:0}],
   "New Zealand":[{n:"Chris Wood",p:"FW",goals:1,ht:0},{n:"Elijah Just",p:"FW",goals:1,ht:0},{n:"Clayton Lewis",p:"MF",goals:0,ht:0}],
   Jordan:      [{n:"Nizar Al-Rashdan",p:"MF",goals:1,ht:0},{n:"Mousa Tamari",p:"FW",goals:0,ht:0},{n:"Yazan Al-Naimat",p:"FW",goals:0,ht:0}],
-  "Bosnia and Herzegovina":[{n:"Jovo Lukić",p:"FW",goals:1,ht:0},{n:"Edin Džeko",p:"FW",goals:0,ht:0},{n:"Miralem Pjanić",p:"MF",goals:0,ht:0}],
-  Paraguay:    [{n:"Mauricio",p:"FW",goals:1,ht:0},{n:"Miguel Almirón",p:"MF",goals:0,ht:0},{n:"Julio Enciso",p:"FW",goals:0,ht:0}],
-  Turkiye:     [{n:"Hakan Çalhanoğlu",p:"MF",goals:0,ht:0},{n:"Arda Güler",p:"MF",goals:0,ht:0},{n:"Kerem Aktürkoğlu",p:"FW",goals:0,ht:0}],
+  "Bosnia and Herzegovina":[{n:"Jovo Lukic",p:"FW",goals:1,ht:0},{n:"Edin Dzeko",p:"FW",goals:0,ht:0},{n:"Miralem Pjanic",p:"MF",goals:0,ht:0}],
+  Paraguay:    [{n:"Mauricio",p:"FW",goals:1,ht:0},{n:"Miguel Almiron",p:"MF",goals:0,ht:0},{n:"Julio Enciso",p:"FW",goals:0,ht:0}],
+  Turkiye:     [{n:"Hakan Calhanoglu",p:"MF",goals:0,ht:0},{n:"Arda Guler",p:"MF",goals:0,ht:0},{n:"Kerem Akturkoglu",p:"FW",goals:0,ht:0}],
   Tunisia:     [{n:"Youssef Msakni",p:"FW",goals:0,ht:0},{n:"Wahbi Khazri",p:"FW",goals:0,ht:0},{n:"Hannibal Mejbri",p:"MF",goals:0,ht:0}],
   Algeria:     [{n:"Riyad Mahrez",p:"FW",goals:0,ht:0},{n:"Islam Slimani",p:"FW",goals:0,ht:0},{n:"Andy Delort",p:"FW",goals:0,ht:0}],
   Scotland:    [{n:"Scott McTominay",p:"MF",goals:0,ht:0},{n:"Andy Robertson",p:"DF",goals:0,ht:0},{n:"Che Adams",p:"FW",goals:0,ht:0}],
-  Austria:     [{n:"Marcel Sabitzer",p:"MF",goals:0,ht:0},{n:"Christoph Baumgartner",p:"MF",goals:0,ht:0},{n:"Marko Arnautović",p:"FW",goals:0,ht:0}],
+  Austria:     [{n:"Marcel Sabitzer",p:"MF",goals:0,ht:0},{n:"Christoph Baumgartner",p:"MF",goals:0,ht:0},{n:"Marko Arnautovic",p:"FW",goals:0,ht:0}],
   Qatar:       [{n:"Akram Afif",p:"FW",goals:0,ht:0},{n:"Almoez Ali",p:"FW",goals:0,ht:0},{n:"Hassan Al-Haydos",p:"FW",goals:0,ht:0}],
   Haiti:       [{n:"Duckens Nazon",p:"FW",goals:0,ht:0},{n:"Frantzdy Pierrot",p:"FW",goals:0,ht:0},{n:"Derrick Etienne",p:"MF",goals:0,ht:0}],
   Uzbekistan:  [{n:"Eldor Shomurodov",p:"FW",goals:0,ht:0},{n:"Jaloliddin Masharipov",p:"MF",goals:0,ht:0},{n:"Dostonbek Khamdamov",p:"MF",goals:0,ht:0}],
-  Curacao:     [{n:"Leandro Bacuna",p:"MF",goals:0,ht:0},{n:"Juriën Timber",p:"DF",goals:0,ht:0},{n:"Cuco Martina",p:"DF",goals:0,ht:0}],
-  "DR Congo":  [{n:"Cédric Bakambu",p:"FW",goals:0,ht:0},{n:"Chancel Mbemba",p:"DF",goals:0,ht:0},{n:"Arthur Masuaku",p:"DF",goals:0,ht:0}],
-  "Congo DR":  [{n:"Cédric Bakambu",p:"FW",goals:0,ht:0},{n:"Chancel Mbemba",p:"DF",goals:0,ht:0},{n:"Arthur Masuaku",p:"DF",goals:0,ht:0}],
+  Curacao:     [{n:"Leandro Bacuna",p:"MF",goals:0,ht:0},{n:"Jurien Timber",p:"DF",goals:0,ht:0},{n:"Cuco Martina",p:"DF",goals:0,ht:0}],
+  "DR Congo":  [{n:"Cedric Bakambu",p:"FW",goals:0,ht:0},{n:"Chancel Mbemba",p:"DF",goals:0,ht:0},{n:"Arthur Masuaku",p:"DF",goals:0,ht:0}],
+  "Congo DR":  [{n:"Cedric Bakambu",p:"FW",goals:0,ht:0},{n:"Chancel Mbemba",p:"DF",goals:0,ht:0},{n:"Arthur Masuaku",p:"DF",goals:0,ht:0}],
 };
 
 const FLAG = {
@@ -145,158 +143,7 @@ const SEED = {
   J:{"Argentina":{pts:0,p:0,w:0,d:0,l:0,f:0,a:0},"Austria":{pts:0,p:0,w:0,d:0,l:0,f:0,a:0},"Algeria":{pts:0,p:0,w:0,d:0,l:0,f:0,a:0},"Jordan":{pts:0,p:0,w:0,d:0,l:0,f:0,a:0}},
   K:{"Colombia":{pts:0,p:0,w:0,d:0,l:0,f:0,a:0},"Portugal":{pts:0,p:0,w:0,d:0,l:0,f:0,a:0},"Congo DR":{pts:0,p:0,w:0,d:0,l:0,f:0,a:0},"Uzbekistan":{pts:0,p:0,w:0,d:0,l:0,f:0,a:0}},
   L:{"England":{pts:0,p:0,w:0,d:0,l:0,f:0,a:0},"Ghana":{pts:0,p:0,w:0,d:0,l:0,f:0,a:0},"Croatia":{pts:0,p:0,w:0,d:0,l:0,f:0,a:0},"Panama":{pts:0,p:0,w:0,d:0,l:0,f:0,a:0}},
-}
-
-mport { useState, useEffect, useCallback } from "react";
-
-const SHEET_CSV_URL = "YOUR_GOOGLE_SHEET_CSV_URL_HERE";
-const AUTO_REFRESH_SECONDS = 120;
-
-const FIFA_RANK = {
-  Argentina:1,Spain:2,France:3,England:4,Portugal:5,
-  Brazil:6,Morocco:7,Netherlands:8,Belgium:9,Germany:10,
-  Croatia:11,Colombia:13,Mexico:14,Senegal:15,Uruguay:16,
-  USA:17,Japan:18,Switzerland:19,Iran:20,Turkiye:22,
-  Ecuador:23,Austria:24,"Korea Republic":25,Australia:27,
-  Algeria:28,Egypt:29,Canada:30,Norway:31,"Ivory Coast":33,
-  Panama:34,Sweden:38,Czechia:40,Paraguay:41,Scotland:42,
-  Tunisia:45,"DR Congo":46,Uzbekistan:50,Qatar:56,Iraq:57,
-  "South Africa":60,"Saudi Arabia":61,Jordan:63,
-  "Bosnia and Herzegovina":64,"Cape Verde":67,Ghana:73,
-  Curacao:82,Haiti:83,"New Zealand":85,"Congo DR":46,
 };
-const rank = (n) => FIFA_RANK[n] ? `#${FIFA_RANK[n]}` : null;
-
-// ── SCORERS (updated through Matchday 2) ─────────────────────────────────
-const SCORERS = [
-  {name:"Lionel Messi",      team:"Argentina",  goals:5,hattricks:1,pos:"FW"},
-  {name:"Kylian Mbappé",     team:"France",     goals:4,hattricks:0,pos:"FW"},
-  {name:"Erling Haaland",    team:"Norway",     goals:4,hattricks:0,pos:"FW"},
-  {name:"Harry Kane",        team:"England",    goals:3,hattricks:1,pos:"FW"},
-  {name:"Cristiano Ronaldo", team:"Portugal",   goals:3,hattricks:0,pos:"FW"},
-  {name:"Vinicius Jr",       team:"Brazil",     goals:3,hattricks:0,pos:"FW"},
-  {name:"Jonathan David",    team:"Canada",     goals:3,hattricks:1,pos:"FW"},
-  {name:"Lamine Yamal",      team:"Spain",      goals:3,hattricks:0,pos:"FW"},
-  {name:"Folarin Balogun",   team:"USA",        goals:2,hattricks:0,pos:"FW"},
-  {name:"Bukayo Saka",       team:"England",    goals:2,hattricks:0,pos:"FW"},
-  {name:"Memphis Depay",     team:"Netherlands",goals:2,hattricks:0,pos:"FW"},
-  {name:"Cody Gakpo",        team:"Netherlands",goals:2,hattricks:0,pos:"FW"},
-  {name:"Raphinha",          team:"Brazil",     goals:2,hattricks:0,pos:"FW"},
-  {name:"Lautaro Martínez",  team:"Argentina",  goals:2,hattricks:0,pos:"FW"},
-  {name:"Ferran Torres",     team:"Spain",      goals:2,hattricks:0,pos:"FW"},
-  {name:"Mikel Oyarzabal",   team:"Spain",      goals:2,hattricks:0,pos:"FW"},
-  {name:"Raúl Jiménez",      team:"Mexico",     goals:2,hattricks:0,pos:"FW"},
-  {name:"Julián Álvarez",    team:"Argentina",  goals:2,hattricks:0,pos:"FW"},
-  {name:"Deniz Undav",       team:"Germany",    goals:2,hattricks:0,pos:"FW"},
-  {name:"Ousmane Dembélé",   team:"France",     goals:2,hattricks:0,pos:"FW"},
-  {name:"Johan Manzambi",    team:"Switzerland",goals:2,hattricks:0,pos:"FW"},
-  {name:"Jude Bellingham",   team:"England",    goals:2,hattricks:0,pos:"MF"},
-  {name:"Alexander Isak",    team:"Sweden",     goals:2,hattricks:0,pos:"FW"},
-  {name:"Cyle Larin",        team:"Canada",     goals:1,hattricks:0,pos:"FW"},
-  {name:"Julián Quiñones",   team:"Mexico",     goals:1,hattricks:0,pos:"FW"},
-  {name:"Hwang In-Beom",     team:"Korea Republic",goals:1,hattricks:0,pos:"MF"},
-  {name:"Oh Hyeon-Gyu",      team:"Korea Republic",goals:1,hattricks:0,pos:"FW"},
-  {name:"Jovo Lukić",        team:"Bosnia and Herzegovina",goals:1,hattricks:0,pos:"FW"},
-  {name:"Ladislav Krejčí",   team:"Czechia",    goals:1,hattricks:0,pos:"MF"},
-  {name:"Mauricio",          team:"Paraguay",   goals:1,hattricks:0,pos:"FW"},
-  {name:"Ayman Hussein",     team:"Iraq",       goals:1,hattricks:0,pos:"FW"},
-  {name:"Elijah Just",       team:"New Zealand",goals:1,hattricks:0,pos:"FW"},
-  {name:"Nizar Al-Rashdan",  team:"Jordan",     goals:1,hattricks:0,pos:"MF"},
-  {name:"Granit Xhaka",      team:"Switzerland",goals:1,hattricks:0,pos:"MF"},
-  {name:"Chris Wood",        team:"New Zealand",goals:1,hattricks:0,pos:"FW"},
-  {name:"Michael Olise",     team:"France",     goals:1,hattricks:0,pos:"FW"},
-  {name:"João Cancelo",      team:"Portugal",   goals:1,hattricks:0,pos:"DF"},
-  {name:"Felix Nmecha",      team:"Germany",    goals:1,hattricks:0,pos:"MF"},
-  {name:"Leroy Sané",        team:"Germany",    goals:1,hattricks:0,pos:"FW"},
-  {name:"Serhou Guirassy",   team:"Germany",    goals:1,hattricks:0,pos:"FW"},
-  {name:"Kai Havertz",       team:"Germany",    goals:1,hattricks:0,pos:"FW"},
-];
-
-// ── TOP 3 PLAYERS PER TEAM ────────────────────────────────────────────────
-const TOP_PLAYERS = {
-  Argentina:   [{n:"Lionel Messi",p:"FW",goals:5,ht:1},{n:"Lautaro Martínez",p:"FW",goals:2,ht:0},{n:"Julián Álvarez",p:"FW",goals:2,ht:0}],
-  France:      [{n:"Kylian Mbappé",p:"FW",goals:4,ht:0},{n:"Ousmane Dembélé",p:"FW",goals:2,ht:0},{n:"Michael Olise",p:"FW",goals:1,ht:0}],
-  Norway:      [{n:"Erling Haaland",p:"FW",goals:4,ht:0},{n:"Martin Ødegaard",p:"MF",goals:0,ht:0},{n:"Alexander Sørloth",p:"FW",goals:0,ht:0}],
-  England:     [{n:"Harry Kane",p:"FW",goals:3,ht:1},{n:"Bukayo Saka",p:"FW",goals:2,ht:0},{n:"Jude Bellingham",p:"MF",goals:2,ht:0}],
-  Portugal:    [{n:"Cristiano Ronaldo",p:"FW",goals:3,ht:0},{n:"João Cancelo",p:"DF",goals:1,ht:0},{n:"Bruno Fernandes",p:"MF",goals:0,ht:0}],
-  Brazil:      [{n:"Vinicius Jr",p:"FW",goals:3,ht:0},{n:"Raphinha",p:"FW",goals:2,ht:0},{n:"Rodrygo",p:"FW",goals:0,ht:0}],
-  Canada:      [{n:"Jonathan David",p:"FW",goals:3,ht:1},{n:"Cyle Larin",p:"FW",goals:1,ht:0},{n:"Alphonso Davies",p:"DF",goals:0,ht:0}],
-  Spain:       [{n:"Lamine Yamal",p:"FW",goals:3,ht:0},{n:"Ferran Torres",p:"FW",goals:2,ht:0},{n:"Mikel Oyarzabal",p:"FW",goals:2,ht:0}],
-  USA:         [{n:"Folarin Balogun",p:"FW",goals:2,ht:0},{n:"Christian Pulisic",p:"FW",goals:0,ht:0},{n:"Tyler Adams",p:"MF",goals:0,ht:0}],
-  Netherlands: [{n:"Memphis Depay",p:"FW",goals:2,ht:0},{n:"Cody Gakpo",p:"FW",goals:2,ht:0},{n:"Virgil van Dijk",p:"DF",goals:0,ht:0}],
-  Germany:     [{n:"Deniz Undav",p:"FW",goals:2,ht:0},{n:"Leroy Sané",p:"FW",goals:1,ht:0},{n:"Kai Havertz",p:"FW",goals:1,ht:0}],
-  Mexico:      [{n:"Raúl Jiménez",p:"FW",goals:2,ht:0},{n:"Julián Quiñones",p:"FW",goals:1,ht:0},{n:"Hirving Lozano",p:"FW",goals:0,ht:0}],
-  Switzerland: [{n:"Johan Manzambi",p:"FW",goals:2,ht:0},{n:"Granit Xhaka",p:"MF",goals:1,ht:0},{n:"Xherdan Shaqiri",p:"FW",goals:0,ht:0}],
-  Sweden:      [{n:"Alexander Isak",p:"FW",goals:2,ht:0},{n:"Dejan Kulusevski",p:"FW",goals:0,ht:0},{n:"Emil Forsberg",p:"MF",goals:0,ht:0}],
-  Japan:       [{n:"Takumi Minamino",p:"FW",goals:0,ht:0},{n:"Ritsu Doan",p:"FW",goals:0,ht:0},{n:"Kaoru Mitoma",p:"FW",goals:0,ht:0}],
-  Morocco:     [{n:"Hakim Ziyech",p:"MF",goals:0,ht:0},{n:"Youssef En-Nesyri",p:"FW",goals:0,ht:0},{n:"Sofiane Boufal",p:"FW",goals:0,ht:0}],
-  Belgium:     [{n:"Romelu Lukaku",p:"FW",goals:0,ht:0},{n:"Kevin De Bruyne",p:"MF",goals:0,ht:0},{n:"Leandro Trossard",p:"FW",goals:0,ht:0}],
-  Colombia:    [{n:"Luis Díaz",p:"FW",goals:0,ht:0},{n:"James Rodríguez",p:"MF",goals:0,ht:0},{n:"Radamel Falcao",p:"FW",goals:0,ht:0}],
-  Egypt:       [{n:"Mohamed Salah",p:"FW",goals:0,ht:0},{n:"Mostafa Mohamed",p:"FW",goals:0,ht:0},{n:"Trezeguet",p:"FW",goals:0,ht:0}],
-  Iran:        [{n:"Sardar Azmoun",p:"FW",goals:0,ht:0},{n:"Mehdi Taremi",p:"FW",goals:0,ht:0},{n:"Alireza Jahanbakhsh",p:"FW",goals:0,ht:0}],
-  "Korea Republic":[{n:"Hwang In-Beom",p:"MF",goals:1,ht:0},{n:"Oh Hyeon-Gyu",p:"FW",goals:1,ht:0},{n:"Son Heung-min",p:"FW",goals:0,ht:0}],
-  Australia:   [{n:"Mitchell Duke",p:"FW",goals:0,ht:0},{n:"Ajdin Hrustic",p:"MF",goals:0,ht:0},{n:"Martin Boyle",p:"FW",goals:0,ht:0}],
-  Senegal:     [{n:"Sadio Mané",p:"FW",goals:0,ht:0},{n:"Ismaïla Sarr",p:"FW",goals:0,ht:0},{n:"Idrissa Gueye",p:"MF",goals:0,ht:0}],
-  Uruguay:     [{n:"Darwin Núñez",p:"FW",goals:0,ht:0},{n:"Federico Valverde",p:"MF",goals:0,ht:0},{n:"Luis Suárez",p:"FW",goals:0,ht:0}],
-  "Ivory Coast":[{n:"Sébastien Haller",p:"FW",goals:0,ht:0},{n:"Franck Kessie",p:"MF",goals:0,ht:0},{n:"Nicolas Pépé",p:"FW",goals:0,ht:0}],
-  Ecuador:     [{n:"Enner Valencia",p:"FW",goals:0,ht:0},{n:"Moisés Caicedo",p:"MF",goals:0,ht:0},{n:"Ángel Mena",p:"FW",goals:0,ht:0}],
-  Ghana:       [{n:"Jordan Ayew",p:"FW",goals:0,ht:0},{n:"Thomas Partey",p:"MF",goals:0,ht:0},{n:"André Ayew",p:"FW",goals:0,ht:0}],
-  Croatia:     [{n:"Luka Modrić",p:"MF",goals:0,ht:0},{n:"Ivan Perišić",p:"FW",goals:0,ht:0},{n:"Mateo Kovačić",p:"MF",goals:0,ht:0}],
-  Czechia:     [{n:"Ladislav Krejčí",p:"MF",goals:1,ht:0},{n:"Patrik Schick",p:"FW",goals:0,ht:0},{n:"Tomáš Souček",p:"MF",goals:0,ht:0}],
-  "South Africa":[{n:"Percy Tau",p:"FW",goals:0,ht:0},{n:"Bongani Zungu",p:"MF",goals:0,ht:0},{n:"Lebo Mothiba",p:"FW",goals:0,ht:0}],
-  Panama:      [{n:"Rolando Blackburn",p:"FW",goals:0,ht:0},{n:"Adalberto Carrasquilla",p:"MF",goals:0,ht:0},{n:"José Fajardo",p:"FW",goals:0,ht:0}],
-  "Saudi Arabia":[{n:"Salem Al-Dawsari",p:"FW",goals:0,ht:0},{n:"Firas Al-Buraikan",p:"FW",goals:0,ht:0},{n:"Sami Al-Najei",p:"MF",goals:0,ht:0}],
-  "Cape Verde":[{n:"Garry Rodrigues",p:"FW",goals:0,ht:0},{n:"Ryan Mendes",p:"FW",goals:0,ht:0},{n:"Stopira",p:"DF",goals:0,ht:0}],
-  Iraq:        [{n:"Ayman Hussein",p:"FW",goals:1,ht:0},{n:"Bashar Resan",p:"MF",goals:0,ht:0},{n:"Amjad Attwan",p:"FW",goals:0,ht:0}],
-  "New Zealand":[{n:"Chris Wood",p:"FW",goals:1,ht:0},{n:"Elijah Just",p:"FW",goals:1,ht:0},{n:"Clayton Lewis",p:"MF",goals:0,ht:0}],
-  Jordan:      [{n:"Nizar Al-Rashdan",p:"MF",goals:1,ht:0},{n:"Mousa Tamari",p:"FW",goals:0,ht:0},{n:"Yazan Al-Naimat",p:"FW",goals:0,ht:0}],
-  "Bosnia and Herzegovina":[{n:"Jovo Lukić",p:"FW",goals:1,ht:0},{n:"Edin Džeko",p:"FW",goals:0,ht:0},{n:"Miralem Pjanić",p:"MF",goals:0,ht:0}],
-  Paraguay:    [{n:"Mauricio",p:"FW",goals:1,ht:0},{n:"Miguel Almirón",p:"MF",goals:0,ht:0},{n:"Julio Enciso",p:"FW",goals:0,ht:0}],
-  Turkiye:     [{n:"Hakan Çalhanoğlu",p:"MF",goals:0,ht:0},{n:"Arda Güler",p:"MF",goals:0,ht:0},{n:"Kerem Aktürkoğlu",p:"FW",goals:0,ht:0}],
-  Tunisia:     [{n:"Youssef Msakni",p:"FW",goals:0,ht:0},{n:"Wahbi Khazri",p:"FW",goals:0,ht:0},{n:"Hannibal Mejbri",p:"MF",goals:0,ht:0}],
-  Algeria:     [{n:"Riyad Mahrez",p:"FW",goals:0,ht:0},{n:"Islam Slimani",p:"FW",goals:0,ht:0},{n:"Andy Delort",p:"FW",goals:0,ht:0}],
-  Scotland:    [{n:"Scott McTominay",p:"MF",goals:0,ht:0},{n:"Andy Robertson",p:"DF",goals:0,ht:0},{n:"Che Adams",p:"FW",goals:0,ht:0}],
-  Austria:     [{n:"Marcel Sabitzer",p:"MF",goals:0,ht:0},{n:"Christoph Baumgartner",p:"MF",goals:0,ht:0},{n:"Marko Arnautović",p:"FW",goals:0,ht:0}],
-  Qatar:       [{n:"Akram Afif",p:"FW",goals:0,ht:0},{n:"Almoez Ali",p:"FW",goals:0,ht:0},{n:"Hassan Al-Haydos",p:"FW",goals:0,ht:0}],
-  Haiti:       [{n:"Duckens Nazon",p:"FW",goals:0,ht:0},{n:"Frantzdy Pierrot",p:"FW",goals:0,ht:0},{n:"Derrick Etienne",p:"MF",goals:0,ht:0}],
-  Uzbekistan:  [{n:"Eldor Shomurodov",p:"FW",goals:0,ht:0},{n:"Jaloliddin Masharipov",p:"MF",goals:0,ht:0},{n:"Dostonbek Khamdamov",p:"MF",goals:0,ht:0}],
-  Curacao:     [{n:"Leandro Bacuna",p:"MF",goals:0,ht:0},{n:"Juriën Timber",p:"DF",goals:0,ht:0},{n:"Cuco Martina",p:"DF",goals:0,ht:0}],
-  "DR Congo":  [{n:"Cédric Bakambu",p:"FW",goals:0,ht:0},{n:"Chancel Mbemba",p:"DF",goals:0,ht:0},{n:"Arthur Masuaku",p:"DF",goals:0,ht:0}],
-  "Congo DR":  [{n:"Cédric Bakambu",p:"FW",goals:0,ht:0},{n:"Chancel Mbemba",p:"DF",goals:0,ht:0},{n:"Arthur Masuaku",p:"DF",goals:0,ht:0}],
-};
-
-const FLAG = {
-  Mexico:"🇲🇽","South Africa":"🇿🇦","Korea Republic":"🇰🇷",Czechia:"🇨🇿",
-  Canada:"🇨🇦","Bosnia and Herzegovina":"🇧🇦",Qatar:"🇶🇦",Switzerland:"🇨🇭",
-  Brazil:"🇧🇷",Morocco:"🇲🇦",Haiti:"🇭🇹",Scotland:"🏴󠁧󠁢󠁳󠁣󠁴󠁿",
-  USA:"🇺🇸",Paraguay:"🇵🇾",Australia:"🇦🇺",Turkiye:"🇹🇷",
-  Germany:"🇩🇪","Ivory Coast":"🇨🇮",Ecuador:"🇪🇨",Curacao:"🇨🇼",
-  Netherlands:"🇳🇱",Japan:"🇯🇵",Sweden:"🇸🇪",Tunisia:"🇹🇳",
-  Belgium:"🇧🇪",Egypt:"🇪🇬",Iran:"🇮🇷","New Zealand":"🇳🇿",
-  Spain:"🇪🇸",Uruguay:"🇺🇾","Cape Verde":"🇨🇻","Saudi Arabia":"🇸🇦",
-  France:"🇫🇷",Senegal:"🇸🇳",Iraq:"🇮🇶",Norway:"🇳🇴",
-  Argentina:"🇦🇷",Austria:"🇦🇹",Algeria:"🇩🇿","Congo DR":"🇨🇩",Jordan:"🇯🇴",
-  Colombia:"🇨🇴",Portugal:"🇵🇹",Uzbekistan:"🇺🇿","DR Congo":"🇨🇩",
-  England:"🏴󠁧󠁢󠁥󠁮󠁧󠁿",Ghana:"🇬🇭",Croatia:"🇭🇷",Panama:"🇵🇦",
-};
-const fl = (n) => FLAG[n] || null;
-
-const SEED = {
-  A:{"Mexico":{"pts":9,"p":3,"w":3,"d":0,"l":0,"f":6,"a":0},"South Africa":{"pts":4,"p":3,"w":1,"d":1,"l":1,"f":2,"a":3},"Korea Republic":{"pts":3,"p":3,"w":1,"d":0,"l":2,"f":2,"a":3},"Czechia":{"pts":1,"p":3,"w":0,"d":1,"l":2,"f":2,"a":6}},
-  B:{"Switzerland":{"pts":7,"p":3,"w":2,"d":1,"l":0,"f":10,"a":4},"Bosnia and Herzegovina":{"pts":5,"p":3,"w":1,"d":2,"l":0,"f":6,"a":4},"Canada":{"pts":4,"p":3,"w":1,"d":1,"l":1,"f":8,"a":3},"Qatar":{"pts":0,"p":3,"w":0,"d":0,"l":3,"f":2,"a":15}},
-  C:{"Brazil":{"pts":7,"p":3,"w":2,"d":1,"l":0,"f":9,"a":1},"Morocco":{"pts":7,"p":3,"w":2,"d":1,"l":0,"f":6,"a":3},"Scotland":{"pts":3,"p":3,"w":1,"d":0,"l":2,"f":1,"a":4},"Haiti":{"pts":0,"p":3,"w":0,"d":0,"l":3,"f":2,"a":10}},
-  D:{"USA":{"pts":6,"p":2,"w":2,"d":0,"l":0,"f":6,"a":1},"Australia":{"pts":3,"p":2,"w":1,"d":0,"l":1,"f":2,"a":2},"Paraguay":{"pts":3,"p":2,"w":1,"d":0,"l":1,"f":2,"a":4},"Turkiye":{"pts":0,"p":2,"w":0,"d":0,"l":2,"f":0,"a":3}},
-  E:{"Germany":{"pts":6,"p":2,"w":2,"d":0,"l":0,"f":9,"a":2},"Ivory Coast":{"pts":3,"p":2,"w":1,"d":0,"l":1,"f":2,"a":2},"Ecuador":{"pts":1,"p":2,"w":0,"d":1,"l":1,"f":0,"a":1},"Curacao":{"pts":1,"p":2,"w":0,"d":1,"l":1,"f":1,"a":7}},
-  F:{"Netherlands":{"pts":4,"p":2,"w":1,"d":1,"l":0,"f":7,"a":3},"Japan":{"pts":4,"p":2,"w":1,"d":1,"l":0,"f":6,"a":2},"Sweden":{"pts":3,"p":2,"w":1,"d":0,"l":1,"f":6,"a":6},"Tunisia":{"pts":0,"p":2,"w":0,"d":0,"l":2,"f":1,"a":9}},
-  G:{"Egypt":{"pts":4,"p":2,"w":1,"d":1,"l":0,"f":4,"a":2},"Iran":{"pts":2,"p":2,"w":0,"d":2,"l":0,"f":2,"a":2},"Belgium":{"pts":2,"p":2,"w":0,"d":2,"l":0,"f":1,"a":1},"New Zealand":{"pts":1,"p":2,"w":0,"d":1,"l":1,"f":3,"a":5}},
-  H:{"Spain":{"pts":4,"p":2,"w":1,"d":1,"l":0,"f":4,"a":0},"Uruguay":{"pts":2,"p":2,"w":0,"d":2,"l":0,"f":3,"a":3},"Cape Verde":{"pts":2,"p":2,"w":0,"d":2,"l":0,"f":2,"a":2},"Saudi Arabia":{"pts":1,"p":2,"w":0,"d":1,"l":1,"f":1,"a":5}},
-  I:{"France":{"pts":6,"p":2,"w":2,"d":0,"l":0,"f":6,"a":1},"Norway":{"pts":6,"p":2,"w":2,"d":0,"l":0,"f":7,"a":3},"Senegal":{"pts":0,"p":2,"w":0,"d":0,"l":2,"f":3,"a":6},"Iraq":{"pts":0,"p":2,"w":0,"d":0,"l":2,"f":1,"a":7}},
-  J:{"Argentina":{"pts":6,"p":2,"w":2,"d":0,"l":0,"f":5,"a":1},"Austria":{"pts":3,"p":2,"w":1,"d":0,"l":1,"f":3,"a":3},"Algeria":{"pts":3,"p":2,"w":1,"d":0,"l":1,"f":2,"a":4},"Jordan":{"pts":0,"p":2,"w":0,"d":0,"l":2,"f":2,"a":4}},
-  K:{"Colombia":{"pts":6,"p":2,"w":2,"d":0,"l":0,"f":4,"a":0},"Portugal":{"pts":4,"p":2,"w":1,"d":1,"l":0,"f":6,"a":1},"Congo DR":{"pts":1,"p":2,"w":0,"d":1,"l":1,"f":1,"a":2},"Uzbekistan":{"pts":0,"p":2,"w":0,"d":0,"l":2,"f":0,"a":8}},
-  L:{"England":{"pts":4,"p":2,"w":1,"d":1,"l":0,"f":4,"a":2},"Ghana":{"pts":4,"p":2,"w":1,"d":1,"l":0,"f":1,"a":0},"Croatia":{"pts":3,"p":2,"w":1,"d":0,"l":1,"f":3,"a":4},"Panama":{"pts":0,"p":2,"w":0,"d":0,"l":2,"f":0,"a":2}},
-};
-
-
 
 const R32_FIXTURE = [
   {match:73,home:"2A",away:"2B",kickoff:"Jun 28 · 3:00 PM ET · SoFi Stadium, LA"},
@@ -357,7 +204,6 @@ function parseCSV(csv) {
       kickoff: row.kickoff || "",
       prob_home: row.prob_home ? parseFloat(row.prob_home) : null,
       prob_away: row.prob_away ? parseFloat(row.prob_away) : null,
-      prob_draw: row.prob_draw ? parseFloat(row.prob_draw) : null,
     };
   }).filter(r => r.home && r.away);
 }
@@ -416,7 +262,6 @@ const C = {
   orange:"#ff9800", red:"#ef5350", gold:"#ffd600",
 };
 
-// ── COUNTRY PROFILE MODAL ─────────────────────────────────────────────────
 function findTeamGroup(team, seed) {
   return Object.entries(seed).find(([, teams]) => team in teams)?.[0] || null;
 }
@@ -427,61 +272,63 @@ function CountryModal({ team, onClose, standings, results }) {
   const grpTeams = grpKey ? sortGroup(standings[grpKey] || {}) : [];
   const myStats = grpKey ? standings[grpKey]?.[team] : null;
   const myMatches = results.filter(r => r.home === team || r.away === team);
-  const myResults = myMatches.filter(r => r.status === "final" || (r.hg !== null && r.ag !== null));
-  const myUpcoming = myMatches.filter(r => r.hg === null && r.ag === null && r.status !== "final");
+  const myResults = myMatches.filter(r => r.hg !== null && r.ag !== null);
+  const myUpcoming = myMatches.filter(r => r.hg === null && r.ag === null);
 
   const getRes = (r) => {
     const isHome = r.home === team;
     const myG = isHome ? r.hg : r.ag, theirG = isHome ? r.ag : r.hg;
     if (myG > theirG) return "W"; if (myG < theirG) return "L"; return "D";
   };
-  const resColor = (r) => r === "W" ? "#00e676" : r === "L" ? "#ef5350" : "#ffd600";
+  const resColor = (r) => r==="W"?"#00e676":r==="L"?"#ef5350":"#ffd600";
 
   return (
-    <div onClick={onClose} style={{
-      position:"fixed",inset:0,background:"rgba(0,0,0,0.8)",zIndex:1000,
-      display:"flex",alignItems:"center",justifyContent:"center",padding:16,overflowY:"auto"
-    }}>
-      <div onClick={e => e.stopPropagation()} style={{
-        background:"#0a1020",border:`1px solid ${C.border}`,borderRadius:16,
-        width:"100%",maxWidth:480,maxHeight:"90vh",overflowY:"auto",padding:20
-      }}>
-        {/* Header */}
+    <div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.8)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:16,overflowY:"auto"}}>
+      <div onClick={e=>e.stopPropagation()} style={{background:"#0a1020",border:`1px solid ${C.border}`,borderRadius:16,width:"100%",maxWidth:480,maxHeight:"90vh",overflowY:"auto",padding:20}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:18}}>
           <div style={{display:"flex",alignItems:"center",gap:12}}>
-            <span style={{fontSize:44}}>{fl(team) || "🏳"}</span>
+            <span style={{fontSize:44}}>{fl(team)||"🏳"}</span>
             <div>
               <div style={{fontSize:20,fontWeight:800,color:C.text}}>{team}</div>
-              <div style={{fontSize:12,color:C.dim}}>
-                FIFA {rank(team) || "–"} · {grpKey ? `Group ${grpKey}` : "–"}
-              </div>
+              <div style={{fontSize:12,color:C.dim}}>FIFA {rank(team)||"–"} · {grpKey?`Group ${grpKey}`:"–"}</div>
             </div>
           </div>
-          <button onClick={onClose} style={{
-            background:"rgba(255,255,255,0.08)",border:`1px solid ${C.border}`,
-            color:C.sub,borderRadius:8,width:32,height:32,cursor:"pointer",fontSize:18,lineHeight:1
-          }}>✕</button>
+          <button onClick={onClose} style={{background:"rgba(255,255,255,0.08)",border:`1px solid ${C.border}`,color:C.sub,borderRadius:8,width:32,height:32,cursor:"pointer",fontSize:18,lineHeight:1}}>✕</button>
         </div>
-
-        {/* Stats bar */}
-        {myStats && (
+        {myStats&&(
           <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:8,marginBottom:18}}>
             {[["Pts",myStats.pts,C.gold],["W",myStats.w,C.green],["D",myStats.d,C.gold],["L",myStats.l,C.red],["GD",(myStats.f||0)-(myStats.a||0),null]].map(([k,v,col])=>(
               <div key={k} style={{background:C.card,borderRadius:10,padding:"10px 4px",textAlign:"center",border:`1px solid ${C.border}`}}>
-                <div style={{fontSize:20,fontWeight:800,color:col||(v>0?"#00e676":v<0?C.red:C.text)}}>
-                  {k==="GD"&&v>0?"+":""}{v}
-                </div>
+                <div style={{fontSize:20,fontWeight:800,color:col||(v>0?"#00e676":v<0?C.red:C.text)}}>{k==="GD"&&v>0?"+":""}{v}</div>
                 <div style={{fontSize:10,color:C.dim,marginTop:2}}>{k}</div>
               </div>
             ))}
           </div>
         )}
-
-        {/* Upcoming */}
-        {myUpcoming.length > 0 && (
+        {TOP_PLAYERS[team]&&(
+          <div style={{marginBottom:18}}>
+            <div style={{fontSize:10,fontWeight:700,color:C.muted,letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Key Players</div>
+            <div style={{background:C.card,borderRadius:10,overflow:"hidden",border:`1px solid ${C.border}`}}>
+              {TOP_PLAYERS[team].map((p,i)=>(
+                <div key={p.n} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"9px 12px",borderBottom:i<TOP_PLAYERS[team].length-1?`1px solid #0a1020`:"none"}}>
+                  <div style={{display:"flex",alignItems:"center",gap:8}}>
+                    <span style={{fontSize:11,color:C.dim,width:14}}>{i+1}</span>
+                    <div><div style={{fontSize:13,fontWeight:600,color:C.text}}>{p.n}</div><div style={{fontSize:10,color:C.dim}}>{p.p}</div></div>
+                  </div>
+                  <div style={{display:"flex",alignItems:"center",gap:8}}>
+                    {p.goals>0&&<span style={{fontSize:12,fontWeight:700,color:C.gold}}>⚽ {p.goals}</span>}
+                    {p.ht>0&&<span style={{fontSize:10,fontWeight:700,color:C.gold,background:C.gold+"22",borderRadius:4,padding:"2px 5px"}}>HAT</span>}
+                    {p.goals===0&&<span style={{fontSize:11,color:C.muted}}>–</span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        {myUpcoming.length>0&&(
           <div style={{marginBottom:18}}>
             <div style={{fontSize:10,fontWeight:700,color:C.muted,letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Upcoming</div>
-            {myUpcoming.map((m,i) => (
+            {myUpcoming.map((m,i)=>(
               <div key={i} style={{background:C.card,borderRadius:10,padding:"10px 12px",marginBottom:6,border:`1px solid ${C.border}`}}>
                 <div style={{fontSize:11,color:C.gold,marginBottom:4}}>🕐 {m.kickoff}</div>
                 <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
@@ -489,21 +336,16 @@ function CountryModal({ team, onClose, standings, results }) {
                   <span style={{fontSize:11,color:C.dim}}>vs</span>
                   <span style={{fontSize:12,color:C.text,fontWeight:600}}>{m.away} {fl(m.away)}</span>
                 </div>
-                {m.prob_home && <div style={{fontSize:10,color:C.dim,textAlign:"center",marginTop:4}}>{m.prob_home}% · {m.prob_away}%</div>}
               </div>
             ))}
           </div>
         )}
-
-        {/* Results */}
-        {myResults.length > 0 && (
+        {myResults.length>0&&(
           <div style={{marginBottom:18}}>
-            <div style={{fontSize:10,fontWeight:700,color:C.muted,letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Match Results</div>
-            {myResults.map((m,i) => {
-              const res = getRes(m);
-              const isHome = m.home === team;
-              const opp = isHome ? m.away : m.home;
-              return (
+            <div style={{fontSize:10,fontWeight:700,color:C.muted,letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Results</div>
+            {myResults.map((m,i)=>{
+              const res=getRes(m), isHome=m.home===team, opp=isHome?m.away:m.home;
+              return(
                 <div key={i} style={{background:C.card,borderRadius:10,padding:"10px 12px",marginBottom:6,border:`1px solid ${C.border}`,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
                   <div style={{display:"flex",alignItems:"center",gap:8}}>
                     <span style={{fontWeight:700,fontSize:12,color:resColor(res),background:resColor(res)+"22",borderRadius:6,padding:"2px 7px"}}>{res}</span>
@@ -515,19 +357,12 @@ function CountryModal({ team, onClose, standings, results }) {
             })}
           </div>
         )}
-
-        {/* Group standing */}
-        {grpKey && grpTeams.length > 0 && (
+        {grpKey&&grpTeams.length>0&&(
           <div style={{marginBottom:18}}>
             <div style={{fontSize:10,fontWeight:700,color:C.muted,letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Group {grpKey} Standing</div>
             <div style={{background:C.card,borderRadius:10,overflow:"hidden",border:`1px solid ${C.border}`}}>
-              {grpTeams.map((t,i) => (
-                <div key={t.name} style={{
-                  display:"flex",alignItems:"center",justifyContent:"space-between",
-                  padding:"9px 12px",
-                  borderBottom:i<grpTeams.length-1?`1px solid #0a1020`:"none",
-                  background:t.name===team?"rgba(253,214,0,0.06)":"transparent"
-                }}>
+              {grpTeams.map((t,i)=>(
+                <div key={t.name} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"9px 12px",borderBottom:i<grpTeams.length-1?`1px solid #0a1020`:"none",background:t.name===team?"rgba(253,214,0,0.06)":"transparent"}}>
                   <div style={{display:"flex",alignItems:"center",gap:8}}>
                     <span style={{fontSize:11,color:C.dim,width:14}}>{i+1}</span>
                     <span style={{fontSize:18}}>{fl(t.name)||"🏳"}</span>
@@ -542,90 +377,36 @@ function CountryModal({ team, onClose, standings, results }) {
             </div>
           </div>
         )}
-
-
-        {/* Top Players */}
-        {TOP_PLAYERS[team] && (
-          <div style={{marginBottom:18}}>
-            <div style={{fontSize:10,fontWeight:700,color:C.muted,letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>⭐ Key Players</div>
-            <div style={{background:C.card,borderRadius:10,overflow:"hidden",border:`1px solid ${C.border}`}}>
-              {TOP_PLAYERS[team].map((p,i)=>(
-                <div key={p.n} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"9px 12px",borderBottom:i<TOP_PLAYERS[team].length-1?`1px solid #0a1020`:"none"}}>
-                  <div style={{display:"flex",alignItems:"center",gap:8}}>
-                    <span style={{fontSize:11,color:C.dim,width:14}}>{i+1}</span>
-                    <div>
-                      <div style={{fontSize:13,fontWeight:600,color:C.text}}>{p.n}</div>
-                      <div style={{fontSize:10,color:C.dim}}>{p.p}</div>
-                    </div>
-                  </div>
-                  <div style={{display:"flex",alignItems:"center",gap:8}}>
-                    {p.goals>0&&<span style={{fontSize:12,fontWeight:700,color:C.gold}}>⚽ {p.goals}</span>}
-                    {p.ht>0&&<span style={{fontSize:10,fontWeight:700,color:C.gold,background:C.gold+"22",borderRadius:4,padding:"2px 5px"}}>🎩 HAT</span>}
-                    {p.goals===0&&<span style={{fontSize:11,color:C.muted}}>–</span>}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* FIFA ranking note */}
-        <div style={{fontSize:11,color:C.muted,textAlign:"center"}}>
-          FIFA ranking as of Jun 11, 2026 · Next update Jul 20
-        </div>
+        <div style={{fontSize:11,color:C.muted,textAlign:"center"}}>FIFA ranking as of Jun 11, 2026</div>
       </div>
     </div>
   );
 }
 
-// ── UI COMPONENTS ─────────────────────────────────────────────────────────
 function Tab({label, active, onClick}) {
   return <button onClick={onClick} style={{padding:"7px 13px",borderRadius:8,border:"none",cursor:"pointer",fontSize:12,fontWeight:700,whiteSpace:"nowrap",background:active?C.blue:"#111827",color:active?"#fff":C.dim}}>{label}</button>;
 }
-function SectionHeader({title, color=C.muted}) {
-  return <div style={{fontSize:10,fontWeight:700,letterSpacing:2.5,color,textTransform:"uppercase",marginBottom:10,marginTop:4}}>{title}</div>;
-}
 function RankBadge({name, style={}}) {
-  const r = rank(name); if (!r) return null;
+  const r=rank(name); if(!r) return null;
   return <span style={{fontSize:9,fontWeight:700,color:"#607d8b",background:"#0a1428",border:"1px solid #1e2a4a",borderRadius:3,padding:"1px 4px",lineHeight:1,whiteSpace:"nowrap",...style}}>{r}</span>;
 }
-
-// Clickable flag wrapper
-function ClickableFlag({ name, onSelect }) {
-  const emoji = fl(name);
-  if (!emoji) return null;
-  return (
-    <span
-      onClick={e => { e.stopPropagation(); onSelect && onSelect(name); }}
-      style={{fontSize:20,cursor:"pointer",userSelect:"none"}}
-      title={`View ${name} profile`}
-    >{emoji}</span>
-  );
+function ClickableFlag({name, onSelect}) {
+  const emoji=fl(name); if(!emoji) return null;
+  return <span onClick={e=>{e.stopPropagation();onSelect&&onSelect(name);}} style={{fontSize:20,cursor:"pointer",userSelect:"none"}} title={`View ${name}`}>{emoji}</span>;
 }
-
 function TeamName({name, align="right", bold=false, onSelect}) {
-  const isRight = align==="right";
-  return (
+  const isRight=align==="right";
+  return(
     <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:isRight?"flex-end":"flex-start",gap:5}}>
-      {isRight && <>
-        <RankBadge name={name}/>
-        <span style={{fontSize:13,fontWeight:bold?700:500,color:bold?C.text:C.sub,textAlign:"right"}}>{name}</span>
-        <ClickableFlag name={name} onSelect={onSelect}/>
-      </>}
-      {!isRight && <>
-        <ClickableFlag name={name} onSelect={onSelect}/>
-        <span style={{fontSize:13,fontWeight:bold?700:500,color:bold?C.text:C.sub}}>{name}</span>
-        <RankBadge name={name}/>
-      </>}
+      {isRight&&<><RankBadge name={name}/><span style={{fontSize:13,fontWeight:bold?700:500,color:bold?C.text:C.sub,textAlign:"right"}}>{name}</span><ClickableFlag name={name} onSelect={onSelect}/></>}
+      {!isRight&&<><ClickableFlag name={name} onSelect={onSelect}/><span style={{fontSize:13,fontWeight:bold?700:500,color:bold?C.text:C.sub}}>{name}</span><RankBadge name={name}/></>}
     </div>
   );
 }
-
-function MatchRow({home, away, hg, ag, status, kickoff, prob_home, prob_away, compact, onSelect}) {
-  const played = hg!==null && ag!==null;
-  const live = status==="in_progress", fin = status==="final";
+function MatchRow({home,away,hg,ag,status,kickoff,prob_home,prob_away,compact,onSelect}) {
+  const played=hg!==null&&ag!==null, live=status==="in_progress", fin=status==="final";
   const hWin=played&&hg>ag, aWin=played&&ag>hg;
-  return (
+  return(
     <div style={{background:C.card,borderRadius:10,padding:compact?"10px 14px":"14px 18px",marginBottom:7,border:`1px solid ${live?"#ff980055":C.border}`,boxShadow:live?"0 0 12px #ff980018":"none"}}>
       {kickoff&&!played&&<div style={{fontSize:10,color:C.gold,fontWeight:700,marginBottom:6}}>🕐 {kickoff}</div>}
       <div style={{display:"flex",alignItems:"center",gap:6}}>
@@ -633,28 +414,19 @@ function MatchRow({home, away, hg, ag, status, kickoff, prob_home, prob_away, co
         <div style={{textAlign:"center",minWidth:72}}>
           {live&&<div style={{fontSize:8,color:C.orange,fontWeight:700,letterSpacing:1,marginBottom:1}}>● LIVE</div>}
           {fin&&<div style={{fontSize:8,color:C.green,fontWeight:700,letterSpacing:1,marginBottom:1}}>FT</div>}
-          {played
-            ? <div style={{fontSize:compact?17:20,fontWeight:900,color:"#fff",letterSpacing:2}}>{hg}<span style={{color:C.border}}> – </span>{ag}</div>
-            : <div><div style={{fontSize:11,color:C.muted,fontWeight:700}}>vs</div>
-                {prob_home&&<div style={{fontSize:9,color:C.dim,marginTop:2}}>{prob_home}% · {prob_away}%</div>}
-              </div>
-          }
+          {played?<div style={{fontSize:compact?17:20,fontWeight:900,color:"#fff",letterSpacing:2}}>{hg}<span style={{color:C.border}}> – </span>{ag}</div>
+          :<div><div style={{fontSize:11,color:C.muted,fontWeight:700}}>vs</div>{prob_home&&<div style={{fontSize:9,color:C.dim,marginTop:2}}>{prob_home}% · {prob_away}%</div>}</div>}
         </div>
         <TeamName name={away} align="left" bold={aWin} onSelect={onSelect}/>
       </div>
     </div>
   );
 }
-
-// Collapsible section
-function CollapsibleSection({ title, count, defaultOpen=true, accent=C.blue, children }) {
-  const [open, setOpen] = useState(defaultOpen);
-  return (
+function CollapsibleSection({title,count,defaultOpen=true,accent=C.blue,children}) {
+  const [open,setOpen]=useState(defaultOpen);
+  return(
     <div style={{marginBottom:16}}>
-      <button onClick={()=>setOpen(o=>!o)} style={{
-        width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",
-        background:"transparent",border:"none",cursor:"pointer",padding:"8px 0",marginBottom:open?8:0
-      }}>
+      <button onClick={()=>setOpen(o=>!o)} style={{width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",background:"transparent",border:"none",cursor:"pointer",padding:"8px 0",marginBottom:open?8:0}}>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
           <div style={{width:3,height:18,borderRadius:2,background:accent}}/>
           <span style={{fontSize:12,fontWeight:800,color:C.text,letterSpacing:1}}>{title}</span>
@@ -662,20 +434,19 @@ function CollapsibleSection({ title, count, defaultOpen=true, accent=C.blue, chi
         </div>
         <span style={{fontSize:16,color:C.dim,transform:open?"rotate(0deg)":"rotate(-90deg)",transition:"transform 0.2s"}}>▾</span>
       </button>
-      {open && <div>{children}</div>}
+      {open&&<div>{children}</div>}
     </div>
   );
 }
-
-function StandingsTable({teams, onSelect}) {
-  return (
+function StandingsTable({teams,onSelect}) {
+  return(
     <div style={{background:C.card,borderRadius:12,overflow:"hidden",border:`1px solid ${C.border}`}}>
       <div style={{display:"grid",gridTemplateColumns:"22px 1fr 34px 26px 26px 26px 26px 26px 26px 34px",padding:"8px 12px",background:"#0a1020",borderBottom:`1px solid ${C.border}`}}>
         {["#","Team","Pts","P","W","D","L","F","A","GD"].map((h,i)=><div key={h} style={{fontSize:9,fontWeight:700,color:C.muted,textAlign:i>1?"center":"left",textTransform:"uppercase",letterSpacing:1}}>{h}</div>)}
       </div>
       {teams.map((t,idx)=>{
-        const isQ=idx<2, is3=idx===2;
-        return (
+        const isQ=idx<2,is3=idx===2;
+        return(
           <div key={t.name} style={{display:"grid",gridTemplateColumns:"22px 1fr 34px 26px 26px 26px 26px 26px 26px 34px",padding:"11px 12px",alignItems:"center",borderBottom:idx<teams.length-1?"1px solid #0d1428":"none",borderLeft:`3px solid ${isQ?C.blue:is3?"#546e7a55":"transparent"}`,background:idx%2===0?C.card:"#0a1228"}}>
             <div style={{fontSize:11,color:C.muted,fontWeight:700}}>{idx+1}</div>
             <div style={{display:"flex",alignItems:"center",gap:5,flexWrap:"wrap"}}>
@@ -694,16 +465,15 @@ function StandingsTable({teams, onSelect}) {
     </div>
   );
 }
-
-function BestThirdsTable({thirds, onSelect}) {
-  return (
+function BestThirdsTable({thirds,onSelect}) {
+  return(
     <div style={{background:C.card,borderRadius:12,overflow:"hidden",border:`1px solid ${C.border}`}}>
       <div style={{display:"grid",gridTemplateColumns:"22px 1fr 26px 32px 24px 24px 24px 24px 24px 24px 30px",padding:"8px 12px",background:"#0a1020",borderBottom:`1px solid ${C.border}`}}>
         {["#","Team","Grp","Pts","P","W","D","L","F","A","GD"].map((h,i)=><div key={h} style={{fontSize:9,fontWeight:700,color:C.muted,textAlign:i>1?"center":"left",textTransform:"uppercase",letterSpacing:1}}>{h}</div>)}
       </div>
       {thirds.map((t,idx)=>{
         const adv=idx<8;
-        return (
+        return(
           <div key={t.name} style={{display:"grid",gridTemplateColumns:"22px 1fr 26px 32px 24px 24px 24px 24px 24px 24px 30px",padding:"10px 12px",alignItems:"center",borderBottom:idx<thirds.length-1?"1px solid #0d1428":"none",borderLeft:`3px solid ${adv?C.gold+"99":"transparent"}`,background:idx%2===0?C.card:"#0a1228"}}>
             <div style={{fontSize:11,color:C.muted,fontWeight:700}}>{idx+1}</div>
             <div style={{display:"flex",alignItems:"center",gap:5,flexWrap:"wrap"}}>
@@ -722,34 +492,18 @@ function BestThirdsTable({thirds, onSelect}) {
     </div>
   );
 }
-
-function TeamSlot({res, align, onSelect}) {
-  const {label, team, confirmed} = res, emoji = team ? fl(team) : null, isRight = align==="right";
-  return (
+function TeamSlot({res,align,onSelect}) {
+  const {label,team,confirmed}=res, emoji=team?fl(team):null, isRight=align==="right";
+  return(
     <div style={{flex:1,display:"flex",alignItems:"center",gap:6,justifyContent:isRight?"flex-end":"flex-start"}}>
-      {isRight&&<>
-        {confirmed&&<RankBadge name={team}/>}
-        <span style={{fontSize:13,fontWeight:confirmed?700:400,color:confirmed?C.text:C.muted,textAlign:"right",lineHeight:1.2}}>{label}</span>
-        {emoji
-          ? <span onClick={()=>onSelect&&onSelect(team)} style={{fontSize:22,cursor:"pointer"}}>{emoji}</span>
-          : <div style={{width:24,height:24,borderRadius:"50%",background:"#1e2a4a",border:`1px solid ${C.border}`,flexShrink:0}}/>
-        }
-      </>}
-      {!isRight&&<>
-        {emoji
-          ? <span onClick={()=>onSelect&&onSelect(team)} style={{fontSize:22,cursor:"pointer"}}>{emoji}</span>
-          : <div style={{width:24,height:24,borderRadius:"50%",background:"#1e2a4a",border:`1px solid ${C.border}`,flexShrink:0}}/>
-        }
-        <span style={{fontSize:13,fontWeight:confirmed?700:400,color:confirmed?C.text:C.muted,lineHeight:1.2}}>{label}</span>
-        {confirmed&&<RankBadge name={team}/>}
-      </>}
+      {isRight&&<>{confirmed&&<RankBadge name={team}/>}<span style={{fontSize:13,fontWeight:confirmed?700:400,color:confirmed?C.text:C.muted,textAlign:"right",lineHeight:1.2}}>{label}</span>{emoji?<span onClick={()=>onSelect&&onSelect(team)} style={{fontSize:22,cursor:"pointer"}}>{emoji}</span>:<div style={{width:24,height:24,borderRadius:"50%",background:"#1e2a4a",border:`1px solid ${C.border}`,flexShrink:0}}/>}</>}
+      {!isRight&&<>{emoji?<span onClick={()=>onSelect&&onSelect(team)} style={{fontSize:22,cursor:"pointer"}}>{emoji}</span>:<div style={{width:24,height:24,borderRadius:"50%",background:"#1e2a4a",border:`1px solid ${C.border}`,flexShrink:0}}/> }<span style={{fontSize:13,fontWeight:confirmed?700:400,color:confirmed?C.text:C.muted,lineHeight:1.2}}>{label}</span>{confirmed&&<RankBadge name={team}/>}</>}
     </div>
   );
 }
-
-function KnockoutMatchRow({r, slotMap, divider, accent, onSelect}) {
-  const homeRes = resolveSlot(r.home, slotMap), awayRes = resolveSlot(r.away, slotMap);
-  return (
+function KnockoutMatchRow({r,slotMap,divider,accent,onSelect}) {
+  const homeRes=resolveSlot(r.home,slotMap), awayRes=resolveSlot(r.away,slotMap);
+  return(
     <div style={{borderBottom:divider?`1px solid ${C.border}`:"none"}}>
       <div style={{display:"flex",alignItems:"center",gap:8,padding:"8px 14px 0",flexWrap:"wrap"}}>
         <span style={{fontSize:9,fontWeight:700,color:accent,background:accent+"18",borderRadius:4,padding:"2px 7px"}}>#{r.match}</span>
@@ -763,11 +517,10 @@ function KnockoutMatchRow({r, slotMap, divider, accent, onSelect}) {
     </div>
   );
 }
-
-function KnockoutGrid({rounds, slotMap, accent=C.blue, title, info, onSelect}) {
-  const pairs = [];
-  for (let i = 0; i < rounds.length; i += 2) pairs.push(rounds.slice(i,i+2));
-  return (
+function KnockoutGrid({rounds,slotMap,accent=C.blue,title,info,onSelect}) {
+  const pairs=[];
+  for(let i=0;i<rounds.length;i+=2) pairs.push(rounds.slice(i,i+2));
+  return(
     <div style={{marginBottom:20}}>
       {title&&<div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}><div style={{width:3,height:18,background:accent,borderRadius:2}}/><span style={{fontSize:12,fontWeight:800,color:C.text,letterSpacing:1}}>{title}</span></div>}
       {info&&<div style={{background:"#1a237e18",border:`1px solid ${C.border}`,borderRadius:10,padding:"9px 13px",marginBottom:12,fontSize:12,color:C.sub}}>{info}</div>}
@@ -781,86 +534,70 @@ function KnockoutGrid({rounds, slotMap, accent=C.blue, title, info, onSelect}) {
     </div>
   );
 }
-
-function StatusBar({loading, error, lastUpdated, onRefresh}) {
-  return (
+function StatusBar({loading,error,lastUpdated,onRefresh}) {
+  return(
     <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
       <div style={{fontSize:10,color:C.muted}}>{loading?"Fetching…":error?"⚠ Sheet error":lastUpdated?`Synced ${lastUpdated}`:""}</div>
-      <button onClick={onRefresh} disabled={loading} style={{display:"flex",alignItems:"center",gap:5,padding:"5px 11px",borderRadius:20,border:`1px solid ${C.border}`,background:"transparent",color:loading?C.muted:C.dim,cursor:loading?"not-allowed":"pointer",fontSize:11,fontWeight:700}}>
-        {loading?"…":"↻ Refresh"}
-      </button>
+      <button onClick={onRefresh} disabled={loading} style={{display:"flex",alignItems:"center",gap:5,padding:"5px 11px",borderRadius:20,border:`1px solid ${C.border}`,background:"transparent",color:loading?C.muted:C.dim,cursor:loading?"not-allowed":"pointer",fontSize:11,fontWeight:700}}>{loading?"…":"↻ Refresh"}</button>
     </div>
   );
 }
 
 const DEMO_RESULTS = [
-  // GROUP A - complete
   {group:"A",home:"Mexico",away:"South Africa",hg:2,ag:0,status:"final",kickoff:"Jun 11 · 8:00 PM ET"},
   {group:"A",home:"Korea Republic",away:"Czechia",hg:2,ag:1,status:"final",kickoff:"Jun 11 · 5:00 PM ET"},
   {group:"A",home:"Mexico",away:"Korea Republic",hg:1,ag:0,status:"final",kickoff:"Jun 18 · 9:00 PM ET"},
   {group:"A",home:"Czechia",away:"South Africa",hg:1,ag:1,status:"final",kickoff:"Jun 18 · 9:00 PM ET"},
   {group:"A",home:"Czechia",away:"Mexico",hg:0,ag:3,status:"final",kickoff:"Jun 24 · 9:00 PM ET"},
   {group:"A",home:"South Africa",away:"Korea Republic",hg:1,ag:0,status:"final",kickoff:"Jun 24 · 9:00 PM ET"},
-  // GROUP B - complete
   {group:"B",home:"Canada",away:"Bosnia and Herzegovina",hg:1,ag:1,status:"final",kickoff:"Jun 12 · 3:00 PM ET"},
   {group:"B",home:"Switzerland",away:"Qatar",hg:6,ag:1,status:"final",kickoff:"Jun 12 · 3:00 PM ET"},
   {group:"B",home:"Canada",away:"Qatar",hg:6,ag:0,status:"final",kickoff:"Jun 19 · 6:00 PM ET"},
   {group:"B",home:"Switzerland",away:"Bosnia and Herzegovina",hg:2,ag:2,status:"final",kickoff:"Jun 19 · 6:00 PM ET"},
   {group:"B",home:"Switzerland",away:"Canada",hg:2,ag:1,status:"final",kickoff:"Jun 24 · 3:00 PM ET"},
   {group:"B",home:"Bosnia and Herzegovina",away:"Qatar",hg:3,ag:1,status:"final",kickoff:"Jun 24 · 3:00 PM ET"},
-  // GROUP C - complete
   {group:"C",home:"Brazil",away:"Haiti",hg:5,ag:0,status:"final",kickoff:"Jun 13 · 9:00 PM ET"},
   {group:"C",home:"Morocco",away:"Scotland",hg:1,ag:0,status:"final",kickoff:"Jun 13 · 6:00 PM ET"},
   {group:"C",home:"Brazil",away:"Morocco",hg:1,ag:1,status:"final",kickoff:"Jun 20 · 9:00 PM ET"},
   {group:"C",home:"Scotland",away:"Haiti",hg:1,ag:0,status:"final",kickoff:"Jun 20 · 6:00 PM ET"},
   {group:"C",home:"Scotland",away:"Brazil",hg:0,ag:3,status:"final",kickoff:"Jun 24 · 6:00 PM ET"},
   {group:"C",home:"Morocco",away:"Haiti",hg:4,ag:2,status:"final",kickoff:"Jun 24 · 6:00 PM ET"},
-  // GROUP D - MD1+MD2 complete
   {group:"D",home:"USA",away:"Paraguay",hg:4,ag:1,status:"final",kickoff:"Jun 12 · 9:00 PM ET"},
   {group:"D",home:"Australia",away:"Turkiye",hg:2,ag:0,status:"final",kickoff:"Jun 13 · 3:00 PM ET"},
   {group:"D",home:"USA",away:"Australia",hg:2,ag:0,status:"final",kickoff:"Jun 19 · 9:00 PM ET"},
   {group:"D",home:"Turkiye",away:"Paraguay",hg:0,ag:1,status:"final",kickoff:"Jun 19 · 6:00 PM ET"},
-  // GROUP E - MD1+MD2 complete
   {group:"E",home:"Germany",away:"Curacao",hg:7,ag:1,status:"final",kickoff:"Jun 14 · 3:00 PM ET"},
   {group:"E",home:"Ivory Coast",away:"Ecuador",hg:1,ag:0,status:"final",kickoff:"Jun 14 · 6:00 PM ET"},
   {group:"E",home:"Germany",away:"Ivory Coast",hg:2,ag:1,status:"final",kickoff:"Jun 20 · 6:00 PM ET"},
   {group:"E",home:"Ecuador",away:"Curacao",hg:0,ag:0,status:"final",kickoff:"Jun 20 · 9:00 PM ET"},
-  // GROUP F - MD1+MD2 complete
   {group:"F",home:"Netherlands",away:"Japan",hg:2,ag:2,status:"final",kickoff:"Jun 14 · 6:00 PM ET"},
   {group:"F",home:"Sweden",away:"Tunisia",hg:5,ag:1,status:"final",kickoff:"Jun 14 · 9:00 PM ET"},
   {group:"F",home:"Netherlands",away:"Sweden",hg:5,ag:1,status:"final",kickoff:"Jun 20 · 3:00 PM ET"},
   {group:"F",home:"Japan",away:"Tunisia",hg:4,ag:0,status:"final",kickoff:"Jun 20 · 6:00 PM ET"},
-  // GROUP G - MD1+MD2 complete
   {group:"G",home:"Belgium",away:"Egypt",hg:1,ag:1,status:"final",kickoff:"Jun 15 · 3:00 PM ET"},
   {group:"G",home:"Iran",away:"New Zealand",hg:2,ag:2,status:"final",kickoff:"Jun 15 · 6:00 PM ET"},
   {group:"G",home:"Belgium",away:"Iran",hg:0,ag:0,status:"final",kickoff:"Jun 21 · 3:00 PM ET"},
   {group:"G",home:"Egypt",away:"New Zealand",hg:3,ag:1,status:"final",kickoff:"Jun 21 · 6:00 PM ET"},
-  // GROUP H - MD1+MD2 complete
   {group:"H",home:"Spain",away:"Cape Verde",hg:0,ag:0,status:"final",kickoff:"Jun 15 · 9:00 PM ET"},
   {group:"H",home:"Saudi Arabia",away:"Uruguay",hg:1,ag:1,status:"final",kickoff:"Jun 15 · 6:00 PM ET"},
   {group:"H",home:"Spain",away:"Saudi Arabia",hg:4,ag:0,status:"final",kickoff:"Jun 21 · 9:00 PM ET"},
   {group:"H",home:"Uruguay",away:"Cape Verde",hg:2,ag:2,status:"final",kickoff:"Jun 21 · 6:00 PM ET"},
-  // GROUP I - MD1+MD2 complete
   {group:"I",home:"France",away:"Senegal",hg:3,ag:1,status:"final",kickoff:"Jun 16 · 3:00 PM ET"},
   {group:"I",home:"Norway",away:"Iraq",hg:4,ag:1,status:"final",kickoff:"Jun 16 · 6:00 PM ET"},
   {group:"I",home:"France",away:"Iraq",hg:3,ag:0,status:"final",kickoff:"Jun 22 · 3:00 PM ET"},
   {group:"I",home:"Norway",away:"Senegal",hg:3,ag:2,status:"final",kickoff:"Jun 22 · 6:00 PM ET"},
-  // GROUP J - MD1+MD2 complete
   {group:"J",home:"Argentina",away:"Algeria",hg:3,ag:0,status:"final",kickoff:"Jun 16 · 9:00 PM ET"},
   {group:"J",home:"Jordan",away:"Austria",hg:1,ag:2,status:"final",kickoff:"Jun 17 · 3:00 PM ET"},
   {group:"J",home:"Argentina",away:"Austria",hg:2,ag:1,status:"final",kickoff:"Jun 22 · 9:00 PM ET"},
   {group:"J",home:"Algeria",away:"Jordan",hg:2,ag:1,status:"final",kickoff:"Jun 22 · 6:00 PM ET"},
-  // GROUP K - MD1+MD2 complete
   {group:"K",home:"Colombia",away:"Uzbekistan",hg:3,ag:0,status:"final",kickoff:"Jun 17 · 6:00 PM ET"},
   {group:"K",home:"Portugal",away:"Congo DR",hg:1,ag:1,status:"final",kickoff:"Jun 17 · 9:00 PM ET"},
   {group:"K",home:"Colombia",away:"Congo DR",hg:1,ag:0,status:"final",kickoff:"Jun 23 · 10:00 PM ET"},
   {group:"K",home:"Portugal",away:"Uzbekistan",hg:5,ag:0,status:"final",kickoff:"Jun 23 · 1:00 PM ET"},
-  // GROUP L - MD1+MD2 complete
   {group:"L",home:"England",away:"Croatia",hg:4,ag:2,status:"final",kickoff:"Jun 17 · 3:00 PM ET"},
   {group:"L",home:"Ghana",away:"Panama",hg:1,ag:0,status:"final",kickoff:"Jun 17 · 6:00 PM ET"},
   {group:"L",home:"England",away:"Ghana",hg:0,ag:0,status:"final",kickoff:"Jun 23 · 4:00 PM ET"},
   {group:"L",home:"Panama",away:"Croatia",hg:0,ag:1,status:"final",kickoff:"Jun 23 · 7:00 PM ET"},
-  // ── ALL UPCOMING MD3 - sorted by ET kickoff time ──────────────────────
   {group:"E",home:"Ecuador",away:"Germany",hg:null,ag:null,status:"scheduled",kickoff:"Jun 25 · 4:00 PM ET",prob_home:18.6,prob_away:60.3},
   {group:"E",home:"Curacao",away:"Ivory Coast",hg:null,ag:null,status:"scheduled",kickoff:"Jun 25 · 4:00 PM ET",prob_home:5.2,prob_away:83.9},
   {group:"F",home:"Tunisia",away:"Netherlands",hg:null,ag:null,status:"scheduled",kickoff:"Jun 25 · 7:00 PM ET",prob_home:3.3,prob_away:88.1},
@@ -881,95 +618,71 @@ const DEMO_RESULTS = [
   {group:"K",home:"Congo DR",away:"Uzbekistan",hg:null,ag:null,status:"scheduled",kickoff:"Jun 27 · 7:30 PM ET"},
 ];
 
-
-
-// ── MAIN APP ──────────────────────────────────────────────────────────────
 export default function WorldCup2026() {
-  const [view, setView] = useState("live");
-  const [activeGroup, setActiveGroup] = useState("A");
-  const [results, setResults] = useState(DEMO_RESULTS);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [lastUpdated, setLastUpdated] = useState(null);
-  const [selectedTeam, setSelectedTeam] = useState(null);
-  const isDemo = SHEET_CSV_URL === "YOUR_GOOGLE_SHEET_CSV_URL_HERE";
+  const [view,setView]=useState("live");
+  const [activeGroup,setActiveGroup]=useState("A");
+  const [results,setResults]=useState(DEMO_RESULTS);
+  const [loading,setLoading]=useState(false);
+  const [error,setError]=useState(null);
+  const [lastUpdated,setLastUpdated]=useState(null);
+  const [selectedTeam,setSelectedTeam]=useState(null);
+  const isDemo=SHEET_CSV_URL==="YOUR_GOOGLE_SHEET_CSV_URL_HERE";
 
-  const fetchScores = useCallback(async () => {
-    if (isDemo) return;
+  const fetchScores=useCallback(async()=>{
+    if(isDemo) return;
     setLoading(true); setError(null);
     try {
-      const res = await fetch(`${SHEET_CSV_URL}&t=${Date.now()}`);
-      if (!res.ok) throw new Error("Sheet fetch failed");
-      const text = await res.text();
-      const parsed = parseCSV(text);
-      if (parsed.length > 0) {
-        setResults(parsed);
-        setLastUpdated(new Date().toLocaleTimeString("en-CA", {hour:"2-digit",minute:"2-digit",timeZoneName:"short"}));
-      }
-    } catch (e) { setError(e.message); }
-    finally { setLoading(false); }
-  }, [isDemo]);
+      const res=await fetch(`${SHEET_CSV_URL}&t=${Date.now()}`);
+      if(!res.ok) throw new Error("Sheet fetch failed");
+      const text=await res.text();
+      const parsed=parseCSV(text);
+      if(parsed.length>0){setResults(parsed);setLastUpdated(new Date().toLocaleTimeString("en-CA",{hour:"2-digit",minute:"2-digit",timeZoneName:"short"}));}
+    } catch(e){setError(e.message);}
+    finally{setLoading(false);}
+  },[isDemo]);
 
-  useEffect(() => { fetchScores(); }, [fetchScores]);
+  useEffect(()=>{fetchScores();},[fetchScores]);
+  useEffect(()=>{
+    if(isDemo||!AUTO_REFRESH_SECONDS) return;
+    const id=setInterval(fetchScores,AUTO_REFRESH_SECONDS*1000);
+    return()=>clearInterval(id);
+  },[fetchScores,isDemo]);
 
-  useEffect(() => {
-    if (isDemo || !AUTO_REFRESH_SECONDS) return;
-    const id = setInterval(fetchScores, AUTO_REFRESH_SECONDS * 1000);
-    return () => clearInterval(id);
-  }, [fetchScores, isDemo]);
+  const standings=buildStandings(SEED,results);
+  const thirds=getBestThirds(standings);
+  const slotMap=buildSlotMap(standings,thirds,results);
+  const liveGames=results.filter(g=>g.status==="in_progress");
+  const finalGames=[...results].filter(g=>g.status==="final").reverse();
 
-  const standings = buildStandings(SEED, results);
-  const thirds = getBestThirds(standings);
-  const slotMap = buildSlotMap(standings, thirds, results);
-  const liveGames = results.filter(g => g.status === "in_progress");
-  const finalGames = [...results].filter(g => g.status === "final").reverse();
-  // Sort upcoming by kickoff time (earliest first)
-  // Sort upcoming by kickoff — parse "Jun 25 · 4:00 PM ET" into a sort key
-  const kickoffOrder = k => {
-    if (!k) return 999999;
-    const parts = k.split(/[·:]/);
-    // parts: ["Jun 25 ", " 4", "00 PM ET"] or ["Jun 25 ", " 10", "00 PM ET"]
-    try {
-      const dateStr = parts[0].trim(); // "Jun 25"
-      const [mon, dayStr] = dateStr.split(" ");
-      const day = parseInt(dayStr);
-      const monNum = mon === "Jun" ? 6 : 7;
-      const hrRaw = parseInt(parts[1].trim());
-      const rest = parts[2].trim(); // "00 PM ET"
-      const [minStr, ampm] = rest.split(" ");
-      const mn = parseInt(minStr);
-      let h = hrRaw;
-      if (ampm === "PM" && h !== 12) h += 12;
-      if (ampm === "AM" && h === 12) h = 0;
-      return monNum * 100000 + day * 1000 + h * 60 + mn;
-    } catch(e) { return 999999; }
+  const kickoffOrder=k=>{
+    if(!k) return 999999;
+    try{
+      const parts=k.split(/[·:]/);
+      const [mon,dayStr]=parts[0].trim().split(" ");
+      const day=parseInt(dayStr), monNum=mon==="Jun"?6:7;
+      const hrRaw=parseInt(parts[1].trim());
+      const [minStr,ampm]=parts[2].trim().split(" ");
+      const mn=parseInt(minStr);
+      let h=hrRaw;
+      if(ampm==="PM"&&h!==12) h+=12;
+      if(ampm==="AM"&&h===12) h=0;
+      return monNum*100000+day*1000+h*60+mn;
+    }catch(e){return 999999;}
   };
-  const scheduledGames = [...results.filter(g => g.status === "scheduled")]
-    .sort((a,b) => kickoffOrder(a.kickoff) - kickoffOrder(b.kickoff));
-  const groupTeams = sortGroup(standings[activeGroup] || {});
+  const scheduledGames=[...results.filter(g=>g.status==="scheduled")].sort((a,b)=>kickoffOrder(a.kickoff)-kickoffOrder(b.kickoff));
+  const groupTeams=sortGroup(standings[activeGroup]||{});
 
-  const TABS = [
+  const TABS=[
     {id:"live",label:"⚡ Live"},{id:"groups",label:"📊 Groups"},
-    {id:"scorers",label:"🥅 Scorers"},{id:"thirds",label:"🥉 Best 3rds"},{id:"r32",label:"Round of 32"},
-    {id:"r16",label:"Round of 16"},{id:"qf",label:"Quarterfinals"},
-    {id:"sf",label:"Semifinals"},{id:"final",label:"🏆 Final"},
+    {id:"scorers",label:"🥅 Scorers"},{id:"thirds",label:"🥉 Best 3rds"},
+    {id:"r32",label:"Round of 32"},{id:"r16",label:"Round of 16"},
+    {id:"qf",label:"Quarterfinals"},{id:"sf",label:"Semifinals"},{id:"final",label:"🏆 Final"},
   ];
 
-  return (
+  return(
     <div style={{minHeight:"100vh",background:C.bg,color:C.text,fontFamily:"'Inter','Segoe UI',sans-serif"}}>
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}} *{box-sizing:border-box}`}</style>
-
-      {/* Country Profile Modal */}
-      {selectedTeam && (
-        <CountryModal
-          team={selectedTeam}
-          onClose={() => setSelectedTeam(null)}
-          standings={standings}
-          results={results}
-        />
-      )}
-
-      {/* Header */}
+      {selectedTeam&&<CountryModal team={selectedTeam} onClose={()=>setSelectedTeam(null)} standings={standings} results={results}/>}
       <div style={{background:"linear-gradient(180deg,#0d1428 0%,#060d1a 100%)",borderBottom:`1px solid ${C.border}`,padding:"18px 18px 0"}}>
         <div style={{maxWidth:820,margin:"0 auto"}}>
           <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:8,marginBottom:14}}>
@@ -981,7 +694,7 @@ export default function WorldCup2026() {
               </div>
             </div>
             <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
-              {liveGames.length > 0 && (
+              {liveGames.length>0&&(
                 <div style={{display:"flex",alignItems:"center",gap:6,background:"#ff980018",border:"1px solid #ff980044",borderRadius:20,padding:"4px 10px"}}>
                   <span style={{width:6,height:6,borderRadius:"50%",background:C.orange,display:"inline-block",animation:"pulse 1s infinite"}}/>
                   <span style={{fontSize:11,fontWeight:700,color:C.orange}}>{liveGames.length} LIVE</span>
@@ -991,47 +704,28 @@ export default function WorldCup2026() {
             </div>
           </div>
           <div style={{display:"flex",gap:5,overflowX:"auto",paddingBottom:12}}>
-            {TABS.map(t => <Tab key={t.id} label={t.label} active={view===t.id} onClick={()=>setView(t.id)}/>)}
+            {TABS.map(t=><Tab key={t.id} label={t.label} active={view===t.id} onClick={()=>setView(t.id)}/>)}
           </div>
         </div>
       </div>
 
-      {/* Content */}
       <div style={{maxWidth:820,margin:"0 auto",padding:"20px 14px"}}>
-
         {view==="live"&&<div>
-          {liveGames.length>0&&(
-            <CollapsibleSection title="🔴 In Progress" count={liveGames.length} defaultOpen={true} accent={C.orange}>
-              {liveGames.map((g,i)=><MatchRow key={i} {...g} onSelect={setSelectedTeam}/>)}
-            </CollapsibleSection>
-          )}
-
-          {/* UPCOMING FIRST */}
-          {scheduledGames.length>0&&(
-            <CollapsibleSection title="🕐 Upcoming" count={scheduledGames.length} defaultOpen={true} accent={C.blue}>
-              {scheduledGames.map((g,i)=><MatchRow key={i} {...g} onSelect={setSelectedTeam}/>)}
-            </CollapsibleSection>
-          )}
-
-          {/* RESULTS BELOW */}
-          {finalGames.length>0&&(
-            <CollapsibleSection title="✅ Results" count={finalGames.length} defaultOpen={false} accent={C.green}>
-              {finalGames.map((g,i)=><MatchRow key={i} {...g} compact onSelect={setSelectedTeam}/>)}
-            </CollapsibleSection>
-          )}
+          {liveGames.length>0&&<CollapsibleSection title="🔴 In Progress" count={liveGames.length} defaultOpen={true} accent={C.orange}>{liveGames.map((g,i)=><MatchRow key={i} {...g} onSelect={setSelectedTeam}/>)}</CollapsibleSection>}
+          {scheduledGames.length>0&&<CollapsibleSection title="🕐 Upcoming" count={scheduledGames.length} defaultOpen={true} accent={C.blue}>{scheduledGames.map((g,i)=><MatchRow key={i} {...g} onSelect={setSelectedTeam}/>)}</CollapsibleSection>}
+          {finalGames.length>0&&<CollapsibleSection title="✅ Results" count={finalGames.length} defaultOpen={false} accent={C.green}>{finalGames.map((g,i)=><MatchRow key={i} {...g} compact onSelect={setSelectedTeam}/>)}</CollapsibleSection>}
         </div>}
 
         {view==="groups"&&<div>
           <div style={{display:"flex",gap:5,flexWrap:"wrap",marginBottom:14}}>
             {"ABCDEFGHIJKL".split("").map(g=>(
-              <button key={g} onClick={()=>setActiveGroup(g)} style={{padding:"6px 12px",borderRadius:8,border:"none",cursor:"pointer",fontWeight:700,fontSize:13,background:activeGroup===g?C.blue:"#111827",color:activeGroup===g?"#fff":C.dim,outline:activeGroup===g?`2px solid #5c6bc0`:"none"}}>{g}</button>
+              <button key={g} onClick={()=>setActiveGroup(g)} style={{padding:"6px 12px",borderRadius:8,border:"none",cursor:"pointer",fontWeight:700,fontSize:13,background:activeGroup===g?C.blue:"#111827",color:activeGroup===g?"#fff":C.dim}}>{g}</button>
             ))}
           </div>
           <StandingsTable teams={groupTeams} onSelect={setSelectedTeam}/>
           <div style={{marginTop:12}}>{results.filter(g=>g.group===activeGroup).map((g,i)=><MatchRow key={i} {...g} compact onSelect={setSelectedTeam}/>)}</div>
         </div>}
 
-        
         {view==="scorers"&&<div>
           <div style={{background:"#f57f1710",border:"1px solid #f57f1730",borderRadius:10,padding:"10px 14px",marginBottom:14,fontSize:12,color:"#ffb74d"}}>
             🥅 Golden Boot Race · Updated through Matchday 2 · Tap flag to view team
@@ -1040,7 +734,7 @@ export default function WorldCup2026() {
             <div style={{display:"grid",gridTemplateColumns:"28px 1fr 60px 50px 50px",padding:"8px 12px",background:"#0a1020",borderBottom:`1px solid ${C.border}`}}>
               {["#","Player","Team","Goals","HT"].map((h,i)=><div key={h} style={{fontSize:9,fontWeight:700,color:C.muted,textAlign:i>1?"center":"left",textTransform:"uppercase",letterSpacing:1}}>{h}</div>)}
             </div>
-            {SCORERS.sort((a,b)=>b.goals-a.goals||b.hattricks-a.hattricks).map((s,idx)=>(
+            {[...SCORERS].sort((a,b)=>b.goals-a.goals||b.hattricks-a.hattricks).map((s,idx)=>(
               <div key={s.name} style={{display:"grid",gridTemplateColumns:"28px 1fr 60px 50px 50px",padding:"11px 12px",alignItems:"center",borderBottom:idx<SCORERS.length-1?"1px solid #0d1428":"none",background:idx%2===0?C.card:"#0a1228"}}>
                 <div style={{fontSize:11,color:idx===0?C.gold:C.muted,fontWeight:700}}>{idx+1}</div>
                 <div style={{display:"flex",flexDirection:"column",gap:2}}>
@@ -1048,26 +742,18 @@ export default function WorldCup2026() {
                   <span style={{fontSize:10,color:C.dim}}>{s.pos}</span>
                 </div>
                 <div style={{textAlign:"center"}}>
-                  <span
-                    onClick={()=>setSelectedTeam(s.team)}
-                    style={{fontSize:20,cursor:"pointer"}}
-                    title={s.team}
-                  >{fl(s.team)||"🏳"}</span>
+                  <span onClick={()=>setSelectedTeam(s.team)} style={{fontSize:20,cursor:"pointer"}} title={s.team}>{fl(s.team)||"🏳"}</span>
                 </div>
                 <div style={{textAlign:"center"}}>
                   <span style={{fontSize:16,fontWeight:800,color:idx===0?C.gold:idx<3?"#fff":C.text}}>{s.goals}</span>
-                  {s.goals>0&&<div style={{width:`${Math.round(s.goals/SCORERS[0].goals*100)}%`,height:3,background:idx===0?C.gold:C.blue,borderRadius:2,margin:"3px auto 0",maxWidth:36}}/>}
                 </div>
                 <div style={{textAlign:"center"}}>
-                  {s.hattricks>0
-                    ? <span style={{fontSize:11,fontWeight:700,color:C.gold,background:C.gold+"22",borderRadius:4,padding:"2px 6px"}}>🎩×{s.hattricks}</span>
-                    : <span style={{fontSize:11,color:C.muted}}>–</span>
-                  }
+                  {s.hattricks>0?<span style={{fontSize:11,fontWeight:700,color:C.gold,background:C.gold+"22",borderRadius:4,padding:"2px 6px"}}>🎩×{s.hattricks}</span>:<span style={{fontSize:11,color:C.muted}}>–</span>}
                 </div>
               </div>
             ))}
           </div>
-          <div style={{fontSize:10,color:C.muted,textAlign:"center",marginTop:10}}>Tap a flag to view full team profile · Hat-trick = 3+ goals in one match</div>
+          <div style={{fontSize:10,color:C.muted,textAlign:"center",marginTop:10}}>Tap a flag to view full team profile</div>
         </div>}
 
         {view==="thirds"&&<div>
