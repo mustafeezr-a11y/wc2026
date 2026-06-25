@@ -1,7 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 
+// Primary free/no-key World Cup 2026 feed. If CORS blocks direct browser access, use /api/worldcup-live.js as a Vercel proxy.
+const LIVE_API_URL = "https://worldcup26.ir/get/games";
 const SHEET_CSV_URL = "YOUR_GOOGLE_SHEET_CSV_URL_HERE";
-const AUTO_REFRESH_SECONDS = 120;
+const AUTO_REFRESH_SECONDS = 60;
+const LIVE_STATUSES = new Set(["live", "in_progress", "in-progress", "1h", "2h", "ht", "extra_time", "penalties"]);
 
 const FIFA_RANK = {
   Argentina:1,Spain:2,France:3,England:4,Portugal:5,
@@ -216,6 +219,89 @@ function parseCSV(csv) {
   }).filter(r => r.home && r.away);
 }
 
+
+function normalizeTeamName(name) {
+  const n = String(name || "").trim();
+  const aliases = {
+    "United States": "USA",
+    "United States of America": "USA",
+    "South Korea": "Korea Republic",
+    "Czech Republic": "Czechia",
+    "Côte d’Ivoire": "Ivory Coast",
+    "Côte d'Ivoire": "Ivory Coast",
+    "Cote d'Ivoire": "Ivory Coast",
+    "Türkiye": "Turkiye",
+    "Turkey": "Turkiye",
+    "DR Congo": "Congo DR",
+    "Bosnia": "Bosnia and Herzegovina",
+  };
+  return aliases[n] || n;
+}
+function normalizeStatus(status) {
+  const s = String(status || "scheduled").toLowerCase().replace(/\s+/g, "_");
+  if (["finished", "final", "ft", "complete", "completed"].includes(s)) return "final";
+  if (LIVE_STATUSES.has(s)) return "in_progress";
+  return "scheduled";
+}
+function pick(obj, keys) {
+  for (const key of keys) {
+    const value = key.split(".").reduce((acc, part) => acc && acc[part], obj);
+    if (value !== undefined && value !== null && value !== "") return value;
+  }
+  return null;
+}
+function formatKickoff(value) {
+  if (!value) return "";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return String(value);
+  return d.toLocaleString("en-US", { month:"short", day:"numeric", hour:"numeric", minute:"2-digit", timeZoneName:"short" });
+}
+function extractScorers(match) {
+  const events = match.events || match.goals || match.scorers || match.goal_scorers || match.goalScorers || [];
+  if (!Array.isArray(events)) return [];
+  return events.map(e => ({
+      name: pick(e, ["player.name", "player_name", "scorer.name", "scorer", "name"]),
+      team: normalizeTeamName(pick(e, ["team.name", "team_name", "team", "country"])),
+      ownGoal: Boolean(e.own_goal || e.owngoal),
+      penalty: Boolean(e.penalty),
+    }))
+    .filter(e => e.name && e.team && !e.ownGoal);
+}
+function normalizeApiMatch(match) {
+  const home = normalizeTeamName(pick(match, ["home.name_en", "home.name", "home_team.name_en", "home_team.name", "homeTeam.name", "homeTeam", "home", "team_home", "home_name"]));
+  const away = normalizeTeamName(pick(match, ["away.name_en", "away.name", "away_team.name_en", "away_team.name", "awayTeam.name", "awayTeam", "away", "team_away", "away_name"]));
+  const hgRaw = pick(match, ["home_score", "homeScore", "home_goals", "score.home", "score.fullTime.home", "result.home", "hg"]);
+  const agRaw = pick(match, ["away_score", "awayScore", "away_goals", "score.away", "score.fullTime.away", "result.away", "ag"]);
+  const groupRaw = pick(match, ["group", "group_name", "group.name", "group.letter", "stage.group"]);
+  const group = String(groupRaw || "").replace(/^Group\s+/i, "").trim().toUpperCase().slice(0,1) || findTeamGroup(home, SEED);
+  const status = normalizeStatus(pick(match, ["status", "match_status", "state"]));
+  const hg = hgRaw === null ? null : Number.parseInt(hgRaw, 10);
+  const ag = agRaw === null ? null : Number.parseInt(agRaw, 10);
+  return { id: pick(match, ["id", "match_id", "matchNumber", "number"]), group, home, away, hg: Number.isFinite(hg) ? hg : null, ag: Number.isFinite(ag) ? ag : null, status, kickoff: formatKickoff(pick(match, ["kickoff", "date", "datetime", "start_time", "startTime", "utcDate"])), scorers: extractScorers(match) };
+}
+function normalizeApiResponse(data) {
+  const list = Array.isArray(data) ? data : (data?.data || data?.games || data?.matches || data?.results || []);
+  if (!Array.isArray(list)) return [];
+  return list.map(normalizeApiMatch).filter(r => r.home && r.away && r.group);
+}
+function getScoreSignature(matches) {
+  return matches.map(m => `${m.id || `${m.group}-${m.home}-${m.away}`}:${m.hg ?? ""}-${m.ag ?? ""}:${m.status}`).join("|");
+}
+function groupIsComplete(standings, grp) {
+  const teams = Object.values(standings[grp] || {});
+  return teams.length === 4 && teams.every(t => Number(t.p || 0) === 3);
+}
+function deriveScorers(results) {
+  const map = new Map();
+  for (const match of results) for (const goal of match.scorers || []) {
+    const key = `${goal.name}|${goal.team}`;
+    const current = map.get(key) || { name: goal.name, team: goal.team, goals: 0, hattricks: 0, pos: "" };
+    current.goals += 1;
+    map.set(key, current);
+  }
+  return [...map.values()].sort((a,b) => b.goals - a.goals || a.name.localeCompare(b.name));
+}
+
 function applyResult(s, group, home, away, hg, ag) {
   const g = JSON.parse(JSON.stringify(s[group] || {}));
   if (!g[home]) g[home] = {pts:0,p:0,w:0,d:0,l:0,f:0,a:0};
@@ -241,14 +327,15 @@ function buildStandings(seed, results) {
 }
 function getBestThirds(standings) {
   return Object.entries(standings)
-    .map(([grp, teams]) => { const s = sortGroup(teams); return s.length >= 3 ? {...s[2], group: grp} : null; })
+    .filter(([grp]) => groupIsComplete(standings, grp))
+    .map(([grp, teams]) => { const s = sortGroup(teams); return s.length >= 3 && s[2].p === 3 ? {...s[2], group: grp} : null; })
     .filter(Boolean).sort((a,b) => b.pts-a.pts || b.gd-a.gd || b.f-a.f);
 }
 function buildSlotMap(standings, thirds, results) {
   const map = {};
-  const done = new Set((results||[]).filter(r => r.hg !== null).map(r => r.group));
   for (const grp of Object.keys(standings)) {
-    if (!done.has(grp)) continue;
+    // Only display Round of 32 teams after every team in the group has played 3 games.
+    if (!groupIsComplete(standings, grp)) continue;
     const s = sortGroup(standings[grp]);
     if (s[0]) map[`1${grp}`] = s[0].name;
     if (s[1]) map[`2${grp}`] = s[1].name;
@@ -634,27 +721,41 @@ export default function WorldCup2026() {
   const [error,setError]=useState(null);
   const [lastUpdated,setLastUpdated]=useState(null);
   const [selectedTeam,setSelectedTeam]=useState(null);
-  const isDemo=SHEET_CSV_URL==="YOUR_GOOGLE_SHEET_CSV_URL_HERE";
+  const [scoreSignature,setScoreSignature]=useState(getScoreSignature(DEMO_RESULTS));
+  const hasSheet=SHEET_CSV_URL!=="YOUR_GOOGLE_SHEET_CSV_URL_HERE";
 
   const fetchScores=useCallback(async()=>{
-    if(isDemo) return;
     setLoading(true); setError(null);
     try {
-      const res=await fetch(`${SHEET_CSV_URL}&t=${Date.now()}`);
-      if(!res.ok) throw new Error("Sheet fetch failed");
-      const text=await res.text();
-      const parsed=parseCSV(text);
-      if(parsed.length>0){setResults(parsed);setLastUpdated(new Date().toLocaleTimeString("en-CA",{hour:"2-digit",minute:"2-digit",timeZoneName:"short"}));}
+      let parsed=[];
+      if (LIVE_API_URL) {
+        const res=await fetch(`${LIVE_API_URL}${LIVE_API_URL.includes("?") ? "&" : "?"}t=${Date.now()}`);
+        if(!res.ok) throw new Error("Live API fetch failed");
+        parsed=normalizeApiResponse(await res.json());
+      }
+      if (parsed.length===0 && hasSheet) {
+        const res=await fetch(`${SHEET_CSV_URL}&t=${Date.now()}`);
+        if(!res.ok) throw new Error("Sheet fetch failed");
+        parsed=parseCSV(await res.text());
+      }
+      if(parsed.length>0){
+        const nextSignature=getScoreSignature(parsed);
+        setScoreSignature(prev=>{
+          setLastUpdated(new Date().toLocaleTimeString("en-CA",{hour:"2-digit",minute:"2-digit",timeZoneName:"short"}));
+          if(prev!==nextSignature) { setResults(parsed); return nextSignature; }
+          return prev;
+        });
+      }
     } catch(e){setError(e.message);}
     finally{setLoading(false);}
-  },[isDemo]);
+  },[hasSheet]);
 
   useEffect(()=>{fetchScores();},[fetchScores]);
   useEffect(()=>{
-    if(isDemo||!AUTO_REFRESH_SECONDS) return;
+    if(!AUTO_REFRESH_SECONDS) return;
     const id=setInterval(fetchScores,AUTO_REFRESH_SECONDS*1000);
     return()=>clearInterval(id);
-  },[fetchScores,isDemo]);
+  },[fetchScores]);
 
   const standings=buildStandings(SEED,results);
   const thirds=getBestThirds(standings);
@@ -679,6 +780,8 @@ export default function WorldCup2026() {
   };
   const scheduledGames=[...results.filter(g=>g.status==="scheduled")].sort((a,b)=>kickoffOrder(a.kickoff)-kickoffOrder(b.kickoff));
   const groupTeams=sortGroup(standings[activeGroup]||{});
+  const liveScorers=deriveScorers(results);
+  const displayScorers=liveScorers.length ? liveScorers : (error ? SCORERS : []);
 
   const TABS=[
     {id:"live",label:"⚡ Live"},{id:"groups",label:"📊 Groups"},
@@ -689,7 +792,7 @@ export default function WorldCup2026() {
 
   return(
     <div style={{minHeight:"100vh",background:C.bg,color:C.text,fontFamily:"'Inter','Segoe UI',sans-serif"}}>
-      <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}} *{box-sizing:border-box}`}</style>
+      <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}} *{box-sizing:border-box} html,body,#root{touch-action:pan-x pan-y pinch-zoom}`}</style>
       {selectedTeam&&<CountryModal team={selectedTeam} onClose={()=>setSelectedTeam(null)} standings={standings} results={results}/>}
       <div style={{background:"linear-gradient(180deg,#0d1428 0%,#060d1a 100%)",borderBottom:`1px solid ${C.border}`,padding:"18px 18px 0"}}>
         <div style={{maxWidth:820,margin:"0 auto"}}>
@@ -736,14 +839,15 @@ export default function WorldCup2026() {
 
         {view==="scorers"&&<div>
           <div style={{background:"#f57f1710",border:"1px solid #f57f1730",borderRadius:10,padding:"10px 14px",marginBottom:14,fontSize:12,color:"#ffb74d"}}>
-            🥅 Golden Boot Race · Updated through Matchday 2 · Tap flag to view team
+            🥅 Golden Boot Race · Live feed when scorer events are available · Tap flag to view team
           </div>
           <div style={{background:C.card,borderRadius:12,overflow:"hidden",border:`1px solid ${C.border}`}}>
             <div style={{display:"grid",gridTemplateColumns:"28px 1fr 60px 50px 50px",padding:"8px 12px",background:"#0a1020",borderBottom:`1px solid ${C.border}`}}>
               {["#","Player","Team","Goals","HT"].map((h,i)=><div key={h} style={{fontSize:9,fontWeight:700,color:C.muted,textAlign:i>1?"center":"left",textTransform:"uppercase",letterSpacing:1}}>{h}</div>)}
             </div>
-            {[...SCORERS].sort((a,b)=>b.goals-a.goals||b.hattricks-a.hattricks).map((s,idx)=>(
-              <div key={s.name} style={{display:"grid",gridTemplateColumns:"28px 1fr 60px 50px 50px",padding:"11px 12px",alignItems:"center",borderBottom:idx<SCORERS.length-1?"1px solid #0d1428":"none",background:idx%2===0?C.card:"#0a1228"}}>
+            {displayScorers.length===0&&(<div style={{padding:"18px",fontSize:12,color:C.sub,textAlign:"center"}}>No live scorer data available from the free feed yet.</div>)}
+            {displayScorers.map((s,idx)=>(
+              <div key={`${s.name}-${s.team}`} style={{display:"grid",gridTemplateColumns:"28px 1fr 60px 50px 50px",padding:"11px 12px",alignItems:"center",borderBottom:idx<displayScorers.length-1?"1px solid #0d1428":"none",background:idx%2===0?C.card:"#0a1228"}}>
                 <div style={{fontSize:11,color:idx===0?C.gold:C.muted,fontWeight:700}}>{idx+1}</div>
                 <div style={{display:"flex",flexDirection:"column",gap:2}}>
                   <span style={{fontSize:13,fontWeight:600,color:idx<3?C.text:C.sub}}>{s.name}</span>
@@ -794,6 +898,9 @@ export default function WorldCup2026() {
             ))}
           </div>
         </div>}
+        <footer style={{marginTop:26,padding:"18px 8px",borderTop:`1px solid ${C.border}`,textAlign:"center",fontSize:11,color:C.dim}}>
+          © 2026 World Cup Live Tracker. All rights reserved. Developed by MRTeam.
+        </footer>
       </div>
     </div>
   );
