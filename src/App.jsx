@@ -924,16 +924,28 @@ export default function WorldCup2026() {
   const liveGames = results.filter(g => g.status === "in_progress");
   const finalGames = [...results].filter(g => g.status === "final").reverse();
   // Sort upcoming by kickoff time (earliest first)
+  // Sort upcoming by kickoff — parse "Jun 25 · 4:00 PM ET" into a sort key
   const kickoffOrder = k => {
-    if (!k) return 9999;
-    const m = k.match(/(Jun|Jul) (\d+) · (\d+):(\d+) (AM|PM) ET/);
-    if (!m) return 9999;
-    const [,mon,day,hr,min,ampm] = m;
-    const monNum = mon==="Jun"?6:7;
-    let h = parseInt(hr); if(ampm==="PM"&&h!==12) h+=12; if(ampm==="AM"&&h===12) h=0;
-    return monNum*10000 + parseInt(day)*100 + h + parseInt(min)/60;
+    if (!k) return 999999;
+    const parts = k.split(/[·:]/);
+    // parts: ["Jun 25 ", " 4", "00 PM ET"] or ["Jun 25 ", " 10", "00 PM ET"]
+    try {
+      const dateStr = parts[0].trim(); // "Jun 25"
+      const [mon, dayStr] = dateStr.split(" ");
+      const day = parseInt(dayStr);
+      const monNum = mon === "Jun" ? 6 : 7;
+      const hrRaw = parseInt(parts[1].trim());
+      const rest = parts[2].trim(); // "00 PM ET"
+      const [minStr, ampm] = rest.split(" ");
+      const mn = parseInt(minStr);
+      let h = hrRaw;
+      if (ampm === "PM" && h !== 12) h += 12;
+      if (ampm === "AM" && h === 12) h = 0;
+      return monNum * 100000 + day * 1000 + h * 60 + mn;
+    } catch(e) { return 999999; }
   };
-  const scheduledGames = [...results.filter(g => g.status === "scheduled")].sort((a,b)=>kickoffOrder(a.kickoff)-kickoffOrder(b.kickoff));
+  const scheduledGames = [...results.filter(g => g.status === "scheduled")]
+    .sort((a,b) => kickoffOrder(a.kickoff) - kickoffOrder(b.kickoff));
   const groupTeams = sortGroup(standings[activeGroup] || {});
 
   const TABS = [
