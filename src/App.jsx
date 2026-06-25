@@ -18,6 +18,104 @@ const FIFA_RANK = {
 };
 const rank = (n) => FIFA_RANK[n] ? `#${FIFA_RANK[n]}` : null;
 
+// ── SCORERS (updated through Matchday 2) ─────────────────────────────────
+const SCORERS = [
+  {name:"Lionel Messi",      team:"Argentina",  goals:5,hattricks:1,pos:"FW"},
+  {name:"Kylian Mbappé",     team:"France",     goals:4,hattricks:0,pos:"FW"},
+  {name:"Erling Haaland",    team:"Norway",     goals:4,hattricks:0,pos:"FW"},
+  {name:"Harry Kane",        team:"England",    goals:3,hattricks:1,pos:"FW"},
+  {name:"Cristiano Ronaldo", team:"Portugal",   goals:3,hattricks:0,pos:"FW"},
+  {name:"Vinicius Jr",       team:"Brazil",     goals:3,hattricks:0,pos:"FW"},
+  {name:"Jonathan David",    team:"Canada",     goals:3,hattricks:1,pos:"FW"},
+  {name:"Lamine Yamal",      team:"Spain",      goals:3,hattricks:0,pos:"FW"},
+  {name:"Folarin Balogun",   team:"USA",        goals:2,hattricks:0,pos:"FW"},
+  {name:"Bukayo Saka",       team:"England",    goals:2,hattricks:0,pos:"FW"},
+  {name:"Memphis Depay",     team:"Netherlands",goals:2,hattricks:0,pos:"FW"},
+  {name:"Cody Gakpo",        team:"Netherlands",goals:2,hattricks:0,pos:"FW"},
+  {name:"Raphinha",          team:"Brazil",     goals:2,hattricks:0,pos:"FW"},
+  {name:"Lautaro Martínez",  team:"Argentina",  goals:2,hattricks:0,pos:"FW"},
+  {name:"Ferran Torres",     team:"Spain",      goals:2,hattricks:0,pos:"FW"},
+  {name:"Mikel Oyarzabal",   team:"Spain",      goals:2,hattricks:0,pos:"FW"},
+  {name:"Raúl Jiménez",      team:"Mexico",     goals:2,hattricks:0,pos:"FW"},
+  {name:"Julián Álvarez",    team:"Argentina",  goals:2,hattricks:0,pos:"FW"},
+  {name:"Deniz Undav",       team:"Germany",    goals:2,hattricks:0,pos:"FW"},
+  {name:"Ousmane Dembélé",   team:"France",     goals:2,hattricks:0,pos:"FW"},
+  {name:"Johan Manzambi",    team:"Switzerland",goals:2,hattricks:0,pos:"FW"},
+  {name:"Jude Bellingham",   team:"England",    goals:2,hattricks:0,pos:"MF"},
+  {name:"Alexander Isak",    team:"Sweden",     goals:2,hattricks:0,pos:"FW"},
+  {name:"Cyle Larin",        team:"Canada",     goals:1,hattricks:0,pos:"FW"},
+  {name:"Julián Quiñones",   team:"Mexico",     goals:1,hattricks:0,pos:"FW"},
+  {name:"Hwang In-Beom",     team:"Korea Republic",goals:1,hattricks:0,pos:"MF"},
+  {name:"Oh Hyeon-Gyu",      team:"Korea Republic",goals:1,hattricks:0,pos:"FW"},
+  {name:"Jovo Lukić",        team:"Bosnia and Herzegovina",goals:1,hattricks:0,pos:"FW"},
+  {name:"Ladislav Krejčí",   team:"Czechia",    goals:1,hattricks:0,pos:"MF"},
+  {name:"Mauricio",          team:"Paraguay",   goals:1,hattricks:0,pos:"FW"},
+  {name:"Ayman Hussein",     team:"Iraq",       goals:1,hattricks:0,pos:"FW"},
+  {name:"Elijah Just",       team:"New Zealand",goals:1,hattricks:0,pos:"FW"},
+  {name:"Nizar Al-Rashdan",  team:"Jordan",     goals:1,hattricks:0,pos:"MF"},
+  {name:"Granit Xhaka",      team:"Switzerland",goals:1,hattricks:0,pos:"MF"},
+  {name:"Chris Wood",        team:"New Zealand",goals:1,hattricks:0,pos:"FW"},
+  {name:"Michael Olise",     team:"France",     goals:1,hattricks:0,pos:"FW"},
+  {name:"João Cancelo",      team:"Portugal",   goals:1,hattricks:0,pos:"DF"},
+  {name:"Felix Nmecha",      team:"Germany",    goals:1,hattricks:0,pos:"MF"},
+  {name:"Leroy Sané",        team:"Germany",    goals:1,hattricks:0,pos:"FW"},
+  {name:"Serhou Guirassy",   team:"Germany",    goals:1,hattricks:0,pos:"FW"},
+  {name:"Kai Havertz",       team:"Germany",    goals:1,hattricks:0,pos:"FW"},
+];
+
+// ── TOP 3 PLAYERS PER TEAM ────────────────────────────────────────────────
+const TOP_PLAYERS = {
+  Argentina:   [{n:"Lionel Messi",p:"FW",goals:5,ht:1},{n:"Lautaro Martínez",p:"FW",goals:2,ht:0},{n:"Julián Álvarez",p:"FW",goals:2,ht:0}],
+  France:      [{n:"Kylian Mbappé",p:"FW",goals:4,ht:0},{n:"Ousmane Dembélé",p:"FW",goals:2,ht:0},{n:"Michael Olise",p:"FW",goals:1,ht:0}],
+  Norway:      [{n:"Erling Haaland",p:"FW",goals:4,ht:0},{n:"Martin Ødegaard",p:"MF",goals:0,ht:0},{n:"Alexander Sørloth",p:"FW",goals:0,ht:0}],
+  England:     [{n:"Harry Kane",p:"FW",goals:3,ht:1},{n:"Bukayo Saka",p:"FW",goals:2,ht:0},{n:"Jude Bellingham",p:"MF",goals:2,ht:0}],
+  Portugal:    [{n:"Cristiano Ronaldo",p:"FW",goals:3,ht:0},{n:"João Cancelo",p:"DF",goals:1,ht:0},{n:"Bruno Fernandes",p:"MF",goals:0,ht:0}],
+  Brazil:      [{n:"Vinicius Jr",p:"FW",goals:3,ht:0},{n:"Raphinha",p:"FW",goals:2,ht:0},{n:"Rodrygo",p:"FW",goals:0,ht:0}],
+  Canada:      [{n:"Jonathan David",p:"FW",goals:3,ht:1},{n:"Cyle Larin",p:"FW",goals:1,ht:0},{n:"Alphonso Davies",p:"DF",goals:0,ht:0}],
+  Spain:       [{n:"Lamine Yamal",p:"FW",goals:3,ht:0},{n:"Ferran Torres",p:"FW",goals:2,ht:0},{n:"Mikel Oyarzabal",p:"FW",goals:2,ht:0}],
+  USA:         [{n:"Folarin Balogun",p:"FW",goals:2,ht:0},{n:"Christian Pulisic",p:"FW",goals:0,ht:0},{n:"Tyler Adams",p:"MF",goals:0,ht:0}],
+  Netherlands: [{n:"Memphis Depay",p:"FW",goals:2,ht:0},{n:"Cody Gakpo",p:"FW",goals:2,ht:0},{n:"Virgil van Dijk",p:"DF",goals:0,ht:0}],
+  Germany:     [{n:"Deniz Undav",p:"FW",goals:2,ht:0},{n:"Leroy Sané",p:"FW",goals:1,ht:0},{n:"Kai Havertz",p:"FW",goals:1,ht:0}],
+  Mexico:      [{n:"Raúl Jiménez",p:"FW",goals:2,ht:0},{n:"Julián Quiñones",p:"FW",goals:1,ht:0},{n:"Hirving Lozano",p:"FW",goals:0,ht:0}],
+  Switzerland: [{n:"Johan Manzambi",p:"FW",goals:2,ht:0},{n:"Granit Xhaka",p:"MF",goals:1,ht:0},{n:"Xherdan Shaqiri",p:"FW",goals:0,ht:0}],
+  Sweden:      [{n:"Alexander Isak",p:"FW",goals:2,ht:0},{n:"Dejan Kulusevski",p:"FW",goals:0,ht:0},{n:"Emil Forsberg",p:"MF",goals:0,ht:0}],
+  Japan:       [{n:"Takumi Minamino",p:"FW",goals:0,ht:0},{n:"Ritsu Doan",p:"FW",goals:0,ht:0},{n:"Kaoru Mitoma",p:"FW",goals:0,ht:0}],
+  Morocco:     [{n:"Hakim Ziyech",p:"MF",goals:0,ht:0},{n:"Youssef En-Nesyri",p:"FW",goals:0,ht:0},{n:"Sofiane Boufal",p:"FW",goals:0,ht:0}],
+  Belgium:     [{n:"Romelu Lukaku",p:"FW",goals:0,ht:0},{n:"Kevin De Bruyne",p:"MF",goals:0,ht:0},{n:"Leandro Trossard",p:"FW",goals:0,ht:0}],
+  Colombia:    [{n:"Luis Díaz",p:"FW",goals:0,ht:0},{n:"James Rodríguez",p:"MF",goals:0,ht:0},{n:"Radamel Falcao",p:"FW",goals:0,ht:0}],
+  Egypt:       [{n:"Mohamed Salah",p:"FW",goals:0,ht:0},{n:"Mostafa Mohamed",p:"FW",goals:0,ht:0},{n:"Trezeguet",p:"FW",goals:0,ht:0}],
+  Iran:        [{n:"Sardar Azmoun",p:"FW",goals:0,ht:0},{n:"Mehdi Taremi",p:"FW",goals:0,ht:0},{n:"Alireza Jahanbakhsh",p:"FW",goals:0,ht:0}],
+  "Korea Republic":[{n:"Hwang In-Beom",p:"MF",goals:1,ht:0},{n:"Oh Hyeon-Gyu",p:"FW",goals:1,ht:0},{n:"Son Heung-min",p:"FW",goals:0,ht:0}],
+  Australia:   [{n:"Mitchell Duke",p:"FW",goals:0,ht:0},{n:"Ajdin Hrustic",p:"MF",goals:0,ht:0},{n:"Martin Boyle",p:"FW",goals:0,ht:0}],
+  Senegal:     [{n:"Sadio Mané",p:"FW",goals:0,ht:0},{n:"Ismaïla Sarr",p:"FW",goals:0,ht:0},{n:"Idrissa Gueye",p:"MF",goals:0,ht:0}],
+  Uruguay:     [{n:"Darwin Núñez",p:"FW",goals:0,ht:0},{n:"Federico Valverde",p:"MF",goals:0,ht:0},{n:"Luis Suárez",p:"FW",goals:0,ht:0}],
+  "Ivory Coast":[{n:"Sébastien Haller",p:"FW",goals:0,ht:0},{n:"Franck Kessie",p:"MF",goals:0,ht:0},{n:"Nicolas Pépé",p:"FW",goals:0,ht:0}],
+  Ecuador:     [{n:"Enner Valencia",p:"FW",goals:0,ht:0},{n:"Moisés Caicedo",p:"MF",goals:0,ht:0},{n:"Ángel Mena",p:"FW",goals:0,ht:0}],
+  Ghana:       [{n:"Jordan Ayew",p:"FW",goals:0,ht:0},{n:"Thomas Partey",p:"MF",goals:0,ht:0},{n:"André Ayew",p:"FW",goals:0,ht:0}],
+  Croatia:     [{n:"Luka Modrić",p:"MF",goals:0,ht:0},{n:"Ivan Perišić",p:"FW",goals:0,ht:0},{n:"Mateo Kovačić",p:"MF",goals:0,ht:0}],
+  Czechia:     [{n:"Ladislav Krejčí",p:"MF",goals:1,ht:0},{n:"Patrik Schick",p:"FW",goals:0,ht:0},{n:"Tomáš Souček",p:"MF",goals:0,ht:0}],
+  "South Africa":[{n:"Percy Tau",p:"FW",goals:0,ht:0},{n:"Bongani Zungu",p:"MF",goals:0,ht:0},{n:"Lebo Mothiba",p:"FW",goals:0,ht:0}],
+  Panama:      [{n:"Rolando Blackburn",p:"FW",goals:0,ht:0},{n:"Adalberto Carrasquilla",p:"MF",goals:0,ht:0},{n:"José Fajardo",p:"FW",goals:0,ht:0}],
+  "Saudi Arabia":[{n:"Salem Al-Dawsari",p:"FW",goals:0,ht:0},{n:"Firas Al-Buraikan",p:"FW",goals:0,ht:0},{n:"Sami Al-Najei",p:"MF",goals:0,ht:0}],
+  "Cape Verde":[{n:"Garry Rodrigues",p:"FW",goals:0,ht:0},{n:"Ryan Mendes",p:"FW",goals:0,ht:0},{n:"Stopira",p:"DF",goals:0,ht:0}],
+  Iraq:        [{n:"Ayman Hussein",p:"FW",goals:1,ht:0},{n:"Bashar Resan",p:"MF",goals:0,ht:0},{n:"Amjad Attwan",p:"FW",goals:0,ht:0}],
+  "New Zealand":[{n:"Chris Wood",p:"FW",goals:1,ht:0},{n:"Elijah Just",p:"FW",goals:1,ht:0},{n:"Clayton Lewis",p:"MF",goals:0,ht:0}],
+  Jordan:      [{n:"Nizar Al-Rashdan",p:"MF",goals:1,ht:0},{n:"Mousa Tamari",p:"FW",goals:0,ht:0},{n:"Yazan Al-Naimat",p:"FW",goals:0,ht:0}],
+  "Bosnia and Herzegovina":[{n:"Jovo Lukić",p:"FW",goals:1,ht:0},{n:"Edin Džeko",p:"FW",goals:0,ht:0},{n:"Miralem Pjanić",p:"MF",goals:0,ht:0}],
+  Paraguay:    [{n:"Mauricio",p:"FW",goals:1,ht:0},{n:"Miguel Almirón",p:"MF",goals:0,ht:0},{n:"Julio Enciso",p:"FW",goals:0,ht:0}],
+  Turkiye:     [{n:"Hakan Çalhanoğlu",p:"MF",goals:0,ht:0},{n:"Arda Güler",p:"MF",goals:0,ht:0},{n:"Kerem Aktürkoğlu",p:"FW",goals:0,ht:0}],
+  Tunisia:     [{n:"Youssef Msakni",p:"FW",goals:0,ht:0},{n:"Wahbi Khazri",p:"FW",goals:0,ht:0},{n:"Hannibal Mejbri",p:"MF",goals:0,ht:0}],
+  Algeria:     [{n:"Riyad Mahrez",p:"FW",goals:0,ht:0},{n:"Islam Slimani",p:"FW",goals:0,ht:0},{n:"Andy Delort",p:"FW",goals:0,ht:0}],
+  Scotland:    [{n:"Scott McTominay",p:"MF",goals:0,ht:0},{n:"Andy Robertson",p:"DF",goals:0,ht:0},{n:"Che Adams",p:"FW",goals:0,ht:0}],
+  Austria:     [{n:"Marcel Sabitzer",p:"MF",goals:0,ht:0},{n:"Christoph Baumgartner",p:"MF",goals:0,ht:0},{n:"Marko Arnautović",p:"FW",goals:0,ht:0}],
+  Qatar:       [{n:"Akram Afif",p:"FW",goals:0,ht:0},{n:"Almoez Ali",p:"FW",goals:0,ht:0},{n:"Hassan Al-Haydos",p:"FW",goals:0,ht:0}],
+  Haiti:       [{n:"Duckens Nazon",p:"FW",goals:0,ht:0},{n:"Frantzdy Pierrot",p:"FW",goals:0,ht:0},{n:"Derrick Etienne",p:"MF",goals:0,ht:0}],
+  Uzbekistan:  [{n:"Eldor Shomurodov",p:"FW",goals:0,ht:0},{n:"Jaloliddin Masharipov",p:"MF",goals:0,ht:0},{n:"Dostonbek Khamdamov",p:"MF",goals:0,ht:0}],
+  Curacao:     [{n:"Leandro Bacuna",p:"MF",goals:0,ht:0},{n:"Juriën Timber",p:"DF",goals:0,ht:0},{n:"Cuco Martina",p:"DF",goals:0,ht:0}],
+  "DR Congo":  [{n:"Cédric Bakambu",p:"FW",goals:0,ht:0},{n:"Chancel Mbemba",p:"DF",goals:0,ht:0},{n:"Arthur Masuaku",p:"DF",goals:0,ht:0}],
+  "Congo DR":  [{n:"Cédric Bakambu",p:"FW",goals:0,ht:0},{n:"Chancel Mbemba",p:"DF",goals:0,ht:0},{n:"Arthur Masuaku",p:"DF",goals:0,ht:0}],
+};
+
 const FLAG = {
   Mexico:"🇲🇽","South Africa":"🇿🇦","Korea Republic":"🇰🇷",Czechia:"🇨🇿",
   Canada:"🇨🇦","Bosnia and Herzegovina":"🇧🇦",Qatar:"🇶🇦",Switzerland:"🇨🇭",
@@ -35,19 +133,21 @@ const FLAG = {
 const fl = (n) => FLAG[n] || null;
 
 const SEED = {
-  A:{Mexico:{pts:6,p:2,w:2,d:0,l:0,f:3,a:0},"Korea Republic":{pts:3,p:2,w:1,d:0,l:1,f:2,a:2},Czechia:{pts:1,p:2,w:0,d:1,l:1,f:2,a:3},"South Africa":{pts:1,p:2,w:0,d:1,l:1,f:1,a:3}},
-  B:{Canada:{pts:4,p:2,w:1,d:1,l:0,f:7,a:1},Switzerland:{pts:4,p:2,w:1,d:1,l:0,f:5,a:2},"Bosnia and Herzegovina":{pts:1,p:2,w:0,d:1,l:1,f:2,a:5},Qatar:{pts:1,p:2,w:0,d:1,l:1,f:1,a:7}},
-  C:{Brazil:{pts:4,p:2,w:1,d:1,l:0,f:4,a:1},Morocco:{pts:4,p:2,w:1,d:1,l:0,f:2,a:1},Scotland:{pts:3,p:2,w:1,d:0,l:1,f:1,a:1},Haiti:{pts:0,p:2,w:0,d:0,l:2,f:0,a:4}},
-  D:{USA:{pts:6,p:2,w:2,d:0,l:0,f:6,a:1},Australia:{pts:3,p:2,w:1,d:0,l:1,f:2,a:2},Paraguay:{pts:3,p:2,w:1,d:0,l:1,f:2,a:4},Turkiye:{pts:0,p:2,w:0,d:0,l:2,f:0,a:3}},
-  E:{Germany:{pts:6,p:2,w:2,d:0,l:0,f:9,a:2},"Ivory Coast":{pts:3,p:2,w:1,d:0,l:1,f:2,a:2},Ecuador:{pts:1,p:2,w:0,d:1,l:1,f:0,a:1},Curacao:{pts:1,p:2,w:0,d:1,l:1,f:1,a:7}},
-  F:{Netherlands:{pts:4,p:2,w:1,d:1,l:0,f:7,a:3},Japan:{pts:4,p:2,w:1,d:1,l:0,f:6,a:2},Sweden:{pts:3,p:2,w:1,d:0,l:1,f:6,a:6},Tunisia:{pts:0,p:2,w:0,d:0,l:2,f:1,a:9}},
-  G:{Egypt:{pts:4,p:2,w:1,d:1,l:0,f:4,a:2},Iran:{pts:2,p:2,w:0,d:2,l:0,f:2,a:2},Belgium:{pts:2,p:2,w:0,d:2,l:0,f:1,a:1},"New Zealand":{pts:1,p:2,w:0,d:1,l:1,f:3,a:5}},
-  H:{Spain:{pts:4,p:2,w:1,d:1,l:0,f:4,a:0},Uruguay:{pts:2,p:2,w:0,d:2,l:0,f:3,a:3},"Cape Verde":{pts:2,p:2,w:0,d:2,l:0,f:2,a:2},"Saudi Arabia":{pts:1,p:2,w:0,d:1,l:1,f:1,a:5}},
-  I:{France:{pts:6,p:2,w:2,d:0,l:0,f:6,a:1},Norway:{pts:6,p:2,w:2,d:0,l:0,f:7,a:3},Senegal:{pts:0,p:2,w:0,d:0,l:2,f:3,a:6},Iraq:{pts:0,p:2,w:0,d:0,l:2,f:1,a:7}},
-  J:{Argentina:{pts:6,p:2,w:2,d:0,l:0,f:5,a:0},Austria:{pts:3,p:2,w:1,d:0,l:1,f:3,a:3},Algeria:{pts:3,p:2,w:1,d:0,l:1,f:2,a:4},"Congo DR":{pts:0,p:2,w:0,d:0,l:2,f:2,a:5}},
-  K:{Colombia:{pts:6,p:2,w:2,d:0,l:0,f:4,a:1},Portugal:{pts:4,p:2,w:1,d:1,l:0,f:6,a:1},"DR Congo":{pts:1,p:2,w:0,d:1,l:1,f:1,a:2},Uzbekistan:{pts:0,p:2,w:0,d:0,l:2,f:1,a:8}},
-  L:{England:{pts:4,p:2,w:1,d:1,l:0,f:4,a:2},Ghana:{pts:4,p:2,w:1,d:1,l:0,f:1,a:0},Croatia:{pts:3,p:2,w:1,d:0,l:1,f:3,a:4},Panama:{pts:0,p:2,w:0,d:0,l:2,f:0,a:2}},
+  A:{"Mexico":{"pts":9,"p":3,"w":3,"d":0,"l":0,"f":6,"a":0},"South Africa":{"pts":4,"p":3,"w":1,"d":1,"l":1,"f":2,"a":3},"Korea Republic":{"pts":3,"p":3,"w":1,"d":0,"l":2,"f":2,"a":3},"Czechia":{"pts":1,"p":3,"w":0,"d":1,"l":2,"f":2,"a":6}},
+  B:{"Switzerland":{"pts":7,"p":3,"w":2,"d":1,"l":0,"f":10,"a":4},"Bosnia and Herzegovina":{"pts":5,"p":3,"w":1,"d":2,"l":0,"f":6,"a":4},"Canada":{"pts":4,"p":3,"w":1,"d":1,"l":1,"f":8,"a":3},"Qatar":{"pts":0,"p":3,"w":0,"d":0,"l":3,"f":2,"a":15}},
+  C:{"Brazil":{"pts":7,"p":3,"w":2,"d":1,"l":0,"f":9,"a":1},"Morocco":{"pts":7,"p":3,"w":2,"d":1,"l":0,"f":6,"a":3},"Scotland":{"pts":3,"p":3,"w":1,"d":0,"l":2,"f":1,"a":4},"Haiti":{"pts":0,"p":3,"w":0,"d":0,"l":3,"f":2,"a":10}},
+  D:{"USA":{"pts":6,"p":2,"w":2,"d":0,"l":0,"f":6,"a":1},"Australia":{"pts":3,"p":2,"w":1,"d":0,"l":1,"f":2,"a":2},"Paraguay":{"pts":3,"p":2,"w":1,"d":0,"l":1,"f":2,"a":4},"Turkiye":{"pts":0,"p":2,"w":0,"d":0,"l":2,"f":0,"a":3}},
+  E:{"Germany":{"pts":6,"p":2,"w":2,"d":0,"l":0,"f":9,"a":2},"Ivory Coast":{"pts":3,"p":2,"w":1,"d":0,"l":1,"f":2,"a":2},"Ecuador":{"pts":1,"p":2,"w":0,"d":1,"l":1,"f":0,"a":1},"Curacao":{"pts":1,"p":2,"w":0,"d":1,"l":1,"f":1,"a":7}},
+  F:{"Netherlands":{"pts":4,"p":2,"w":1,"d":1,"l":0,"f":7,"a":3},"Japan":{"pts":4,"p":2,"w":1,"d":1,"l":0,"f":6,"a":2},"Sweden":{"pts":3,"p":2,"w":1,"d":0,"l":1,"f":6,"a":6},"Tunisia":{"pts":0,"p":2,"w":0,"d":0,"l":2,"f":1,"a":9}},
+  G:{"Egypt":{"pts":4,"p":2,"w":1,"d":1,"l":0,"f":4,"a":2},"Iran":{"pts":2,"p":2,"w":0,"d":2,"l":0,"f":2,"a":2},"Belgium":{"pts":2,"p":2,"w":0,"d":2,"l":0,"f":1,"a":1},"New Zealand":{"pts":1,"p":2,"w":0,"d":1,"l":1,"f":3,"a":5}},
+  H:{"Spain":{"pts":4,"p":2,"w":1,"d":1,"l":0,"f":4,"a":0},"Uruguay":{"pts":2,"p":2,"w":0,"d":2,"l":0,"f":3,"a":3},"Cape Verde":{"pts":2,"p":2,"w":0,"d":2,"l":0,"f":2,"a":2},"Saudi Arabia":{"pts":1,"p":2,"w":0,"d":1,"l":1,"f":1,"a":5}},
+  I:{"France":{"pts":6,"p":2,"w":2,"d":0,"l":0,"f":6,"a":1},"Norway":{"pts":6,"p":2,"w":2,"d":0,"l":0,"f":7,"a":3},"Senegal":{"pts":0,"p":2,"w":0,"d":0,"l":2,"f":3,"a":6},"Iraq":{"pts":0,"p":2,"w":0,"d":0,"l":2,"f":1,"a":7}},
+  J:{"Argentina":{"pts":6,"p":2,"w":2,"d":0,"l":0,"f":5,"a":1},"Austria":{"pts":3,"p":2,"w":1,"d":0,"l":1,"f":3,"a":3},"Algeria":{"pts":3,"p":2,"w":1,"d":0,"l":1,"f":2,"a":4},"Jordan":{"pts":0,"p":2,"w":0,"d":0,"l":2,"f":2,"a":4}},
+  K:{"Colombia":{"pts":6,"p":2,"w":2,"d":0,"l":0,"f":4,"a":0},"Portugal":{"pts":4,"p":2,"w":1,"d":1,"l":0,"f":6,"a":1},"Congo DR":{"pts":1,"p":2,"w":0,"d":1,"l":1,"f":1,"a":2},"Uzbekistan":{"pts":0,"p":2,"w":0,"d":0,"l":2,"f":0,"a":8}},
+  L:{"England":{"pts":4,"p":2,"w":1,"d":1,"l":0,"f":4,"a":2},"Ghana":{"pts":4,"p":2,"w":1,"d":1,"l":0,"f":1,"a":0},"Croatia":{"pts":3,"p":2,"w":1,"d":0,"l":1,"f":3,"a":4},"Panama":{"pts":0,"p":2,"w":0,"d":0,"l":2,"f":0,"a":2}},
 };
+
+
 
 const R32_FIXTURE = [
   {match:73,home:"2A",away:"2B",kickoff:"Jun 28 · 3:00 PM ET · SoFi Stadium, LA"},
@@ -294,6 +394,32 @@ function CountryModal({ team, onClose, standings, results }) {
           </div>
         )}
 
+
+        {/* Top Players */}
+        {TOP_PLAYERS[team] && (
+          <div style={{marginBottom:18}}>
+            <div style={{fontSize:10,fontWeight:700,color:C.muted,letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>⭐ Key Players</div>
+            <div style={{background:C.card,borderRadius:10,overflow:"hidden",border:`1px solid ${C.border}`}}>
+              {TOP_PLAYERS[team].map((p,i)=>(
+                <div key={p.n} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"9px 12px",borderBottom:i<TOP_PLAYERS[team].length-1?`1px solid #0a1020`:"none"}}>
+                  <div style={{display:"flex",alignItems:"center",gap:8}}>
+                    <span style={{fontSize:11,color:C.dim,width:14}}>{i+1}</span>
+                    <div>
+                      <div style={{fontSize:13,fontWeight:600,color:C.text}}>{p.n}</div>
+                      <div style={{fontSize:10,color:C.dim}}>{p.p}</div>
+                    </div>
+                  </div>
+                  <div style={{display:"flex",alignItems:"center",gap:8}}>
+                    {p.goals>0&&<span style={{fontSize:12,fontWeight:700,color:C.gold}}>⚽ {p.goals}</span>}
+                    {p.ht>0&&<span style={{fontSize:10,fontWeight:700,color:C.gold,background:C.gold+"22",borderRadius:4,padding:"2px 5px"}}>🎩 HAT</span>}
+                    {p.goals===0&&<span style={{fontSize:11,color:C.muted}}>–</span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* FIFA ranking note */}
         <div style={{fontSize:11,color:C.muted,textAlign:"center"}}>
           FIFA ranking as of Jun 11, 2026 · Next update Jul 20
@@ -519,33 +645,93 @@ function StatusBar({loading, error, lastUpdated, onRefresh}) {
 }
 
 const DEMO_RESULTS = [
-  {group:"A",home:"Czechia",away:"Mexico",hg:0,ag:3,status:"final",kickoff:""},
-  {group:"A",home:"South Africa",away:"Korea Republic",hg:1,ag:0,status:"final",kickoff:""},
-  {group:"B",home:"Switzerland",away:"Canada",hg:2,ag:1,status:"final",kickoff:""},
-  {group:"B",home:"Bosnia and Herzegovina",away:"Qatar",hg:3,ag:1,status:"final",kickoff:""},
-  {group:"C",home:"Scotland",away:"Brazil",hg:0,ag:3,status:"final",kickoff:""},
-  {group:"C",home:"Morocco",away:"Haiti",hg:4,ag:2,status:"final",kickoff:""},
-  {group:"I",home:"France",away:"Iraq",hg:3,ag:0,status:"final",kickoff:""},
-  {group:"I",home:"Norway",away:"Senegal",hg:3,ag:2,status:"final",kickoff:""},
-  {group:"J",home:"Argentina",away:"Austria",hg:2,ag:0,status:"final",kickoff:""},
-  {group:"J",home:"Jordan",away:"Algeria",hg:1,ag:2,status:"final",kickoff:""},
-  {group:"K",home:"Portugal",away:"Uzbekistan",hg:5,ag:0,status:"final",kickoff:""},
-  {group:"K",home:"Colombia",away:"Congo DR",hg:1,ag:0,status:"final",kickoff:""},
-  {group:"L",home:"England",away:"Ghana",hg:0,ag:0,status:"final",kickoff:""},
-  {group:"L",home:"Panama",away:"Croatia",hg:0,ag:1,status:"final",kickoff:""},
-  {group:"E",home:"Ecuador",away:"Germany",hg:null,ag:null,status:"scheduled",kickoff:"Jun 25 · 4:00 PM ET",prob_home:17.4,prob_away:62.1},
-  {group:"E",home:"Curacao",away:"Ivory Coast",hg:null,ag:null,status:"scheduled",kickoff:"Jun 25 · 4:00 PM ET",prob_home:5.2,prob_away:83.7},
-  {group:"F",home:"Tunisia",away:"Netherlands",hg:null,ag:null,status:"scheduled",kickoff:"Jun 25 · 7:00 PM ET",prob_home:2.2,prob_away:90.7},
-  {group:"F",home:"Japan",away:"Sweden",hg:null,ag:null,status:"scheduled",kickoff:"Jun 25 · 7:00 PM ET",prob_home:50.6,prob_away:22.4},
-  {group:"D",home:"Turkiye",away:"USA",hg:null,ag:null,status:"scheduled",kickoff:"Jun 25 · 10:00 PM ET",prob_home:25.4,prob_away:50.5},
-  {group:"D",home:"Paraguay",away:"Australia",hg:null,ag:null,status:"scheduled",kickoff:"Jun 25 · 10:00 PM ET",prob_home:35,prob_away:23.9},
-  {group:"G",home:"Egypt",away:"Iran",hg:null,ag:null,status:"scheduled",kickoff:"Jun 27 · 3:00 PM ET"},
-  {group:"G",home:"New Zealand",away:"Belgium",hg:null,ag:null,status:"scheduled",kickoff:"Jun 27 · 3:00 PM ET"},
-  {group:"H",home:"Uruguay",away:"Spain",hg:null,ag:null,status:"scheduled",kickoff:"Jun 26 · 8:00 PM ET",prob_home:13.8,prob_away:64.9},
-  {group:"H",home:"Cape Verde",away:"Saudi Arabia",hg:null,ag:null,status:"scheduled",kickoff:"Jun 26 · 8:00 PM ET",prob_home:37.7,prob_away:34.3},
-  {group:"I",home:"Norway",away:"France",hg:null,ag:null,status:"scheduled",kickoff:"Jun 26 · 3:00 PM ET",prob_home:18.7,prob_away:59.5},
+  // GROUP A - complete
+  {group:"A",home:"Mexico",away:"South Africa",hg:2,ag:0,status:"final",kickoff:"Jun 11 · 8:00 PM ET"},
+  {group:"A",home:"Korea Republic",away:"Czechia",hg:2,ag:1,status:"final",kickoff:"Jun 11 · 5:00 PM ET"},
+  {group:"A",home:"Mexico",away:"Korea Republic",hg:1,ag:0,status:"final",kickoff:"Jun 18 · 9:00 PM ET"},
+  {group:"A",home:"Czechia",away:"South Africa",hg:1,ag:1,status:"final",kickoff:"Jun 18 · 9:00 PM ET"},
+  {group:"A",home:"Czechia",away:"Mexico",hg:0,ag:3,status:"final",kickoff:"Jun 24 · 9:00 PM ET"},
+  {group:"A",home:"South Africa",away:"Korea Republic",hg:1,ag:0,status:"final",kickoff:"Jun 24 · 9:00 PM ET"},
+  // GROUP B - complete
+  {group:"B",home:"Canada",away:"Bosnia and Herzegovina",hg:1,ag:1,status:"final",kickoff:"Jun 12 · 3:00 PM ET"},
+  {group:"B",home:"Switzerland",away:"Qatar",hg:6,ag:1,status:"final",kickoff:"Jun 12 · 3:00 PM ET"},
+  {group:"B",home:"Canada",away:"Qatar",hg:6,ag:0,status:"final",kickoff:"Jun 19 · 6:00 PM ET"},
+  {group:"B",home:"Switzerland",away:"Bosnia and Herzegovina",hg:2,ag:2,status:"final",kickoff:"Jun 19 · 6:00 PM ET"},
+  {group:"B",home:"Switzerland",away:"Canada",hg:2,ag:1,status:"final",kickoff:"Jun 24 · 3:00 PM ET"},
+  {group:"B",home:"Bosnia and Herzegovina",away:"Qatar",hg:3,ag:1,status:"final",kickoff:"Jun 24 · 3:00 PM ET"},
+  // GROUP C - complete
+  {group:"C",home:"Brazil",away:"Haiti",hg:5,ag:0,status:"final",kickoff:"Jun 13 · 9:00 PM ET"},
+  {group:"C",home:"Morocco",away:"Scotland",hg:1,ag:0,status:"final",kickoff:"Jun 13 · 6:00 PM ET"},
+  {group:"C",home:"Brazil",away:"Morocco",hg:1,ag:1,status:"final",kickoff:"Jun 20 · 9:00 PM ET"},
+  {group:"C",home:"Scotland",away:"Haiti",hg:1,ag:0,status:"final",kickoff:"Jun 20 · 6:00 PM ET"},
+  {group:"C",home:"Scotland",away:"Brazil",hg:0,ag:3,status:"final",kickoff:"Jun 24 · 6:00 PM ET"},
+  {group:"C",home:"Morocco",away:"Haiti",hg:4,ag:2,status:"final",kickoff:"Jun 24 · 6:00 PM ET"},
+  // GROUP D - MD3 today
+  {group:"D",home:"USA",away:"Paraguay",hg:4,ag:1,status:"final",kickoff:"Jun 12 · 9:00 PM ET"},
+  {group:"D",home:"Australia",away:"Turkiye",hg:2,ag:0,status:"final",kickoff:"Jun 13 · 3:00 PM ET"},
+  {group:"D",home:"USA",away:"Australia",hg:2,ag:0,status:"final",kickoff:"Jun 19 · 9:00 PM ET"},
+  {group:"D",home:"Turkiye",away:"Paraguay",hg:0,ag:1,status:"final",kickoff:"Jun 19 · 6:00 PM ET"},
+  {group:"D",home:"Turkiye",away:"USA",hg:null,ag:null,status:"scheduled",kickoff:"Jun 25 · 10:00 PM ET",prob_home:24.7,prob_away:51.5},
+  {group:"D",home:"Paraguay",away:"Australia",hg:null,ag:null,status:"scheduled",kickoff:"Jun 25 · 10:00 PM ET",prob_home:35.9,prob_away:22.4},
+  // GROUP E - MD3 today
+  {group:"E",home:"Germany",away:"Curacao",hg:7,ag:1,status:"final",kickoff:"Jun 14 · 3:00 PM ET"},
+  {group:"E",home:"Ivory Coast",away:"Ecuador",hg:1,ag:0,status:"final",kickoff:"Jun 14 · 6:00 PM ET"},
+  {group:"E",home:"Germany",away:"Ivory Coast",hg:2,ag:1,status:"final",kickoff:"Jun 20 · 6:00 PM ET"},
+  {group:"E",home:"Ecuador",away:"Curacao",hg:0,ag:0,status:"final",kickoff:"Jun 20 · 9:00 PM ET"},
+  {group:"E",home:"Ecuador",away:"Germany",hg:null,ag:null,status:"scheduled",kickoff:"Jun 25 · 4:00 PM ET",prob_home:18.6,prob_away:60.3},
+  {group:"E",home:"Curacao",away:"Ivory Coast",hg:null,ag:null,status:"scheduled",kickoff:"Jun 25 · 4:00 PM ET",prob_home:5.2,prob_away:83.9},
+  // GROUP F - MD3 today
+  {group:"F",home:"Netherlands",away:"Japan",hg:2,ag:2,status:"final",kickoff:"Jun 14 · 6:00 PM ET"},
+  {group:"F",home:"Sweden",away:"Tunisia",hg:5,ag:1,status:"final",kickoff:"Jun 14 · 9:00 PM ET"},
+  {group:"F",home:"Netherlands",away:"Sweden",hg:5,ag:1,status:"final",kickoff:"Jun 20 · 3:00 PM ET"},
+  {group:"F",home:"Japan",away:"Tunisia",hg:4,ag:0,status:"final",kickoff:"Jun 20 · 6:00 PM ET"},
+  {group:"F",home:"Tunisia",away:"Netherlands",hg:null,ag:null,status:"scheduled",kickoff:"Jun 25 · 7:00 PM ET",prob_home:3.3,prob_away:88.1},
+  {group:"F",home:"Japan",away:"Sweden",hg:null,ag:null,status:"scheduled",kickoff:"Jun 25 · 7:00 PM ET",prob_home:49.6,prob_away:23.1},
+  // GROUP G - MD3 Jun 27
+  {group:"G",home:"Belgium",away:"Egypt",hg:1,ag:1,status:"final",kickoff:"Jun 15 · 3:00 PM ET"},
+  {group:"G",home:"Iran",away:"New Zealand",hg:2,ag:2,status:"final",kickoff:"Jun 15 · 6:00 PM ET"},
+  {group:"G",home:"Belgium",away:"Iran",hg:0,ag:0,status:"final",kickoff:"Jun 21 · 3:00 PM ET"},
+  {group:"G",home:"Egypt",away:"New Zealand",hg:3,ag:1,status:"final",kickoff:"Jun 21 · 6:00 PM ET"},
+  {group:"G",home:"Egypt",away:"Iran",hg:null,ag:null,status:"scheduled",kickoff:"Jun 27 · 11:00 PM ET"},
+  {group:"G",home:"New Zealand",away:"Belgium",hg:null,ag:null,status:"scheduled",kickoff:"Jun 27 · 11:00 PM ET"},
+  // GROUP H - MD3 Jun 26
+  {group:"H",home:"Spain",away:"Cape Verde",hg:0,ag:0,status:"final",kickoff:"Jun 15 · 9:00 PM ET"},
+  {group:"H",home:"Saudi Arabia",away:"Uruguay",hg:1,ag:1,status:"final",kickoff:"Jun 15 · 6:00 PM ET"},
+  {group:"H",home:"Spain",away:"Saudi Arabia",hg:4,ag:0,status:"final",kickoff:"Jun 21 · 9:00 PM ET"},
+  {group:"H",home:"Uruguay",away:"Cape Verde",hg:2,ag:2,status:"final",kickoff:"Jun 21 · 6:00 PM ET"},
+  {group:"H",home:"Cape Verde",away:"Saudi Arabia",hg:null,ag:null,status:"scheduled",kickoff:"Jun 26 · 8:00 PM ET",prob_home:36.7,prob_away:34.7},
+  {group:"H",home:"Uruguay",away:"Spain",hg:null,ag:null,status:"scheduled",kickoff:"Jun 26 · 8:00 PM ET",prob_home:14.3,prob_away:64.1},
+  // GROUP I - MD3 Jun 26
+  {group:"I",home:"France",away:"Senegal",hg:3,ag:1,status:"final",kickoff:"Jun 16 · 3:00 PM ET"},
+  {group:"I",home:"Norway",away:"Iraq",hg:4,ag:1,status:"final",kickoff:"Jun 16 · 6:00 PM ET"},
+  {group:"I",home:"France",away:"Iraq",hg:3,ag:0,status:"final",kickoff:"Jun 22 · 3:00 PM ET"},
+  {group:"I",home:"Norway",away:"Senegal",hg:3,ag:2,status:"final",kickoff:"Jun 22 · 6:00 PM ET"},
+  {group:"I",home:"Norway",away:"France",hg:null,ag:null,status:"scheduled",kickoff:"Jun 26 · 3:00 PM ET",prob_home:18.6,prob_away:59.8},
   {group:"I",home:"Senegal",away:"Iraq",hg:null,ag:null,status:"scheduled",kickoff:"Jun 26 · 3:00 PM ET",prob_home:79,prob_away:7.4},
+  // GROUP J - MD3 Jun 27
+  {group:"J",home:"Argentina",away:"Algeria",hg:3,ag:0,status:"final",kickoff:"Jun 16 · 9:00 PM ET"},
+  {group:"J",home:"Jordan",away:"Austria",hg:1,ag:2,status:"final",kickoff:"Jun 17 · 3:00 PM ET"},
+  {group:"J",home:"Argentina",away:"Austria",hg:2,ag:1,status:"final",kickoff:"Jun 22 · 9:00 PM ET"},
+  {group:"J",home:"Algeria",away:"Jordan",hg:2,ag:1,status:"final",kickoff:"Jun 22 · 6:00 PM ET"},
+  {group:"J",home:"Argentina",away:"Jordan",hg:null,ag:null,status:"scheduled",kickoff:"Jun 27 · 6:00 PM ET"},
+  {group:"J",home:"Austria",away:"Algeria",hg:null,ag:null,status:"scheduled",kickoff:"Jun 27 · 6:00 PM ET"},
+  // GROUP K - MD3 Jun 27
+  {group:"K",home:"Colombia",away:"Uzbekistan",hg:3,ag:0,status:"final",kickoff:"Jun 17 · 6:00 PM ET"},
+  {group:"K",home:"Portugal",away:"Congo DR",hg:1,ag:1,status:"final",kickoff:"Jun 17 · 9:00 PM ET"},
+  {group:"K",home:"Colombia",away:"Congo DR",hg:1,ag:0,status:"final",kickoff:"Jun 23 · 10:00 PM ET"},
+  {group:"K",home:"Portugal",away:"Uzbekistan",hg:5,ag:0,status:"final",kickoff:"Jun 23 · 1:00 PM ET"},
+  {group:"K",home:"Colombia",away:"Portugal",hg:null,ag:null,status:"scheduled",kickoff:"Jun 27 · 7:30 PM ET"},
+  {group:"K",home:"Congo DR",away:"Uzbekistan",hg:null,ag:null,status:"scheduled",kickoff:"Jun 27 · 7:30 PM ET"},
+  // GROUP L - MD3 Jun 27
+  {group:"L",home:"England",away:"Croatia",hg:4,ag:2,status:"final",kickoff:"Jun 17 · 3:00 PM ET"},
+  {group:"L",home:"Ghana",away:"Panama",hg:1,ag:0,status:"final",kickoff:"Jun 17 · 6:00 PM ET"},
+  {group:"L",home:"England",away:"Ghana",hg:0,ag:0,status:"final",kickoff:"Jun 23 · 4:00 PM ET"},
+  {group:"L",home:"Panama",away:"Croatia",hg:0,ag:1,status:"final",kickoff:"Jun 23 · 7:00 PM ET"},
+  {group:"L",home:"Panama",away:"England",hg:null,ag:null,status:"scheduled",kickoff:"Jun 27 · 5:00 PM ET"},
+  {group:"L",home:"Croatia",away:"Ghana",hg:null,ag:null,status:"scheduled",kickoff:"Jun 27 · 5:00 PM ET"},
 ];
+
+
 
 // ── MAIN APP ──────────────────────────────────────────────────────────────
 export default function WorldCup2026() {
@@ -592,7 +778,7 @@ export default function WorldCup2026() {
 
   const TABS = [
     {id:"live",label:"⚡ Live"},{id:"groups",label:"📊 Groups"},
-    {id:"thirds",label:"🥉 Best 3rds"},{id:"r32",label:"Round of 32"},
+    {id:"scorers",label:"🥅 Scorers"},{id:"thirds",label:"🥉 Best 3rds"},{id:"r32",label:"Round of 32"},
     {id:"r16",label:"Round of 16"},{id:"qf",label:"Quarterfinals"},
     {id:"sf",label:"Semifinals"},{id:"final",label:"🏆 Final"},
   ];
@@ -671,6 +857,45 @@ export default function WorldCup2026() {
           </div>
           <StandingsTable teams={groupTeams} onSelect={setSelectedTeam}/>
           <div style={{marginTop:12}}>{results.filter(g=>g.group===activeGroup).map((g,i)=><MatchRow key={i} {...g} compact onSelect={setSelectedTeam}/>)}</div>
+        </div>}
+
+        
+        {view==="scorers"&&<div>
+          <div style={{background:"#f57f1710",border:"1px solid #f57f1730",borderRadius:10,padding:"10px 14px",marginBottom:14,fontSize:12,color:"#ffb74d"}}>
+            🥅 Golden Boot Race · Updated through Matchday 2 · Tap flag to view team
+          </div>
+          <div style={{background:C.card,borderRadius:12,overflow:"hidden",border:`1px solid ${C.border}`}}>
+            <div style={{display:"grid",gridTemplateColumns:"28px 1fr 60px 50px 50px",padding:"8px 12px",background:"#0a1020",borderBottom:`1px solid ${C.border}`}}>
+              {["#","Player","Team","Goals","HT"].map((h,i)=><div key={h} style={{fontSize:9,fontWeight:700,color:C.muted,textAlign:i>1?"center":"left",textTransform:"uppercase",letterSpacing:1}}>{h}</div>)}
+            </div>
+            {SCORERS.sort((a,b)=>b.goals-a.goals||b.hattricks-a.hattricks).map((s,idx)=>(
+              <div key={s.name} style={{display:"grid",gridTemplateColumns:"28px 1fr 60px 50px 50px",padding:"11px 12px",alignItems:"center",borderBottom:idx<SCORERS.length-1?"1px solid #0d1428":"none",background:idx%2===0?C.card:"#0a1228"}}>
+                <div style={{fontSize:11,color:idx===0?C.gold:C.muted,fontWeight:700}}>{idx+1}</div>
+                <div style={{display:"flex",flexDirection:"column",gap:2}}>
+                  <span style={{fontSize:13,fontWeight:600,color:idx<3?C.text:C.sub}}>{s.name}</span>
+                  <span style={{fontSize:10,color:C.dim}}>{s.pos}</span>
+                </div>
+                <div style={{textAlign:"center"}}>
+                  <span
+                    onClick={()=>setSelectedTeam(s.team)}
+                    style={{fontSize:20,cursor:"pointer"}}
+                    title={s.team}
+                  >{fl(s.team)||"🏳"}</span>
+                </div>
+                <div style={{textAlign:"center"}}>
+                  <span style={{fontSize:16,fontWeight:800,color:idx===0?C.gold:idx<3?"#fff":C.text}}>{s.goals}</span>
+                  {s.goals>0&&<div style={{width:`${Math.round(s.goals/SCORERS[0].goals*100)}%`,height:3,background:idx===0?C.gold:C.blue,borderRadius:2,margin:"3px auto 0",maxWidth:36}}/>}
+                </div>
+                <div style={{textAlign:"center"}}>
+                  {s.hattricks>0
+                    ? <span style={{fontSize:11,fontWeight:700,color:C.gold,background:C.gold+"22",borderRadius:4,padding:"2px 6px"}}>🎩×{s.hattricks}</span>
+                    : <span style={{fontSize:11,color:C.muted}}>–</span>
+                  }
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{fontSize:10,color:C.muted,textAlign:"center",marginTop:10}}>Tap a flag to view full team profile · Hat-trick = 3+ goals in one match</div>
         </div>}
 
         {view==="thirds"&&<div>
