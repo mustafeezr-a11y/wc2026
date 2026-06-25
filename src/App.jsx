@@ -1,13 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 
-// ─────────────────────────────────────────────────────────────────────────────
-// 🔧 CONFIG — paste your published Google Sheet CSV URL here
-// Sheet → File → Share → Publish to web → Sheet1 → CSV → Copy link
-// ─────────────────────────────────────────────────────────────────────────────
 const SHEET_CSV_URL = "YOUR_GOOGLE_SHEET_CSV_URL_HERE";
-const AUTO_REFRESH_SECONDS = 120; // refresh every 2 min (0 to disable)
+const AUTO_REFRESH_SECONDS = 120;
 
-// ── FIFA RANKINGS (Jun 11 2026 — official) ────────────────────────────────
 const FIFA_RANK = {
   Argentina:1,Spain:2,France:3,England:4,Portugal:5,
   Brazil:6,Morocco:7,Netherlands:8,Belgium:9,Germany:10,
@@ -39,7 +34,6 @@ const FLAG = {
 };
 const fl = (n) => FLAG[n] || null;
 
-// ── SEED STANDINGS (after Matchday 2 — base before sheet data) ───────────
 const SEED = {
   A:{Mexico:{pts:6,p:2,w:2,d:0,l:0,f:3,a:0},"Korea Republic":{pts:3,p:2,w:1,d:0,l:1,f:2,a:2},Czechia:{pts:1,p:2,w:0,d:1,l:1,f:2,a:3},"South Africa":{pts:1,p:2,w:0,d:1,l:1,f:1,a:3}},
   B:{Canada:{pts:4,p:2,w:1,d:1,l:0,f:7,a:1},Switzerland:{pts:4,p:2,w:1,d:1,l:0,f:5,a:2},"Bosnia and Herzegovina":{pts:1,p:2,w:0,d:1,l:1,f:2,a:5},Qatar:{pts:1,p:2,w:0,d:1,l:1,f:1,a:7}},
@@ -55,7 +49,6 @@ const SEED = {
   L:{England:{pts:4,p:2,w:1,d:1,l:0,f:4,a:2},Ghana:{pts:4,p:2,w:1,d:1,l:0,f:1,a:0},Croatia:{pts:3,p:2,w:1,d:0,l:1,f:3,a:4},Panama:{pts:0,p:2,w:0,d:0,l:2,f:0,a:2}},
 };
 
-// ── KNOCKOUT FIXTURES ─────────────────────────────────────────────────────
 const R32_FIXTURE = [
   {match:73,home:"2A",away:"2B",kickoff:"Jun 28 · 3:00 PM ET · SoFi Stadium, LA"},
   {match:74,home:"1E",away:"3ABCDF",kickoff:"Jun 29 · 4:30 PM ET · Gillette Stadium, Boston"},
@@ -97,7 +90,6 @@ const SF_FIXTURE = [
 const THIRD_FIXTURE = [{match:103,home:"L101",away:"L102",kickoff:"Jul 18 · 5:00 PM ET · Hard Rock Stadium, Miami"}];
 const FINAL_FIXTURE = [{match:104,home:"W101",away:"W102",kickoff:"Jul 19 · 3:00 PM ET · MetLife Stadium, NY/NJ"}];
 
-// ── CSV PARSER ────────────────────────────────────────────────────────────
 function parseCSV(csv) {
   const lines = csv.trim().split("\n").filter(Boolean);
   if (lines.length < 2) return [];
@@ -121,7 +113,6 @@ function parseCSV(csv) {
   }).filter(r => r.home && r.away);
 }
 
-// ── HELPERS ───────────────────────────────────────────────────────────────
 function applyResult(s, group, home, away, hg, ag) {
   const g = JSON.parse(JSON.stringify(s[group] || {}));
   if (!g[home]) g[home] = {pts:0,p:0,w:0,d:0,l:0,f:0,a:0};
@@ -169,13 +160,148 @@ function resolveSlot(slot, slotMap) {
   return { label: slot, team: null, confirmed: false };
 }
 
-// ── COLORS ────────────────────────────────────────────────────────────────
 const C = {
   bg:"#060d1a", card:"#0f1520", border:"#1e2a4a", muted:"#37474f",
   dim:"#546e7a", text:"#e8eaf6", sub:"#90a4ae",
   blue:"#3d5afe", blueDark:"#1a237e", green:"#00e676",
   orange:"#ff9800", red:"#ef5350", gold:"#ffd600",
 };
+
+// ── COUNTRY PROFILE MODAL ─────────────────────────────────────────────────
+function findTeamGroup(team, seed) {
+  return Object.entries(seed).find(([, teams]) => team in teams)?.[0] || null;
+}
+
+function CountryModal({ team, onClose, standings, results }) {
+  if (!team) return null;
+  const grpKey = findTeamGroup(team, standings);
+  const grpTeams = grpKey ? sortGroup(standings[grpKey] || {}) : [];
+  const myStats = grpKey ? standings[grpKey]?.[team] : null;
+  const myMatches = results.filter(r => r.home === team || r.away === team);
+  const myResults = myMatches.filter(r => r.status === "final" || (r.hg !== null && r.ag !== null));
+  const myUpcoming = myMatches.filter(r => r.hg === null && r.ag === null && r.status !== "final");
+
+  const getRes = (r) => {
+    const isHome = r.home === team;
+    const myG = isHome ? r.hg : r.ag, theirG = isHome ? r.ag : r.hg;
+    if (myG > theirG) return "W"; if (myG < theirG) return "L"; return "D";
+  };
+  const resColor = (r) => r === "W" ? "#00e676" : r === "L" ? "#ef5350" : "#ffd600";
+
+  return (
+    <div onClick={onClose} style={{
+      position:"fixed",inset:0,background:"rgba(0,0,0,0.8)",zIndex:1000,
+      display:"flex",alignItems:"center",justifyContent:"center",padding:16,overflowY:"auto"
+    }}>
+      <div onClick={e => e.stopPropagation()} style={{
+        background:"#0a1020",border:`1px solid ${C.border}`,borderRadius:16,
+        width:"100%",maxWidth:480,maxHeight:"90vh",overflowY:"auto",padding:20
+      }}>
+        {/* Header */}
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:18}}>
+          <div style={{display:"flex",alignItems:"center",gap:12}}>
+            <span style={{fontSize:44}}>{fl(team) || "🏳"}</span>
+            <div>
+              <div style={{fontSize:20,fontWeight:800,color:C.text}}>{team}</div>
+              <div style={{fontSize:12,color:C.dim}}>
+                FIFA {rank(team) || "–"} · {grpKey ? `Group ${grpKey}` : "–"}
+              </div>
+            </div>
+          </div>
+          <button onClick={onClose} style={{
+            background:"rgba(255,255,255,0.08)",border:`1px solid ${C.border}`,
+            color:C.sub,borderRadius:8,width:32,height:32,cursor:"pointer",fontSize:18,lineHeight:1
+          }}>✕</button>
+        </div>
+
+        {/* Stats bar */}
+        {myStats && (
+          <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:8,marginBottom:18}}>
+            {[["Pts",myStats.pts,C.gold],["W",myStats.w,C.green],["D",myStats.d,C.gold],["L",myStats.l,C.red],["GD",(myStats.f||0)-(myStats.a||0),null]].map(([k,v,col])=>(
+              <div key={k} style={{background:C.card,borderRadius:10,padding:"10px 4px",textAlign:"center",border:`1px solid ${C.border}`}}>
+                <div style={{fontSize:20,fontWeight:800,color:col||(v>0?"#00e676":v<0?C.red:C.text)}}>
+                  {k==="GD"&&v>0?"+":""}{v}
+                </div>
+                <div style={{fontSize:10,color:C.dim,marginTop:2}}>{k}</div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Upcoming */}
+        {myUpcoming.length > 0 && (
+          <div style={{marginBottom:18}}>
+            <div style={{fontSize:10,fontWeight:700,color:C.muted,letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Upcoming</div>
+            {myUpcoming.map((m,i) => (
+              <div key={i} style={{background:C.card,borderRadius:10,padding:"10px 12px",marginBottom:6,border:`1px solid ${C.border}`}}>
+                <div style={{fontSize:11,color:C.gold,marginBottom:4}}>🕐 {m.kickoff}</div>
+                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                  <span style={{fontSize:12,color:C.text,fontWeight:600}}>{fl(m.home)} {m.home}</span>
+                  <span style={{fontSize:11,color:C.dim}}>vs</span>
+                  <span style={{fontSize:12,color:C.text,fontWeight:600}}>{m.away} {fl(m.away)}</span>
+                </div>
+                {m.prob_home && <div style={{fontSize:10,color:C.dim,textAlign:"center",marginTop:4}}>{m.prob_home}% · {m.prob_away}%</div>}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Results */}
+        {myResults.length > 0 && (
+          <div style={{marginBottom:18}}>
+            <div style={{fontSize:10,fontWeight:700,color:C.muted,letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Match Results</div>
+            {myResults.map((m,i) => {
+              const res = getRes(m);
+              const isHome = m.home === team;
+              const opp = isHome ? m.away : m.home;
+              return (
+                <div key={i} style={{background:C.card,borderRadius:10,padding:"10px 12px",marginBottom:6,border:`1px solid ${C.border}`,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                  <div style={{display:"flex",alignItems:"center",gap:8}}>
+                    <span style={{fontWeight:700,fontSize:12,color:resColor(res),background:resColor(res)+"22",borderRadius:6,padding:"2px 7px"}}>{res}</span>
+                    <span style={{fontSize:12,color:C.sub}}>{fl(opp)} {opp}</span>
+                  </div>
+                  <span style={{fontSize:14,fontWeight:800,color:C.text}}>{m.hg} – {m.ag}</span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Group standing */}
+        {grpKey && grpTeams.length > 0 && (
+          <div style={{marginBottom:18}}>
+            <div style={{fontSize:10,fontWeight:700,color:C.muted,letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Group {grpKey} Standing</div>
+            <div style={{background:C.card,borderRadius:10,overflow:"hidden",border:`1px solid ${C.border}`}}>
+              {grpTeams.map((t,i) => (
+                <div key={t.name} style={{
+                  display:"flex",alignItems:"center",justifyContent:"space-between",
+                  padding:"9px 12px",
+                  borderBottom:i<grpTeams.length-1?`1px solid #0a1020`:"none",
+                  background:t.name===team?"rgba(253,214,0,0.06)":"transparent"
+                }}>
+                  <div style={{display:"flex",alignItems:"center",gap:8}}>
+                    <span style={{fontSize:11,color:C.dim,width:14}}>{i+1}</span>
+                    <span style={{fontSize:18}}>{fl(t.name)||"🏳"}</span>
+                    <span style={{fontSize:12,color:t.name===team?C.gold:C.text,fontWeight:t.name===team?700:500}}>{t.name}</span>
+                  </div>
+                  <div style={{display:"flex",gap:10,alignItems:"center"}}>
+                    <span style={{fontSize:11,color:C.dim}}>{t.w}W {t.d}D {t.l}L</span>
+                    <span style={{fontSize:13,fontWeight:800,color:t.name===team?C.gold:C.blue}}>{t.pts}pts</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* FIFA ranking note */}
+        <div style={{fontSize:11,color:C.muted,textAlign:"center"}}>
+          FIFA ranking as of Jun 11, 2026 · Next update Jul 20
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // ── UI COMPONENTS ─────────────────────────────────────────────────────────
 function Tab({label, active, onClick}) {
@@ -188,17 +314,39 @@ function RankBadge({name, style={}}) {
   const r = rank(name); if (!r) return null;
   return <span style={{fontSize:9,fontWeight:700,color:"#607d8b",background:"#0a1428",border:"1px solid #1e2a4a",borderRadius:3,padding:"1px 4px",lineHeight:1,whiteSpace:"nowrap",...style}}>{r}</span>;
 }
-function TeamName({name, align="right", bold=false}) {
-  const emoji = fl(name), isRight = align==="right";
+
+// Clickable flag wrapper
+function ClickableFlag({ name, onSelect }) {
+  const emoji = fl(name);
+  if (!emoji) return null;
+  return (
+    <span
+      onClick={e => { e.stopPropagation(); onSelect && onSelect(name); }}
+      style={{fontSize:20,cursor:"pointer",userSelect:"none"}}
+      title={`View ${name} profile`}
+    >{emoji}</span>
+  );
+}
+
+function TeamName({name, align="right", bold=false, onSelect}) {
+  const isRight = align==="right";
   return (
     <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:isRight?"flex-end":"flex-start",gap:5}}>
-      {isRight && <><RankBadge name={name}/><span style={{fontSize:13,fontWeight:bold?700:500,color:bold?C.text:C.sub,textAlign:"right"}}>{name}</span>{emoji&&<span style={{fontSize:20}}>{emoji}</span>}</>}
-      {!isRight && <>{emoji&&<span style={{fontSize:20}}>{emoji}</span>}<span style={{fontSize:13,fontWeight:bold?700:500,color:bold?C.text:C.sub}}>{name}</span><RankBadge name={name}/></>}
+      {isRight && <>
+        <RankBadge name={name}/>
+        <span style={{fontSize:13,fontWeight:bold?700:500,color:bold?C.text:C.sub,textAlign:"right"}}>{name}</span>
+        <ClickableFlag name={name} onSelect={onSelect}/>
+      </>}
+      {!isRight && <>
+        <ClickableFlag name={name} onSelect={onSelect}/>
+        <span style={{fontSize:13,fontWeight:bold?700:500,color:bold?C.text:C.sub}}>{name}</span>
+        <RankBadge name={name}/>
+      </>}
     </div>
   );
 }
 
-function MatchRow({home, away, hg, ag, status, kickoff, prob_home, prob_away, compact}) {
+function MatchRow({home, away, hg, ag, status, kickoff, prob_home, prob_away, compact, onSelect}) {
   const played = hg!==null && ag!==null;
   const live = status==="in_progress", fin = status==="final";
   const hWin=played&&hg>ag, aWin=played&&ag>hg;
@@ -206,7 +354,7 @@ function MatchRow({home, away, hg, ag, status, kickoff, prob_home, prob_away, co
     <div style={{background:C.card,borderRadius:10,padding:compact?"10px 14px":"14px 18px",marginBottom:7,border:`1px solid ${live?"#ff980055":C.border}`,boxShadow:live?"0 0 12px #ff980018":"none"}}>
       {kickoff&&!played&&<div style={{fontSize:10,color:C.gold,fontWeight:700,marginBottom:6}}>🕐 {kickoff}</div>}
       <div style={{display:"flex",alignItems:"center",gap:6}}>
-        <TeamName name={home} align="right" bold={hWin}/>
+        <TeamName name={home} align="right" bold={hWin} onSelect={onSelect}/>
         <div style={{textAlign:"center",minWidth:72}}>
           {live&&<div style={{fontSize:8,color:C.orange,fontWeight:700,letterSpacing:1,marginBottom:1}}>● LIVE</div>}
           {fin&&<div style={{fontSize:8,color:C.green,fontWeight:700,letterSpacing:1,marginBottom:1}}>FT</div>}
@@ -217,13 +365,34 @@ function MatchRow({home, away, hg, ag, status, kickoff, prob_home, prob_away, co
               </div>
           }
         </div>
-        <TeamName name={away} align="left" bold={aWin}/>
+        <TeamName name={away} align="left" bold={aWin} onSelect={onSelect}/>
       </div>
     </div>
   );
 }
 
-function StandingsTable({teams}) {
+// Collapsible section
+function CollapsibleSection({ title, count, defaultOpen=true, accent=C.blue, children }) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div style={{marginBottom:16}}>
+      <button onClick={()=>setOpen(o=>!o)} style={{
+        width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",
+        background:"transparent",border:"none",cursor:"pointer",padding:"8px 0",marginBottom:open?8:0
+      }}>
+        <div style={{display:"flex",alignItems:"center",gap:10}}>
+          <div style={{width:3,height:18,borderRadius:2,background:accent}}/>
+          <span style={{fontSize:12,fontWeight:800,color:C.text,letterSpacing:1}}>{title}</span>
+          <span style={{fontSize:10,fontWeight:700,color:accent,background:accent+"22",borderRadius:12,padding:"2px 8px"}}>{count}</span>
+        </div>
+        <span style={{fontSize:16,color:C.dim,transform:open?"rotate(0deg)":"rotate(-90deg)",transition:"transform 0.2s"}}>▾</span>
+      </button>
+      {open && <div>{children}</div>}
+    </div>
+  );
+}
+
+function StandingsTable({teams, onSelect}) {
   return (
     <div style={{background:C.card,borderRadius:12,overflow:"hidden",border:`1px solid ${C.border}`}}>
       <div style={{display:"grid",gridTemplateColumns:"22px 1fr 34px 26px 26px 26px 26px 26px 26px 34px",padding:"8px 12px",background:"#0a1020",borderBottom:`1px solid ${C.border}`}}>
@@ -235,7 +404,7 @@ function StandingsTable({teams}) {
           <div key={t.name} style={{display:"grid",gridTemplateColumns:"22px 1fr 34px 26px 26px 26px 26px 26px 26px 34px",padding:"11px 12px",alignItems:"center",borderBottom:idx<teams.length-1?"1px solid #0d1428":"none",borderLeft:`3px solid ${isQ?C.blue:is3?"#546e7a55":"transparent"}`,background:idx%2===0?C.card:"#0a1228"}}>
             <div style={{fontSize:11,color:C.muted,fontWeight:700}}>{idx+1}</div>
             <div style={{display:"flex",alignItems:"center",gap:5,flexWrap:"wrap"}}>
-              {fl(t.name)&&<span style={{fontSize:16}}>{fl(t.name)}</span>}
+              <span onClick={()=>onSelect&&onSelect(t.name)} style={{fontSize:16,cursor:"pointer"}}>{fl(t.name)||"🏳"}</span>
               <span style={{fontSize:13,fontWeight:600,color:isQ?C.text:C.sub}}>{t.name}</span>
               <RankBadge name={t.name}/>
               {isQ&&<span style={{fontSize:7,background:C.blueDark,color:"#7986cb",padding:"2px 4px",borderRadius:3,fontWeight:700}}>Q</span>}
@@ -251,7 +420,7 @@ function StandingsTable({teams}) {
   );
 }
 
-function BestThirdsTable({thirds}) {
+function BestThirdsTable({thirds, onSelect}) {
   return (
     <div style={{background:C.card,borderRadius:12,overflow:"hidden",border:`1px solid ${C.border}`}}>
       <div style={{display:"grid",gridTemplateColumns:"22px 1fr 26px 32px 24px 24px 24px 24px 24px 24px 30px",padding:"8px 12px",background:"#0a1020",borderBottom:`1px solid ${C.border}`}}>
@@ -263,7 +432,7 @@ function BestThirdsTable({thirds}) {
           <div key={t.name} style={{display:"grid",gridTemplateColumns:"22px 1fr 26px 32px 24px 24px 24px 24px 24px 24px 30px",padding:"10px 12px",alignItems:"center",borderBottom:idx<thirds.length-1?"1px solid #0d1428":"none",borderLeft:`3px solid ${adv?C.gold+"99":"transparent"}`,background:idx%2===0?C.card:"#0a1228"}}>
             <div style={{fontSize:11,color:C.muted,fontWeight:700}}>{idx+1}</div>
             <div style={{display:"flex",alignItems:"center",gap:5,flexWrap:"wrap"}}>
-              {fl(t.name)&&<span style={{fontSize:16}}>{fl(t.name)}</span>}
+              <span onClick={()=>onSelect&&onSelect(t.name)} style={{fontSize:16,cursor:"pointer"}}>{fl(t.name)||"🏳"}</span>
               <span style={{fontSize:13,fontWeight:600,color:adv?C.text:C.sub}}>{t.name}</span>
               <RankBadge name={t.name}/>
               {adv&&<span style={{fontSize:7,background:"#f57f1722",color:C.gold,padding:"2px 4px",borderRadius:3,fontWeight:700}}>ADV</span>}
@@ -279,17 +448,31 @@ function BestThirdsTable({thirds}) {
   );
 }
 
-function TeamSlot({res, align}) {
+function TeamSlot({res, align, onSelect}) {
   const {label, team, confirmed} = res, emoji = team ? fl(team) : null, isRight = align==="right";
   return (
     <div style={{flex:1,display:"flex",alignItems:"center",gap:6,justifyContent:isRight?"flex-end":"flex-start"}}>
-      {isRight&&<>{confirmed&&<RankBadge name={team}/>}<span style={{fontSize:13,fontWeight:confirmed?700:400,color:confirmed?C.text:C.muted,textAlign:"right",lineHeight:1.2}}>{label}</span>{emoji?<span style={{fontSize:22}}>{emoji}</span>:<div style={{width:24,height:24,borderRadius:"50%",background:"#1e2a4a",border:`1px solid ${C.border}`,flexShrink:0}}/>}</>}
-      {!isRight&&<>{emoji?<span style={{fontSize:22}}>{emoji}</span>:<div style={{width:24,height:24,borderRadius:"50%",background:"#1e2a4a",border:`1px solid ${C.border}`,flexShrink:0}}/> }<span style={{fontSize:13,fontWeight:confirmed?700:400,color:confirmed?C.text:C.muted,lineHeight:1.2}}>{label}</span>{confirmed&&<RankBadge name={team}/>}</>}
+      {isRight&&<>
+        {confirmed&&<RankBadge name={team}/>}
+        <span style={{fontSize:13,fontWeight:confirmed?700:400,color:confirmed?C.text:C.muted,textAlign:"right",lineHeight:1.2}}>{label}</span>
+        {emoji
+          ? <span onClick={()=>onSelect&&onSelect(team)} style={{fontSize:22,cursor:"pointer"}}>{emoji}</span>
+          : <div style={{width:24,height:24,borderRadius:"50%",background:"#1e2a4a",border:`1px solid ${C.border}`,flexShrink:0}}/>
+        }
+      </>}
+      {!isRight&&<>
+        {emoji
+          ? <span onClick={()=>onSelect&&onSelect(team)} style={{fontSize:22,cursor:"pointer"}}>{emoji}</span>
+          : <div style={{width:24,height:24,borderRadius:"50%",background:"#1e2a4a",border:`1px solid ${C.border}`,flexShrink:0}}/>
+        }
+        <span style={{fontSize:13,fontWeight:confirmed?700:400,color:confirmed?C.text:C.muted,lineHeight:1.2}}>{label}</span>
+        {confirmed&&<RankBadge name={team}/>}
+      </>}
     </div>
   );
 }
 
-function KnockoutMatchRow({r, slotMap, divider, accent}) {
+function KnockoutMatchRow({r, slotMap, divider, accent, onSelect}) {
   const homeRes = resolveSlot(r.home, slotMap), awayRes = resolveSlot(r.away, slotMap);
   return (
     <div style={{borderBottom:divider?`1px solid ${C.border}`:"none"}}>
@@ -298,15 +481,15 @@ function KnockoutMatchRow({r, slotMap, divider, accent}) {
         {r.kickoff&&<span style={{fontSize:10,fontWeight:700,color:C.gold}}>🕐 {r.kickoff}</span>}
       </div>
       <div style={{display:"flex",alignItems:"center",padding:"9px 14px 10px",gap:8}}>
-        <TeamSlot res={homeRes} align="right"/>
+        <TeamSlot res={homeRes} align="right" onSelect={onSelect}/>
         <div style={{minWidth:36,textAlign:"center",fontSize:10,fontWeight:700,color:C.muted,borderLeft:`1px solid ${C.border}`,borderRight:`1px solid ${C.border}`,padding:"4px 6px"}}>vs</div>
-        <TeamSlot res={awayRes} align="left"/>
+        <TeamSlot res={awayRes} align="left" onSelect={onSelect}/>
       </div>
     </div>
   );
 }
 
-function KnockoutGrid({rounds, slotMap, accent=C.blue, title, info}) {
+function KnockoutGrid({rounds, slotMap, accent=C.blue, title, info, onSelect}) {
   const pairs = [];
   for (let i = 0; i < rounds.length; i += 2) pairs.push(rounds.slice(i,i+2));
   return (
@@ -316,7 +499,7 @@ function KnockoutGrid({rounds, slotMap, accent=C.blue, title, info}) {
       <div style={{display:"flex",flexDirection:"column",gap:10}}>
         {pairs.map((pair,pi)=>(
           <div key={pi} style={{background:"#0a1020",borderRadius:12,border:`1px solid ${C.border}`,overflow:"hidden"}}>
-            {pair.map((r,ri)=><KnockoutMatchRow key={r.match} r={r} slotMap={slotMap} divider={ri<pair.length-1} accent={accent}/>)}
+            {pair.map((r,ri)=><KnockoutMatchRow key={r.match} r={r} slotMap={slotMap} divider={ri<pair.length-1} accent={accent} onSelect={onSelect}/>)}
           </div>
         ))}
       </div>
@@ -324,11 +507,10 @@ function KnockoutGrid({rounds, slotMap, accent=C.blue, title, info}) {
   );
 }
 
-function StatusBar({loading, error, lastUpdated, onRefresh, isDemo}) {
+function StatusBar({loading, error, lastUpdated, onRefresh}) {
   return (
     <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
-      {isDemo&&<div style={{fontSize:10,background:"#ff980022",color:C.orange,border:"1px solid #ff980044",borderRadius:12,padding:"3px 8px",fontWeight:700}}>⚠ DEMO MODE — add Sheet URL</div>}
-      {!isDemo&&<div style={{fontSize:10,color:C.muted}}>{loading?"Fetching…":error?"⚠ Sheet error":lastUpdated?`Synced ${lastUpdated}`:""}</div>}
+      <div style={{fontSize:10,color:C.muted}}>{loading?"Fetching…":error?"⚠ Sheet error":lastUpdated?`Synced ${lastUpdated}`:""}</div>
       <button onClick={onRefresh} disabled={loading} style={{display:"flex",alignItems:"center",gap:5,padding:"5px 11px",borderRadius:20,border:`1px solid ${C.border}`,background:"transparent",color:loading?C.muted:C.dim,cursor:loading?"not-allowed":"pointer",fontSize:11,fontWeight:700}}>
         {loading?"…":"↻ Refresh"}
       </button>
@@ -336,7 +518,6 @@ function StatusBar({loading, error, lastUpdated, onRefresh, isDemo}) {
   );
 }
 
-// ── DEMO DATA ─────────────────────────────────────────────────────────────
 const DEMO_RESULTS = [
   {group:"A",home:"Czechia",away:"Mexico",hg:0,ag:3,status:"final",kickoff:""},
   {group:"A",home:"South Africa",away:"Korea Republic",hg:1,ag:0,status:"final",kickoff:""},
@@ -374,6 +555,7 @@ export default function WorldCup2026() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
+  const [selectedTeam, setSelectedTeam] = useState(null);
   const isDemo = SHEET_CSV_URL === "YOUR_GOOGLE_SHEET_CSV_URL_HERE";
 
   const fetchScores = useCallback(async () => {
@@ -418,6 +600,18 @@ export default function WorldCup2026() {
   return (
     <div style={{minHeight:"100vh",background:C.bg,color:C.text,fontFamily:"'Inter','Segoe UI',sans-serif"}}>
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}} *{box-sizing:border-box}`}</style>
+
+      {/* Country Profile Modal */}
+      {selectedTeam && (
+        <CountryModal
+          team={selectedTeam}
+          onClose={() => setSelectedTeam(null)}
+          standings={standings}
+          results={results}
+        />
+      )}
+
+      {/* Header */}
       <div style={{background:"linear-gradient(180deg,#0d1428 0%,#060d1a 100%)",borderBottom:`1px solid ${C.border}`,padding:"18px 18px 0"}}>
         <div style={{maxWidth:820,margin:"0 auto"}}>
           <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:8,marginBottom:14}}>
@@ -435,7 +629,7 @@ export default function WorldCup2026() {
                   <span style={{fontSize:11,fontWeight:700,color:C.orange}}>{liveGames.length} LIVE</span>
                 </div>
               )}
-              <StatusBar loading={loading} error={error} lastUpdated={lastUpdated} onRefresh={fetchScores} isDemo={isDemo}/>
+              <StatusBar loading={loading} error={error} lastUpdated={lastUpdated} onRefresh={fetchScores}/>
             </div>
           </div>
           <div style={{display:"flex",gap:5,overflowX:"auto",paddingBottom:12}}>
@@ -444,15 +638,28 @@ export default function WorldCup2026() {
         </div>
       </div>
 
+      {/* Content */}
       <div style={{maxWidth:820,margin:"0 auto",padding:"20px 14px"}}>
+
         {view==="live"&&<div>
-          {liveGames.length>0&&<><SectionHeader title="🔴 In Progress" color={C.orange}/>{liveGames.map((g,i)=><MatchRow key={i} {...g}/>)}<div style={{height:16}}/></>}
-          {finalGames.length>0&&<><SectionHeader title="✅ Results"/>{finalGames.map((g,i)=><MatchRow key={i} {...g} compact/>)}<div style={{height:16}}/></>}
-          {scheduledGames.length>0&&<><SectionHeader title="🕐 Upcoming"/>{scheduledGames.map((g,i)=><MatchRow key={i} {...g}/>)}</>}
-          {isDemo&&(
-            <div style={{marginTop:16,background:"#ff980010",border:"1px solid #ff980030",borderRadius:10,padding:"12px 14px",fontSize:12,color:"#ffb74d",lineHeight:1.7}}>
-              <strong>Demo mode:</strong> Scores are hardcoded. Replace <code style={{background:"#0a1020",padding:"1px 5px",borderRadius:3}}>SHEET_CSV_URL</code> at the top of App.jsx with your published Google Sheet CSV link to go live.
-            </div>
+          {liveGames.length>0&&(
+            <CollapsibleSection title="🔴 In Progress" count={liveGames.length} defaultOpen={true} accent={C.orange}>
+              {liveGames.map((g,i)=><MatchRow key={i} {...g} onSelect={setSelectedTeam}/>)}
+            </CollapsibleSection>
+          )}
+
+          {/* UPCOMING FIRST */}
+          {scheduledGames.length>0&&(
+            <CollapsibleSection title="🕐 Upcoming" count={scheduledGames.length} defaultOpen={true} accent={C.blue}>
+              {scheduledGames.map((g,i)=><MatchRow key={i} {...g} onSelect={setSelectedTeam}/>)}
+            </CollapsibleSection>
+          )}
+
+          {/* RESULTS BELOW */}
+          {finalGames.length>0&&(
+            <CollapsibleSection title="✅ Results" count={finalGames.length} defaultOpen={false} accent={C.green}>
+              {finalGames.map((g,i)=><MatchRow key={i} {...g} compact onSelect={setSelectedTeam}/>)}
+            </CollapsibleSection>
           )}
         </div>}
 
@@ -462,21 +669,21 @@ export default function WorldCup2026() {
               <button key={g} onClick={()=>setActiveGroup(g)} style={{padding:"6px 12px",borderRadius:8,border:"none",cursor:"pointer",fontWeight:700,fontSize:13,background:activeGroup===g?C.blue:"#111827",color:activeGroup===g?"#fff":C.dim,outline:activeGroup===g?`2px solid #5c6bc0`:"none"}}>{g}</button>
             ))}
           </div>
-          <StandingsTable teams={groupTeams}/>
-          <div style={{marginTop:12}}>{results.filter(g=>g.group===activeGroup).map((g,i)=><MatchRow key={i} {...g} compact/>)}</div>
+          <StandingsTable teams={groupTeams} onSelect={setSelectedTeam}/>
+          <div style={{marginTop:12}}>{results.filter(g=>g.group===activeGroup).map((g,i)=><MatchRow key={i} {...g} compact onSelect={setSelectedTeam}/>)}</div>
         </div>}
 
         {view==="thirds"&&<div>
           <div style={{background:"#f57f1710",border:"1px solid #f57f1730",borderRadius:10,padding:"10px 14px",marginBottom:14,fontSize:12,color:"#ffb74d"}}>Top 8 of 12 third-place teams advance to the Round of 32.</div>
-          <BestThirdsTable thirds={thirds}/>
+          <BestThirdsTable thirds={thirds} onSelect={setSelectedTeam}/>
         </div>}
 
-        {view==="r32"&&<KnockoutGrid rounds={R32_FIXTURE} slotMap={slotMap} accent={C.blue} title="Round of 32" info="Jun 28 – Jul 3 · FIFA rank shown for confirmed qualifiers"/>}
-        {view==="r16"&&<KnockoutGrid rounds={R16_FIXTURE} slotMap={slotMap} accent={C.blue} title="Round of 16" info="Jul 4 – Jul 7"/>}
-        {view==="qf"&&<KnockoutGrid rounds={QF_FIXTURE} slotMap={slotMap} accent="#7c4dff" title="Quarterfinals" info="Jul 9 – Jul 11"/>}
+        {view==="r32"&&<KnockoutGrid rounds={R32_FIXTURE} slotMap={slotMap} accent={C.blue} title="Round of 32" info="Jun 28 – Jul 3 · Tap any flag to view team profile" onSelect={setSelectedTeam}/>}
+        {view==="r16"&&<KnockoutGrid rounds={R16_FIXTURE} slotMap={slotMap} accent={C.blue} title="Round of 16" info="Jul 4 – Jul 7" onSelect={setSelectedTeam}/>}
+        {view==="qf"&&<KnockoutGrid rounds={QF_FIXTURE} slotMap={slotMap} accent="#7c4dff" title="Quarterfinals" info="Jul 9 – Jul 11" onSelect={setSelectedTeam}/>}
         {view==="sf"&&<div>
-          <KnockoutGrid rounds={SF_FIXTURE} slotMap={slotMap} accent="#aa00ff" title="Semifinals"/>
-          <KnockoutGrid rounds={THIRD_FIXTURE} slotMap={slotMap} accent={C.gold} title="3rd Place Match"/>
+          <KnockoutGrid rounds={SF_FIXTURE} slotMap={slotMap} accent="#aa00ff" title="Semifinals" onSelect={setSelectedTeam}/>
+          <KnockoutGrid rounds={THIRD_FIXTURE} slotMap={slotMap} accent={C.gold} title="3rd Place Match" onSelect={setSelectedTeam}/>
         </div>}
         {view==="final"&&<div>
           <div style={{background:"#f57f1710",border:"1px solid #f57f1730",borderRadius:12,padding:"20px",marginBottom:20,textAlign:"center"}}>
@@ -484,8 +691,8 @@ export default function WorldCup2026() {
             <div style={{fontSize:18,fontWeight:900,color:C.gold,letterSpacing:2}}>WORLD CUP FINAL</div>
             <div style={{fontSize:12,color:C.dim,marginTop:4}}>MetLife Stadium · East Rutherford, NJ · July 19 · 3:00 PM ET</div>
           </div>
-          <KnockoutGrid rounds={FINAL_FIXTURE} slotMap={slotMap} accent={C.gold} title="The Final"/>
-          <KnockoutGrid rounds={THIRD_FIXTURE} slotMap={slotMap} accent={C.gold} title="3rd Place Match · Jul 18"/>
+          <KnockoutGrid rounds={FINAL_FIXTURE} slotMap={slotMap} accent={C.gold} title="The Final" onSelect={setSelectedTeam}/>
+          <KnockoutGrid rounds={THIRD_FIXTURE} slotMap={slotMap} accent={C.gold} title="3rd Place Match · Jul 18" onSelect={setSelectedTeam}/>
           <div style={{background:C.card,borderRadius:12,border:`1px solid ${C.border}`,padding:"16px"}}>
             <div style={{fontSize:11,fontWeight:700,color:C.muted,letterSpacing:2,textTransform:"uppercase",marginBottom:12}}>🏅 Honours</div>
             {[["🥇","Winner","TBD"],["🥈","Runner-up","TBD"],["🥉","3rd Place","TBD"],["👟","Golden Boot","TBD"],["⚽","Golden Ball","TBD"]].map(([icon,label,val])=>(
