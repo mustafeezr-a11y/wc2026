@@ -326,42 +326,90 @@ function CountryModal({team,onClose,standings,results}){
 
 // ── PINCH-TO-ZOOM WRAPPER ─────────────────────────────────────────────────
 function PinchZoom({children}){
-  const ref=useRef(null);
-  const state=useRef({scale:1,tx:0,ty:0,lastDist:null,lastMid:null,dragging:false,lastTouch:null});
-  
-  const clamp=(v,mn,mx)=>Math.min(Math.max(v,mn),mx);
-  const getDist=([t1,t2])=>Math.hypot(t2.clientX-t1.clientX,t2.clientY-t1.clientY);
-  const getMid=([t1,t2])=>({x:(t1.clientX+t2.clientX)/2,y:(t1.clientY+t2.clientY)/2});
-  const apply=()=>{if(ref.current)ref.current.style.transform=`translate(${state.current.tx}px,${state.current.ty}px) scale(${state.current.scale})`;};
+  const containerRef=useRef(null);
+  const contentRef=useRef(null);
+  const st=useRef({scale:1,tx:0,ty:0,initDist:0,initScale:1,initMid:{x:0,y:0},initTx:0,initTy:0,pinching:false,panning:false,lastTx:0,lastTy:0,startTouch:{x:0,y:0}});
 
-  const onTouchStart=e=>{
-    if(e.touches.length===2){state.current.lastDist=getDist(e.touches);state.current.lastMid=getMid(e.touches);}
-    else if(e.touches.length===1){state.current.dragging=true;state.current.lastTouch={x:e.touches[0].clientX,y:e.touches[0].clientY};}
-  };
-  const onTouchMove=e=>{
-    if(e.touches.length===2){
-      e.preventDefault();
-      const dist=getDist(e.touches),mid=getMid(e.touches),s=state.current;
-      if(s.lastDist){const ratio=dist/s.lastDist;s.scale=clamp(s.scale*ratio,0.5,4);}
-      if(s.lastMid){s.tx+=mid.x-s.lastMid.x;s.ty+=mid.y-s.lastMid.y;}
-      s.lastDist=dist;s.lastMid=mid;apply();
-    } else if(e.touches.length===1&&state.current.dragging&&state.current.scale>1){
-      e.preventDefault();
-      const s=state.current,t={x:e.touches[0].clientX,y:e.touches[0].clientY};
-      if(s.lastTouch){s.tx+=t.x-s.lastTouch.x;s.ty+=t.y-s.lastTouch.y;}
-      s.lastTouch=t;apply();
+  const apply=()=>{
+    if(contentRef.current){
+      contentRef.current.style.transform=`translate(${st.current.tx}px,${st.current.ty}px) scale(${st.current.scale})`;
     }
   };
-  const onTouchEnd=e=>{
-    state.current.lastDist=null;state.current.lastMid=null;
-    if(e.touches.length===0){state.current.dragging=false;state.current.lastTouch=null;}
+
+  const dist=(a,b)=>Math.hypot(b.clientX-a.clientX,b.clientY-a.clientY);
+  const mid=(a,b)=>({x:(a.clientX+b.clientX)/2,y:(a.clientY+b.clientY)/2});
+  const clamp=(v,lo,hi)=>Math.min(Math.max(v,lo),hi);
+
+  useEffect(()=>{
+    const el=containerRef.current;
+    if(!el) return;
+
+    const onStart=(e)=>{
+      const s=st.current;
+      if(e.touches.length===2){
+        e.preventDefault();
+        s.pinching=true; s.panning=false;
+        s.initDist=dist(e.touches[0],e.touches[1]);
+        s.initScale=s.scale;
+        s.initMid=mid(e.touches[0],e.touches[1]);
+        s.initTx=s.tx; s.initTy=s.ty;
+      } else if(e.touches.length===1 && s.scale>1){
+        s.panning=true; s.pinching=false;
+        s.startTouch={x:e.touches[0].clientX,y:e.touches[0].clientY};
+        s.lastTx=s.tx; s.lastTy=s.ty;
+      }
+    };
+
+    const onMove=(e)=>{
+      const s=st.current;
+      if(e.touches.length===2 && s.pinching){
+        e.preventDefault();
+        const d=dist(e.touches[0],e.touches[1]);
+        const newScale=clamp(s.initScale*(d/s.initDist),0.5,5);
+        const m=mid(e.touches[0],e.touches[1]);
+        // Scale around pinch midpoint
+        const scaleDiff=newScale-s.initScale;
+        const tx=s.initTx-(s.initMid.x*scaleDiff/newScale);
+        const ty=s.initTy-(s.initMid.y*scaleDiff/newScale);
+        s.scale=newScale; s.tx=tx; s.ty=ty;
+        apply();
+      } else if(e.touches.length===1 && s.panning){
+        e.preventDefault();
+        const dx=e.touches[0].clientX-s.startTouch.x;
+        const dy=e.touches[0].clientY-s.startTouch.y;
+        s.tx=s.lastTx+dx; s.ty=s.lastTy+dy;
+        apply();
+      }
+    };
+
+    const onEnd=(e)=>{
+      const s=st.current;
+      if(e.touches.length<2) s.pinching=false;
+      if(e.touches.length===0) s.panning=false;
+    };
+
+    el.addEventListener("touchstart",onStart,{passive:false});
+    el.addEventListener("touchmove",onMove,{passive:false});
+    el.addEventListener("touchend",onEnd,{passive:true});
+    return()=>{
+      el.removeEventListener("touchstart",onStart);
+      el.removeEventListener("touchmove",onMove);
+      el.removeEventListener("touchend",onEnd);
+    };
+  },[]);
+
+  const reset=()=>{
+    const s=st.current;
+    s.scale=1;s.tx=0;s.ty=0;
+    apply();
   };
-  const resetZoom=()=>{const s=state.current;s.scale=1;s.tx=0;s.ty=0;apply();};
 
   return(
-    <div style={{overflow:"hidden",position:"relative",touchAction:"none",userSelect:"none"}} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
-      <div ref={ref} style={{transformOrigin:"top left",transition:"none",willChange:"transform"}}>{children}</div>
-      <button onClick={resetZoom} style={{position:"absolute",top:8,right:8,background:"rgba(255,255,255,0.1)",border:`1px solid ${C.border}`,color:C.sub,borderRadius:6,padding:"4px 8px",fontSize:11,cursor:"pointer"}}>Reset</button>
+    <div ref={containerRef} style={{overflow:"hidden",position:"relative",userSelect:"none",WebkitUserSelect:"none"}}>
+      <div ref={contentRef} style={{transformOrigin:"0 0",willChange:"transform",display:"inline-block",minWidth:"100%"}}>
+        {children}
+      </div>
+      <button onClick={reset} style={{position:"absolute",top:8,right:8,background:"rgba(15,21,32,0.9)",border:`1px solid ${C.border}`,color:C.sub,borderRadius:6,padding:"5px 10px",fontSize:11,cursor:"pointer",zIndex:10}}>↺ Reset</button>
     </div>
   );
 }
