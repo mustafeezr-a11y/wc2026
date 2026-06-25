@@ -13,7 +13,7 @@ export default async function handler(req, res) {
 
   try {
     const ESPN_URL =
-      "https://site.api.espn.com/apis/site/v2/sports/soccer/FIFA.WORLDCUP/scoreboard?limit=200";
+      "https://site.api.espn.com/apis/site/v2/sports/soccer/FIFA.WORLD/scoreboard?limit=200";
 
     const response = await fetch(ESPN_URL, {
       headers: {
