@@ -710,9 +710,9 @@ export default function WorldCup2026(){
       {/* Content */}
       <div style={{maxWidth:820,margin:"0 auto",padding:"20px 14px",flex:1,width:"100%"}}>
         {view==="live"&&<div>
+          {finalGames.length>0&&<CollapsibleSection title="✅ Results" count={finalGames.length} defaultOpen={false} accent={C.green}>{finalGames.map((g,i)=><MatchRow key={i} {...g} compact onSelect={setSelectedTeam}/>)}</CollapsibleSection>}
           {liveGames.length>0&&<CollapsibleSection title="🔴 In Progress" count={liveGames.length} defaultOpen={true} accent={C.orange}>{liveGames.map((g,i)=><MatchRow key={i} {...g} onSelect={setSelectedTeam}/>)}</CollapsibleSection>}
           {scheduledGames.length>0&&<CollapsibleSection title="🕐 Upcoming" count={scheduledGames.length} defaultOpen={true} accent={C.blue}>{scheduledGames.map((g,i)=><MatchRow key={i} {...g} onSelect={setSelectedTeam}/>)}</CollapsibleSection>}
-          {finalGames.length>0&&<CollapsibleSection title="✅ Results" count={finalGames.length} defaultOpen={false} accent={C.green}>{finalGames.map((g,i)=><MatchRow key={i} {...g} compact onSelect={setSelectedTeam}/>)}</CollapsibleSection>}
         </div>}
 
         {view==="groups"&&<div>
