@@ -3,7 +3,7 @@ import { fetchLiveScores, diffResults, mergeResults } from "./worldcup-live";
 
 // ── CONFIG ────────────────────────────────────────────────────────────────
 const SHEET_CSV_URL = "YOUR_GOOGLE_SHEET_CSV_URL_HERE";
-const AUTO_REFRESH_SECONDS = 60;
+const AUTO_REFRESH_SECONDS = 30;
 const isDemo = SHEET_CSV_URL === "YOUR_GOOGLE_SHEET_CSV_URL_HERE";
 
 // ── FIFA RANKINGS ─────────────────────────────────────────────────────────
@@ -425,7 +425,7 @@ function TeamName({name,align="right",bold=false,onSelect}){const isRight=align=
   </div>
 );}
 
-function MatchRow({home,away,hg,ag,status,kickoff,prob_home,prob_away,compact,onSelect}){
+function MatchRow({home,away,hg,ag,status,kickoff,prob_home,prob_away,compact,onSelect,clock=""}){
   const played=hg!==null&&ag!==null,live=status==="in_progress",fin=status==="final";
   const hWin=played&&hg>ag,aWin=played&&ag>hg;
   return(
@@ -434,7 +434,7 @@ function MatchRow({home,away,hg,ag,status,kickoff,prob_home,prob_away,compact,on
       <div style={{display:"flex",alignItems:"center",gap:6}}>
         <TeamName name={home} align="right" bold={hWin} onSelect={onSelect}/>
         <div style={{textAlign:"center",minWidth:72}}>
-          {live&&<div style={{fontSize:8,color:C.orange,fontWeight:700,letterSpacing:1,marginBottom:1,animation:"pulse 1s infinite"}}>● LIVE</div>}
+          {live&&<div style={{fontSize:8,color:C.orange,fontWeight:700,letterSpacing:1,marginBottom:1,animation:"pulse 1s infinite"}}>● LIVE {clock?<span style={{fontSize:9,color:C.orange}}>{clock}&apos;</span>:""}</div>}
           {fin&&<div style={{fontSize:8,color:C.green,fontWeight:700,letterSpacing:1,marginBottom:1}}>FT</div>}
           {played?<div style={{fontSize:compact?17:20,fontWeight:900,color:"#fff",letterSpacing:2}}>{hg}<span style={{color:C.border}}> – </span>{ag}</div>
           :<div><div style={{fontSize:11,color:C.muted,fontWeight:700}}>vs</div>{prob_home&&<div style={{fontSize:9,color:C.dim,marginTop:2}}>{prob_home}% · {prob_away}%</div>}</div>}
