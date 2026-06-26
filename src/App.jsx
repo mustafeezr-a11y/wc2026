@@ -41,7 +41,7 @@ const SCORERS = [
   {name:"Johan Manzambi",        team:"Switzerland", goals:2, hattricks:0, pos:"FW"},
   {name:"Mikel Oyarzabal",       team:"Spain",       goals:2, hattricks:0, pos:"FW"},
   {name:"Lamine Yamal",          team:"Spain",       goals:2, hattricks:0, pos:"FW"},
-  {name:"Ismaila Sarr",          team:"Senegal",     goals:2, hattricks:0, pos:"FW"},
+  {name:"Ismaila Sarr",          team:"Senegal",     goals:3, hattricks:0, pos:"FW"},
   {name:"Cristiano Ronaldo",     team:"Portugal",    goals:2, hattricks:0, pos:"FW"},
   {name:"Cyle Larin",            team:"Canada",      goals:2, hattricks:0, pos:"FW"},
   {name:"Ayase Ueda",            team:"Japan",       goals:2, hattricks:0, pos:"FW"},
@@ -50,7 +50,7 @@ const SCORERS = [
   {name:"Yasin Ayari",           team:"Sweden",      goals:2, hattricks:0, pos:"MF"},
   {name:"Maximiliano Araujo",    team:"Uruguay",     goals:2, hattricks:0, pos:"FW"},
   {name:"Jude Bellingham",       team:"England",     goals:2, hattricks:0, pos:"MF"},
-  {name:"Ousmane Dembele",       team:"France",      goals:2, hattricks:0, pos:"FW"},
+  {name:"Ousmane Dembele",       team:"France",      goals:4, hattricks:1, pos:"FW"},
   {name:"Alexander Isak",        team:"Sweden",      goals:2, hattricks:0, pos:"FW"},
   {name:"Elijah Just",           team:"New Zealand", goals:1, hattricks:0, pos:"FW"},
   {name:"Chris Wood",            team:"New Zealand", goals:1, hattricks:0, pos:"FW"},
@@ -84,6 +84,11 @@ const SCORERS = [
   {name:"Alvaro Fidalgo",        team:"Mexico",      goals:1, hattricks:0, pos:"MF"},
   {name:"Gessime Yassine",       team:"Morocco",     goals:1, hattricks:0, pos:"FW"},
   {name:"Bradley Barcola",       team:"France",      goals:1, hattricks:0, pos:"FW"},
+  {name:"Habib Diarra",            team:"Senegal",    goals:1, hattricks:0, pos:"MF"},
+  {name:"Pape Gueye",             team:"Senegal",    goals:2, hattricks:0, pos:"MF"},
+  {name:"Iliman Ndiaye",          team:"Senegal",    goals:1, hattricks:0, pos:"FW"},
+  {name:"Thelo Aasgaard",         team:"Norway",     goals:1, hattricks:0, pos:"MF"},
+  {name:"Desire Doue",            team:"France",     goals:1, hattricks:0, pos:"FW"},
 ];
 
 // ── TOP 3 PLAYERS PER TEAM ────────────────────────────────────────────────
@@ -110,7 +115,7 @@ const TOP_PLAYERS = {
   Iran:        [{n:"Sardar Azmoun",p:"FW",goals:0,ht:0},{n:"Mehdi Taremi",p:"FW",goals:0,ht:0},{n:"Alireza Jahanbakhsh",p:"FW",goals:0,ht:0}],
   "Korea Republic":[{n:"Hwang In-Beom",p:"MF",goals:1,ht:0},{n:"Oh Hyeon-Gyu",p:"FW",goals:1,ht:0},{n:"Son Heung-min",p:"FW",goals:0,ht:0}],
   Australia:   [{n:"Mitchell Duke",p:"FW",goals:0,ht:0},{n:"Ajdin Hrustic",p:"MF",goals:0,ht:0},{n:"Martin Boyle",p:"FW",goals:0,ht:0}],
-  Senegal:     [{n:"Ismaila Sarr",p:"FW",goals:2,ht:0},{n:"Sadio Mane",p:"FW",goals:0,ht:0},{n:"Idrissa Gueye",p:"MF",goals:0,ht:0}],
+    Senegal:     [{n:"Ismaila Sarr",p:"FW",goals:3,ht:0},{n:"Pape Gueye",p:"MF",goals:2,ht:0},{n:"Habib Diarra",p:"MF",goals:1,ht:0}],
   Uruguay:     [{n:"Maximiliano Araujo",p:"FW",goals:2,ht:0},{n:"Darwin Nunez",p:"FW",goals:0,ht:0},{n:"Federico Valverde",p:"MF",goals:0,ht:0}],
   "Ivory Coast":[{n:"Nicolas Pepe",p:"FW",goals:2,ht:0},{n:"Sebastien Haller",p:"FW",goals:0,ht:0},{n:"Franck Kessie",p:"MF",goals:0,ht:0}],
   Ecuador:     [{n:"Nilson Angulo",p:"FW",goals:1,ht:0},{n:"Gonzalo Plata",p:"FW",goals:1,ht:0},{n:"Enner Valencia",p:"FW",goals:0,ht:0}],
@@ -346,88 +351,170 @@ function CountryModal({team,onClose,standings,results}){
 function PinchZoom({children}){
   const containerRef=useRef(null);
   const contentRef=useRef(null);
-  const st=useRef({scale:1,tx:0,ty:0,initDist:0,initScale:1,initMid:{x:0,y:0},initTx:0,initTy:0,pinching:false,panning:false,lastTx:0,lastTy:0,startTouch:{x:0,y:0}});
+  const [scale,setScale]=useState(1);
 
-  const apply=()=>{
-    if(contentRef.current){
-      contentRef.current.style.transform=`translate(${st.current.tx}px,${st.current.ty}px) scale(${st.current.scale})`;
-    }
+  // Use refs for gesture state to avoid stale closures
+  const g=useRef({
+    scale:1, tx:0, ty:0,
+    pinching:false, panning:false,
+    initDist:0, initScale:1,
+    initMidX:0, initMidY:0,
+    initTx:0, initTy:0,
+    startX:0, startY:0,
+    lastTx:0, lastTy:0,
+  });
+
+  const applyTransform=(sc,tx,ty)=>{
+    if(!contentRef.current) return;
+    contentRef.current.style.transform=`translate(${tx}px,${ty}px) scale(${sc})`;
   };
 
-  const dist=(a,b)=>Math.hypot(b.clientX-a.clientX,b.clientY-a.clientY);
-  const mid=(a,b)=>({x:(a.clientX+b.clientX)/2,y:(a.clientY+b.clientY)/2});
-  const clamp=(v,lo,hi)=>Math.min(Math.max(v,lo),hi);
+  const clampPan=(sc,tx,ty)=>{
+    const el=containerRef.current;
+    const ct=contentRef.current;
+    if(!el||!ct) return {tx,ty};
+    const cW=el.offsetWidth;
+    const cH=el.offsetHeight;
+    const scaledW=ct.scrollWidth*sc;
+    const scaledH=ct.scrollHeight*sc;
+    const maxTx=0;
+    const minTx=Math.min(0,cW-scaledW);
+    const maxTy=0;
+    const minTy=Math.min(0,cH-scaledH);
+    return{
+      tx:Math.min(maxTx,Math.max(minTx,tx)),
+      ty:Math.min(maxTy,Math.max(minTy,ty)),
+    };
+  };
 
   useEffect(()=>{
     const el=containerRef.current;
     if(!el) return;
 
-    const onStart=(e)=>{
-      const s=st.current;
+    const getTouchDist=(t1,t2)=>Math.hypot(t2.clientX-t1.clientX,t2.clientY-t1.clientY);
+    const getTouchMid=(t1,t2,rect)=>({
+      x:(t1.clientX+t2.clientX)/2-rect.left,
+      y:(t1.clientY+t2.clientY)/2-rect.top,
+    });
+
+    const onTouchStart=(e)=>{
+      const s=g.current;
       if(e.touches.length===2){
+        // Always prevent default for 2-finger to block browser zoom
         e.preventDefault();
-        s.pinching=true; s.panning=false;
-        s.initDist=dist(e.touches[0],e.touches[1]);
+        s.pinching=true;
+        s.panning=false;
+        s.initDist=getTouchDist(e.touches[0],e.touches[1]);
         s.initScale=s.scale;
-        s.initMid=mid(e.touches[0],e.touches[1]);
-        s.initTx=s.tx; s.initTy=s.ty;
-      } else if(e.touches.length===1 && s.scale>1){
-        s.panning=true; s.pinching=false;
-        s.startTouch={x:e.touches[0].clientX,y:e.touches[0].clientY};
-        s.lastTx=s.tx; s.lastTy=s.ty;
+        s.initTx=s.tx;
+        s.initTy=s.ty;
+        const rect=el.getBoundingClientRect();
+        const m=getTouchMid(e.touches[0],e.touches[1],rect);
+        s.initMidX=m.x;
+        s.initMidY=m.y;
+      } else if(e.touches.length===1 && s.scale>1.05){
+        s.panning=true;
+        s.pinching=false;
+        s.startX=e.touches[0].clientX;
+        s.startY=e.touches[0].clientY;
+        s.lastTx=s.tx;
+        s.lastTy=s.ty;
       }
     };
 
-    const onMove=(e)=>{
-      const s=st.current;
-      if(e.touches.length===2 && s.pinching){
+    const onTouchMove=(e)=>{
+      const s=g.current;
+      if(s.pinching && e.touches.length===2){
         e.preventDefault();
-        const d=dist(e.touches[0],e.touches[1]);
-        const newScale=clamp(s.initScale*(d/s.initDist),0.5,5);
-        const m=mid(e.touches[0],e.touches[1]);
-        // Scale around pinch midpoint
-        const scaleDiff=newScale-s.initScale;
-        const tx=s.initTx-(s.initMid.x*scaleDiff/newScale);
-        const ty=s.initTy-(s.initMid.y*scaleDiff/newScale);
-        s.scale=newScale; s.tx=tx; s.ty=ty;
-        apply();
-      } else if(e.touches.length===1 && s.panning){
+        const newDist=getTouchDist(e.touches[0],e.touches[1]);
+        const ratio=newDist/s.initDist;
+        const newScale=Math.min(Math.max(s.initScale*ratio,0.8),4);
+        // Scale around the initial pinch midpoint
+        const scaleFactor=newScale/s.initScale;
+        const newTx=s.initMidX-(s.initMidX-s.initTx)*scaleFactor;
+        const newTy=s.initMidY-(s.initMidY-s.initTy)*scaleFactor;
+        const clamped=clampPan(newScale,newTx,newTy);
+        s.scale=newScale; s.tx=clamped.tx; s.ty=clamped.ty;
+        applyTransform(s.scale,s.tx,s.ty);
+        setScale(newScale);
+      } else if(s.panning && e.touches.length===1){
         e.preventDefault();
-        const dx=e.touches[0].clientX-s.startTouch.x;
-        const dy=e.touches[0].clientY-s.startTouch.y;
-        s.tx=s.lastTx+dx; s.ty=s.lastTy+dy;
-        apply();
+        const dx=e.touches[0].clientX-s.startX;
+        const dy=e.touches[0].clientY-s.startY;
+        const clamped=clampPan(s.scale,s.lastTx+dx,s.lastTy+dy);
+        s.tx=clamped.tx; s.ty=clamped.ty;
+        applyTransform(s.scale,s.tx,s.ty);
       }
     };
 
-    const onEnd=(e)=>{
-      const s=st.current;
+    const onTouchEnd=(e)=>{
+      const s=g.current;
       if(e.touches.length<2) s.pinching=false;
       if(e.touches.length===0) s.panning=false;
     };
 
-    el.addEventListener("touchstart",onStart,{passive:false});
-    el.addEventListener("touchmove",onMove,{passive:false});
-    el.addEventListener("touchend",onEnd,{passive:true});
+    // Must use {passive:false} to be able to call preventDefault
+    el.addEventListener("touchstart",onTouchStart,{passive:false});
+    el.addEventListener("touchmove",onTouchMove,{passive:false});
+    el.addEventListener("touchend",onTouchEnd,{passive:true});
     return()=>{
-      el.removeEventListener("touchstart",onStart);
-      el.removeEventListener("touchmove",onMove);
-      el.removeEventListener("touchend",onEnd);
+      el.removeEventListener("touchstart",onTouchStart);
+      el.removeEventListener("touchmove",onTouchMove);
+      el.removeEventListener("touchend",onTouchEnd);
     };
   },[]);
 
-  const reset=()=>{
-    const s=st.current;
-    s.scale=1;s.tx=0;s.ty=0;
-    apply();
+  const doZoom=(delta)=>{
+    const s=g.current;
+    const el=containerRef.current;
+    if(!el) return;
+    const newScale=Math.min(Math.max(s.scale+delta,0.8),4);
+    // Zoom toward center of container
+    const cx=el.offsetWidth/2;
+    const cy=el.offsetHeight/2;
+    const scaleFactor=newScale/s.scale;
+    const newTx=cx-(cx-s.tx)*scaleFactor;
+    const newTy=cy-(cy-s.ty)*scaleFactor;
+    const clamped=clampPan(newScale,newTx,newTy);
+    s.scale=newScale; s.tx=clamped.tx; s.ty=clamped.ty;
+    applyTransform(s.scale,s.tx,s.ty);
+    setScale(newScale);
   };
 
+  const doReset=()=>{
+    const s=g.current;
+    s.scale=1; s.tx=0; s.ty=0;
+    applyTransform(1,0,0);
+    setScale(1);
+  };
+
+  const btnStyle=(disabled)=>({
+    width:36,height:36,borderRadius:8,border:`1px solid ${disabled?"#1e2a3a":C.border}`,
+    background:disabled?"#0a1020":"rgba(15,21,32,0.95)",
+    color:disabled?C.muted:C.text,cursor:disabled?"default":"pointer",
+    fontSize:18,fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center",
+    boxShadow:"0 2px 8px #00000044",transition:"all 0.15s",
+  });
+
   return(
-    <div ref={containerRef} style={{overflow:"hidden",position:"relative",userSelect:"none",WebkitUserSelect:"none"}}>
-      <div ref={contentRef} style={{transformOrigin:"0 0",willChange:"transform",display:"inline-block",minWidth:"100%"}}>
-        {children}
+    <div style={{position:"relative"}}>
+      {/* Zoom control buttons — always visible */}
+      <div style={{position:"absolute",top:8,right:8,zIndex:20,display:"flex",flexDirection:"column",gap:5}}>
+        <button onClick={()=>doZoom(0.4)} style={btnStyle(scale>=4)} title="Zoom in">＋</button>
+        <button onClick={()=>doZoom(-0.4)} style={btnStyle(scale<=0.8)} title="Zoom out">－</button>
+        <button onClick={doReset} style={{...btnStyle(scale===1),fontSize:13,color:scale!==1?C.gold:C.muted}} title="Reset">↺</button>
       </div>
-      <button onClick={reset} style={{position:"absolute",top:8,right:8,background:"rgba(15,21,32,0.9)",border:`1px solid ${C.border}`,color:C.sub,borderRadius:6,padding:"5px 10px",fontSize:11,cursor:"pointer",zIndex:10}}>↺ Reset</button>
+      {/* Zoom level indicator */}
+      {scale!==1&&<div style={{position:"absolute",top:8,left:8,zIndex:20,background:"rgba(10,16,32,0.9)",border:`1px solid ${C.border}`,borderRadius:6,padding:"3px 8px",fontSize:10,color:C.gold,fontWeight:700}}>
+        {Math.round(scale*100)}%
+      </div>}
+      <div ref={containerRef}
+        style={{overflow:"hidden",touchAction:"none",userSelect:"none",WebkitUserSelect:"none",cursor:scale>1?"grab":"default"}}>
+        <div ref={contentRef}
+          style={{transformOrigin:"0 0",willChange:"transform",display:"inline-block",minWidth:"100%"}}>
+          {children}
+        </div>
+      </div>
     </div>
   );
 }
@@ -642,6 +729,17 @@ const MATCH_DETAILS = {
   "Ghana|Panama":{venue:"Estadio BBVA",location:"Monterrey, MEX",scorers:[{name:"Jordan Ayew",team:"home",min:55}],cards:[{name:"Adalberto Carrasquilla",team:"away",min:67,type:"Y"}],ft:"90"},
   "England|Ghana":{venue:"Mercedes-Benz Stadium",location:"Atlanta, GA",scorers:[],cards:[{name:"Thomas Partey",team:"away",min:44,type:"Y"}],ft:"90"},
   "Panama|Croatia":{venue:"Lumen Field",location:"Seattle, WA",scorers:[{name:"Martin Baturina",team:"away",min:67}],cards:[],ft:"90"},
+  // ── Jun 26 MD3 ──
+  "Norway|France":{venue:"Gillette Stadium",location:"Foxborough, MA",scorers:[
+    {name:"Ousmane Dembele",team:"away",min:8},{name:"Ousmane Dembele",team:"away",min:22,extra:"hat"},
+    {name:"Thelo Aasgaard",team:"home",min:24},{name:"Ousmane Dembele",team:"away",min:32,extra:"hat"},
+    {name:"Desire Doue",team:"away",min:89}
+  ],cards:[{name:"Thelo Aasgaard",team:"home",min:67,type:"Y"}],ft:"90+2"},
+  "Senegal|Iraq":{venue:"BMO Field",location:"Toronto, CAN",scorers:[
+    {name:"Habib Diarra",team:"home",min:4},{name:"Ismaila Sarr",team:"home",min:56},
+    {name:"Pape Gueye",team:"home",min:61},{name:"Pape Gueye",team:"home",min:69},
+    {name:"Iliman Ndiaye",team:"home",min:82}
+  ],cards:[{name:"Rebin Sulaka",team:"away",min:13,type:"R"}],ft:"90+4"},
 };
 
 // ── MATCH DETAIL MODAL ───────────────────────────────────────────────────
@@ -841,8 +939,8 @@ const DEMO_RESULTS=[
   {group:"D",home:"Turkiye",away:"USA",hg:3,ag:2,status:"final",kickoff:"Jun 25 · 10:00 PM ET"},
   {group:"D",home:"Paraguay",away:"Australia",hg:0,ag:0,status:"final",kickoff:"Jun 25 · 10:00 PM ET"},
   // ── UPCOMING MD3 Jun 26-27 ──
-  {group:"I",home:"Norway",away:"France",hg:null,ag:null,status:"scheduled",kickoff:"Jun 26 · 3:00 PM ET",prob_home:20,prob_away:59.3},
-  {group:"I",home:"Senegal",away:"Iraq",hg:null,ag:null,status:"scheduled",kickoff:"Jun 26 · 3:00 PM ET",prob_home:79,prob_away:7.4},
+  {group:"I",home:"Norway",away:"France",hg:1,ag:4,status:"final",kickoff:"Jun 26 · 3:00 PM ET"},
+  {group:"I",home:"Senegal",away:"Iraq",hg:5,ag:0,status:"final",kickoff:"Jun 26 · 3:00 PM ET"},
   {group:"H",home:"Uruguay",away:"Spain",hg:null,ag:null,status:"scheduled",kickoff:"Jun 26 · 8:00 PM ET",prob_home:14.3,prob_away:64.1},
   {group:"H",home:"Cape Verde",away:"Saudi Arabia",hg:null,ag:null,status:"scheduled",kickoff:"Jun 26 · 8:00 PM ET",prob_home:36.7,prob_away:34.7},
   {group:"G",home:"Egypt",away:"Iran",hg:null,ag:null,status:"scheduled",kickoff:"Jun 26 · 11:00 PM ET"},
@@ -953,7 +1051,7 @@ export default function WorldCup2026(){
 
   return(
     <div style={{minHeight:"100vh",background:C.bg,color:C.text,fontFamily:"'Inter','Segoe UI',sans-serif",display:"flex",flexDirection:"column"}}>
-      <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}} *{box-sizing:border-box}`}</style>
+      <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}} @keyframes spin{to{transform:rotate(360deg)}} *{box-sizing:border-box}`}</style>
 
       {selectedTeam&&<CountryModal team={selectedTeam} onClose={()=>setSelectedTeam(null)} standings={standings} results={results}/>}
       {selectedMatch&&<MatchDetailModal match={selectedMatch} onClose={()=>setSelectedMatch(null)}/>}
@@ -971,9 +1069,22 @@ export default function WorldCup2026(){
             </div>
             <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
               {liveGames.length>0&&<div style={{display:"flex",alignItems:"center",gap:6,background:"#ff980018",border:"1px solid #ff980044",borderRadius:20,padding:"4px 10px"}}><span style={{width:6,height:6,borderRadius:"50%",background:C.orange,display:"inline-block",animation:"pulse 1s infinite"}}/><span style={{fontSize:11,fontWeight:700,color:C.orange}}>{liveGames.length} LIVE</span></div>}
-              <span style={{fontSize:10,color:liveStatus==="live"?"#00e676":liveStatus==="offline"?C.orange:C.dim}}>{liveIndicator[liveStatus]}</span>
-              {lastUpdated&&<span style={{fontSize:10,color:C.muted}}>Synced {lastUpdated}</span>}
-              <button onClick={fetchSheet} disabled={loading} style={{padding:"5px 11px",borderRadius:20,border:`1px solid ${C.border}`,background:"transparent",color:loading?C.muted:C.dim,cursor:loading?"not-allowed":"pointer",fontSize:11,fontWeight:700}}>{loading?"…":"↻"}</button>
+              <div style={{display:"flex",alignItems:"center",gap:6}}>
+                <span style={{fontSize:10,color:liveStatus==="live"?"#00e676":liveStatus==="fetching"?"#ffb74d":liveStatus==="offline"?C.orange:C.dim,fontWeight:700}}>
+                  {liveStatus==="live"?"🟢 Live":liveStatus==="fetching"?"⟳ Syncing…":liveStatus==="offline"?"📡 Offline":""}
+                </span>
+                {lastUpdated&&<span style={{fontSize:10,color:C.muted}}>Synced {lastUpdated}</span>}
+              </div>
+              <button onClick={fetchLive} disabled={liveStatus==="fetching"}
+                style={{display:"flex",alignItems:"center",gap:5,padding:"6px 13px",borderRadius:20,
+                  border:`1px solid ${liveStatus==="fetching"?C.muted:C.blue}`,
+                  background:liveStatus==="fetching"?"transparent":"rgba(59,130,246,0.12)",
+                  color:liveStatus==="fetching"?C.muted:C.blue,
+                  cursor:liveStatus==="fetching"?"not-allowed":"pointer",
+                  fontSize:11,fontWeight:700,transition:"all 0.2s"}}>
+                <span style={{display:"inline-block",animation:liveStatus==="fetching"?"spin 1s linear infinite":"none"}}>↻</span>
+                {liveStatus==="fetching"?"Syncing…":"Sync Live"}
+              </button>
             </div>
           </div>
           <div style={{display:"flex",gap:5,overflowX:"auto",paddingBottom:12}}>
@@ -999,7 +1110,7 @@ export default function WorldCup2026(){
         </div>}
 
         {view==="scorers"&&<div>
-          <div style={{background:"#f57f1710",border:"1px solid #f57f1730",borderRadius:10,padding:"10px 14px",marginBottom:14,fontSize:12,color:"#ffb74d"}}>🥅 Golden Boot Race · Updated through Matchday 3 (A–F) · Tap flag to view team</div>
+          <div style={{background:"#f57f1710",border:"1px solid #f57f1730",borderRadius:10,padding:"10px 14px",marginBottom:14,fontSize:12,color:"#ffb74d"}}>🥅 Golden Boot Race · Updated through Matchday 3 (A–I) · Tap flag to view team</div>
           <div style={{background:C.card,borderRadius:12,overflow:"hidden",border:`1px solid ${C.border}`}}>
             <div style={{display:"grid",gridTemplateColumns:"28px 1fr 60px 50px 50px",padding:"8px 12px",background:"#0a1020",borderBottom:`1px solid ${C.border}`}}>
               {["#","Player","Team","Goals","HT"].map((h,i)=><div key={h} style={{fontSize:9,fontWeight:700,color:C.muted,textAlign:i>1?"center":"left",textTransform:"uppercase",letterSpacing:1}}>{h}</div>)}
