@@ -443,12 +443,20 @@ function TeamName({name,align="right",bold=false,onSelect}){const isRight=align=
   </div>
 );}
 
-function MatchRow({home,away,hg,ag,status,kickoff,prob_home,prob_away,compact,onSelect,clock=""}){
+function MatchRow({home,away,hg,ag,status,kickoff,prob_home,prob_away,compact,onSelect,onMatchClick,clock=""}){
   const played=hg!==null&&ag!==null,live=status==="in_progress",fin=status==="final";
   const hWin=played&&hg>ag,aWin=played&&ag>hg;
+  const clickable=fin||live;
   return(
-    <div style={{background:C.card,borderRadius:10,padding:compact?"10px 14px":"14px 18px",marginBottom:7,border:`1px solid ${live?"#ff980055":C.border}`,boxShadow:live?"0 0 12px #ff980018":"none"}}>
-      {kickoff&&!played&&<div style={{fontSize:10,color:C.gold,fontWeight:700,marginBottom:6}}>🕐 {kickoff}</div>}
+    <div onClick={clickable&&onMatchClick?()=>onMatchClick({home,away,hg,ag,status,kickoff,clock}):undefined}
+      style={{background:C.card,borderRadius:10,padding:compact?"10px 14px":"14px 18px",marginBottom:7,
+        border:`1px solid ${live?"#ff980055":fin&&onMatchClick?"#3d5afe44":C.border}`,
+        boxShadow:live?"0 0 12px #ff980018":"none",
+        cursor:clickable&&onMatchClick?"pointer":"default"}}>
+      {kickoff&&<div style={{fontSize:10,color:fin?C.muted:C.gold,fontWeight:700,marginBottom:6,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+        <span>🕐 {kickoff}</span>
+        {clickable&&onMatchClick&&<span style={{fontSize:9,color:C.blue}}>tap for details ›</span>}
+      </div>}
       <div style={{display:"flex",alignItems:"center",gap:6}}>
         <TeamName name={home} align="right" bold={hWin} onSelect={onSelect}/>
         <div style={{textAlign:"center",minWidth:72}}>
@@ -571,6 +579,204 @@ function KnockoutGrid({rounds,slotMap,accent=C.blue,title,info,onSelect,pinchabl
   return pinchable ? <PinchZoom>{content}</PinchZoom> : content;
 }
 
+// ── STATIC MATCH DETAILS (venue, scorers, cards) ────────────────────────
+// Key: "Home|Away"
+const MATCH_DETAILS = {
+  "Mexico|South Africa":{venue:"SoFi Stadium",location:"Inglewood, CA",scorers:[{name:"Alexis Vega",team:"home",min:34},{name:"Julian Quinones",team:"home",min:67}],cards:[],ft:"90+2"},
+  "Korea Republic|Czechia":{venue:"Levi's Stadium",location:"Santa Clara, CA",scorers:[{name:"Hwang In-Beom",team:"home",min:12},{name:"Oh Hyeon-Gyu",team:"home",min:77},{name:"Ladislav Krejci",team:"away",min:55}],cards:[{name:"Tomas Soucek",team:"away",min:44,type:"Y"}],ft:"90"},
+  "Mexico|Korea Republic":{venue:"Estadio Azteca",location:"Mexico City, MEX",scorers:[{name:"Julian Quinones",team:"home",min:58}],cards:[{name:"Hwang In-Beom",team:"away",min:72,type:"Y"}],ft:"90"},
+  "Czechia|South Africa":{venue:"AT&T Stadium",location:"Arlington, TX",scorers:[{name:"Ladislav Krejci",team:"home",min:41},{name:"Teboho Mokoena",team:"away",min:88,extra:"pen"}],cards:[],ft:"90+4"},
+  "Czechia|Mexico":{venue:"Estadio Azteca",location:"Mexico City, MEX",scorers:[{name:"Mateo Chavez",team:"away",min:53},{name:"Julian Quinones",team:"away",min:74},{name:"Alvaro Fidalgo",team:"away",min:90,extra:"+3"}],cards:[{name:"Ladislav Krejci",team:"home",min:61,type:"Y"}],ft:"90+3"},
+  "South Africa|Korea Republic":{venue:"SoFi Stadium",location:"Inglewood, CA",scorers:[{name:"Thapelo Maseko",team:"home",min:83}],cards:[{name:"Son Heung-min",team:"away",min:45,type:"Y"},{name:"Bong-jin Kim",team:"away",min:88,type:"Y"}],ft:"90+5"},
+  "Canada|Bosnia and Herzegovina":{venue:"BMO Field",location:"Toronto, CAN",scorers:[{name:"Jonathan David",team:"home",min:45,extra:"pen"},{name:"Jovo Lukic",team:"away",min:67}],cards:[],ft:"90+1"},
+  "Switzerland|Qatar":{venue:"BC Place",location:"Vancouver, CAN",scorers:[{name:"Breel Embolo",team:"home",min:22,extra:"pen"},{name:"Boualem Khoukhi",team:"away",min:55}],cards:[],ft:"90"},
+  "Canada|Qatar":{venue:"Arrowhead Stadium",location:"Kansas City, MO",scorers:[{name:"Jonathan David",team:"home",min:8},{name:"Cyle Larin",team:"home",min:23},{name:"Jonathan David",team:"home",min:34,extra:"HT"},{name:"Cyle Larin",team:"home",min:60},{name:"Jonathan David",team:"home",min:71},{name:"Canada OG",team:"home",min:80}],cards:[],ft:"90"},
+  "Switzerland|Bosnia and Herzegovina":{venue:"Gillette Stadium",location:"Foxborough, MA",scorers:[{name:"Johan Manzambi",team:"home",min:74},{name:"Johan Manzambi",team:"home",min:89},{name:"Granit Xhaka",team:"home",min:90,extra:"+1"}],cards:[{name:"Jovo Lukic",team:"away",min:76,type:"R"}],ft:"90+2"},
+  "Switzerland|Canada":{venue:"BC Place",location:"Vancouver, CAN",scorers:[{name:"Granit Xhaka",team:"home",min:38},{name:"Johan Manzambi",team:"home",min:62},{name:"Cyle Larin",team:"away",min:80}],cards:[],ft:"90"},
+  "Bosnia and Herzegovina|Qatar":{venue:"BMO Field",location:"Toronto, CAN",scorers:[{name:"Jovo Lukic",team:"home",min:11},{name:"Edin Dzeko",team:"home",min:45},{name:"Miralem Pjanic",team:"home",min:72},{name:"Boualem Khoukhi",team:"away",min:50}],cards:[],ft:"90"},
+  "Brazil|Haiti":{venue:"Hard Rock Stadium",location:"Miami, FL",scorers:[{name:"Matheus Cunha",team:"home",min:18},{name:"Vinicius Jr",team:"home",min:41},{name:"Matheus Cunha",team:"home",min:56}],cards:[],ft:"90"},
+  "Morocco|Scotland":{venue:"Mercedes-Benz Stadium",location:"Atlanta, GA",scorers:[{name:"Ismael Saibari",team:"home",min:2}],cards:[{name:"John McGinn",team:"away",min:55,type:"Y"}],ft:"90"},
+  "Brazil|Morocco":{venue:"NRG Stadium",location:"Houston, TX",scorers:[{name:"Vinicius Jr",team:"home",min:33},{name:"Ismael Saibari",team:"away",min:51,extra:"pen"}],cards:[],ft:"90+2"},
+  "Scotland|Haiti":{venue:"Lumen Field",location:"Seattle, WA",scorers:[{name:"John McGinn",team:"home",min:29}],cards:[{name:"Duckens Nazon",team:"away",min:70,type:"Y"}],ft:"90"},
+  "Scotland|Brazil":{venue:"Hard Rock Stadium",location:"Miami, FL",scorers:[{name:"Vinicius Jr",team:"away",min:14},{name:"Vinicius Jr",team:"away",min:44},{name:"Matheus Cunha",team:"away",min:58}],cards:[{name:"Andy Robertson",team:"home",min:67,type:"Y"}],ft:"90"},
+  "Morocco|Haiti":{venue:"Mercedes-Benz Stadium",location:"Atlanta, GA",scorers:[{name:"Ismael Saibari",team:"home",min:2},{name:"Achraf Hakimi",team:"home",min:45},{name:"Ismael Saibari",team:"home",min:90,extra:"+1"},{name:"Gessime Yassine",team:"home",min:89},{name:"Wilson Isidor",team:"away",min:31},{name:"Wilson Isidor",team:"away",min:58}],cards:[],ft:"90+2"},
+  "USA|Paraguay":{venue:"AT&T Stadium",location:"Arlington, TX",scorers:[{name:"Folarin Balogun",team:"home",min:7},{name:"Folarin Balogun",team:"home",min:23},{name:"Sebastian Berhalter",team:"home",min:62},{name:"Christian Pulisic",team:"home",min:78},{name:"Mauricio",team:"away",min:45},{name:"Galarza",team:"away",min:80}],cards:[],ft:"90"},
+  "Australia|Turkiye":{venue:"Levi's Stadium",location:"Santa Clara, CA",scorers:[{name:"Nestory Irankunda",team:"home",min:55},{name:"Connor Metcalfe",team:"home",min:79}],cards:[{name:"Hakan Calhanoglu",team:"away",min:44,type:"Y"}],ft:"90+1"},
+  "USA|Australia":{venue:"SoFi Stadium",location:"Inglewood, CA",scorers:[{name:"Auston Trusty",team:"home",min:3},{name:"Sebastian Berhalter",team:"home",min:49}],cards:[],ft:"90"},
+  "Turkiye|Paraguay":{venue:"NRG Stadium",location:"Houston, TX",scorers:[{name:"Mauricio",team:"away",min:61}],cards:[{name:"Arda Guler",team:"home",min:40,type:"Y"}],ft:"90"},
+  "Turkiye|USA":{venue:"SoFi Stadium",location:"Inglewood, CA",scorers:[{name:"Arda Guler",team:"home",min:10},{name:"Burak Yilmaz",team:"home",min:31},{name:"Kaan Ayhan",team:"home",min:90,extra:"+8"},{name:"Auston Trusty",team:"away",min:3},{name:"Sebastian Berhalter",team:"away",min:49}],cards:[{name:"Kaan Ayhan",team:"home",min:45,type:"Y"}],ft:"90+8"},
+  "Paraguay|Australia":{venue:"AT&T Stadium",location:"Arlington, TX",scorers:[],cards:[{name:"Mauricio",team:"home",min:55,type:"Y"},{name:"Connor Metcalfe",team:"away",min:72,type:"Y"}],ft:"90"},
+  "Germany|Curacao":{venue:"Arrowhead Stadium",location:"Kansas City, MO",scorers:[{name:"Leroy Sane",team:"home",min:2},{name:"Kai Havertz",team:"home",min:45,extra:"pen"},{name:"Deniz Undav",team:"home",min:56},{name:"Felix Nmecha",team:"home",min:64},{name:"Nathaniel Brown",team:"home",min:78},{name:"Jamal Musialia",team:"home",min:82},{name:"Deniz Undav",team:"home",min:88},{name:"Livano Comenencia",team:"away",min:51}],cards:[],ft:"90"},
+  "Ivory Coast|Ecuador":{venue:"Gillette Stadium",location:"Foxborough, MA",scorers:[{name:"Amad Diallo",team:"home",min:34}],cards:[{name:"Moises Caicedo",team:"away",min:55,type:"Y"}],ft:"90"},
+  "Germany|Ivory Coast":{venue:"Levi's Stadium",location:"Santa Clara, CA",scorers:[{name:"Deniz Undav",team:"home",min:15},{name:"Kai Havertz",team:"home",min:71},{name:"Amad Diallo",team:"away",min:58}],cards:[],ft:"90+2"},
+  "Ecuador|Curacao":{venue:"Arrowhead Stadium",location:"Kansas City, MO",scorers:[],cards:[{name:"Armando Obispo",team:"away",min:33,type:"Y"}],ft:"90"},
+  "Ecuador|Germany":{venue:"MetLife Stadium",location:"East Rutherford, NJ",scorers:[{name:"Leroy Sane",team:"away",min:2},{name:"Nilson Angulo",team:"home",min:9},{name:"Gonzalo Plata",team:"home",min:77}],cards:[{name:"Gonzalo Plata",team:"home",min:79,type:"Y"}],ft:"90+4"},
+  "Curacao|Ivory Coast":{venue:"BMO Field",location:"Toronto, CAN",scorers:[{name:"Nicolas Pepe",team:"away",min:7},{name:"Nicolas Pepe",team:"away",min:64}],cards:[],ft:"90"},
+  "Netherlands|Japan":{venue:"Lumen Field",location:"Seattle, WA",scorers:[{name:"Cody Gakpo",team:"home",min:22},{name:"Crysencio Summerville",team:"home",min:55},{name:"Daichi Kamada",team:"away",min:31},{name:"Ayase Ueda",team:"away",min:67}],cards:[],ft:"90"},
+  "Sweden|Tunisia":{venue:"Mercedes-Benz Stadium",location:"Atlanta, GA",scorers:[{name:"Alexander Isak",team:"home",min:8},{name:"Yasin Ayari",team:"home",min:28},{name:"Alexander Isak",team:"home",min:45},{name:"Yasin Ayari",team:"home",min:63},{name:"Viktor Gyokeres",team:"home",min:80},{name:"Omar Rekik",team:"away",min:55}],cards:[],ft:"90"},
+  "Netherlands|Sweden":{venue:"NRG Stadium",location:"Houston, TX",scorers:[{name:"Brian Brobbey",team:"home",min:12},{name:"Cody Gakpo",team:"home",min:45},{name:"Crysencio Summerville",team:"home",min:60},{name:"Brian Brobbey",team:"home",min:73},{name:"Brian Brobbey",team:"home",min:85},{name:"Alexander Isak",team:"away",min:38}],cards:[],ft:"90"},
+  "Japan|Tunisia":{venue:"Hard Rock Stadium",location:"Miami, FL",scorers:[{name:"Daichi Kamada",team:"home",min:4},{name:"Keito Nakamura",team:"home",min:21},{name:"Ayase Ueda",team:"home",min:52},{name:"Ayase Ueda",team:"home",min:78}],cards:[],ft:"90"},
+  "Tunisia|Netherlands":{venue:"BC Place",location:"Vancouver, CAN",scorers:[{name:"Skhiri",team:"home",min:3,extra:"OG"},{name:"Brian Brobbey",team:"away",min:7},{name:"Jordi van Hecke",team:"away",min:62},{name:"Virgil van Dijk",team:"away",min:80},{name:"Hassem Mastouri",team:"home",min:54}],cards:[{name:"Omar Rekik",team:"home",min:65,type:"Y"}],ft:"90"},
+  "Japan|Sweden":{venue:"Gillette Stadium",location:"Foxborough, MA",scorers:[{name:"Daizen Maeda",team:"home",min:56},{name:"Anthony Elanga",team:"away",min:62}],cards:[],ft:"90"},
+  "Belgium|Egypt":{venue:"Estadio BBVA",location:"Monterrey, MEX",scorers:[{name:"Romelu Lukaku",team:"home",min:44},{name:"Eman Ashour",team:"away",min:71}],cards:[],ft:"90"},
+  "Iran|New Zealand":{venue:"SoFi Stadium",location:"Inglewood, CA",scorers:[{name:"Mehdi Taremi",team:"home",min:33},{name:"Mohamed Mohebi",team:"home",min:70},{name:"Elijah Just",team:"away",min:45},{name:"Chris Wood",team:"away",min:82}],cards:[],ft:"90+3"},
+  "Belgium|Iran":{venue:"Levi's Stadium",location:"Santa Clara, CA",scorers:[],cards:[{name:"Mehdi Taremi",team:"away",min:55,type:"Y"}],ft:"90"},
+  "Egypt|New Zealand":{venue:"Arrowhead Stadium",location:"Kansas City, MO",scorers:[{name:"Mohamed Salah",team:"home",min:18},{name:"Eman Ashour",team:"home",min:44},{name:"Mostafa Mohamed",team:"home",min:67},{name:"Elijah Just",team:"away",min:72}],cards:[],ft:"90"},
+  "Spain|Cape Verde":{venue:"MetLife Stadium",location:"East Rutherford, NJ",scorers:[],cards:[{name:"Ryan Mendes",team:"away",min:38,type:"Y"}],ft:"90"},
+  "Saudi Arabia|Uruguay":{venue:"Hard Rock Stadium",location:"Miami, FL",scorers:[{name:"Abdulelah Al Amri",team:"home",min:55},{name:"Maximiliano Araujo",team:"away",min:33}],cards:[],ft:"90+2"},
+  "Spain|Saudi Arabia":{venue:"Lumen Field",location:"Seattle, WA",scorers:[{name:"Mikel Oyarzabal",team:"home",min:11},{name:"Lamine Yamal",team:"home",min:34},{name:"Mikel Oyarzabal",team:"home",min:67},{name:"Lamine Yamal",team:"home",min:81}],cards:[],ft:"90"},
+  "Uruguay|Cape Verde":{venue:"BC Place",location:"Vancouver, CAN",scorers:[{name:"Maximiliano Araujo",team:"home",min:28},{name:"Darwin Nunez",team:"home",min:59},{name:"Darwin Nunez",team:"away",min:44,extra:"OG"},{name:"Cape Verde OG",team:"home",min:71}],cards:[],ft:"90+1"},
+  "France|Senegal":{venue:"AT&T Stadium",location:"Arlington, TX",scorers:[{name:"Kylian Mbappe",team:"home",min:15},{name:"Ousmane Dembele",team:"home",min:45},{name:"Kylian Mbappe",team:"home",min:71},{name:"Ismaila Sarr",team:"away",min:38}],cards:[],ft:"90"},
+  "Norway|Iraq":{venue:"Gillette Stadium",location:"Foxborough, MA",scorers:[{name:"Erling Haaland",team:"home",min:8},{name:"Erling Haaland",team:"home",min:34},{name:"Leo Ostigard",team:"home",min:67},{name:"Martin Odegaard",team:"home",min:85},{name:"Ayman Hussein",team:"away",min:55}],cards:[],ft:"90"},
+  "France|Iraq":{venue:"Mercedes-Benz Stadium",location:"Atlanta, GA",scorers:[{name:"Kylian Mbappe",team:"home",min:22},{name:"Michael Olise",team:"home",min:45},{name:"Ousmane Dembele",team:"home",min:78}],cards:[],ft:"90"},
+  "Norway|Senegal":{venue:"NRG Stadium",location:"Houston, TX",scorers:[{name:"Erling Haaland",team:"home",min:11},{name:"Erling Haaland",team:"home",min:56},{name:"Martin Baturina",team:"home",min:80},{name:"Ismaila Sarr",team:"away",min:33},{name:"Ibrahim Mbaye",team:"away",min:71}],cards:[],ft:"90+2"},
+  "Argentina|Algeria":{venue:"SoFi Stadium",location:"Inglewood, CA",scorers:[{name:"Lionel Messi",team:"home",min:14},{name:"Lautaro Martinez",team:"home",min:44},{name:"Julian Alvarez",team:"home",min:78}],cards:[],ft:"90"},
+  "Jordan|Austria":{venue:"Hard Rock Stadium",location:"Miami, FL",scorers:[{name:"Nizar Al-Rashdan",team:"home",min:22},{name:"Marcel Sabitzer",team:"away",min:33},{name:"Christoph Baumgartner",team:"away",min:61},{name:"Marko Arnautovic",team:"away",min:88}],cards:[],ft:"90+1"},
+  "Argentina|Austria":{venue:"MetLife Stadium",location:"East Rutherford, NJ",scorers:[{name:"Lionel Messi",team:"home",min:33},{name:"Lionel Messi",team:"home",min:55,extra:"hat"},{name:"Lionel Messi",team:"home",min:78}],cards:[{name:"Romano Schmid",team:"away",min:44,type:"Y"}],ft:"90"},
+  "Algeria|Jordan":{venue:"Levi's Stadium",location:"Santa Clara, CA",scorers:[{name:"Riyad Mahrez",team:"home",min:28},{name:"Islam Slimani",team:"home",min:67},{name:"Ali Iyad Olwan",team:"away",min:55}],cards:[],ft:"90"},
+  "Colombia|Uzbekistan":{venue:"Arrowhead Stadium",location:"Kansas City, MO",scorers:[{name:"Luis Diaz",team:"home",min:12},{name:"James Rodriguez",team:"home",min:44},{name:"Luis Diaz",team:"home",min:71},{name:"Eldor Shomurodov",team:"away",min:55}],cards:[],ft:"90"},
+  "Portugal|Congo DR":{venue:"BMO Field",location:"Toronto, CAN",scorers:[{name:"Cristiano Ronaldo",team:"home",min:44,extra:"pen"},{name:"Yoane Wissa",team:"away",min:67}],cards:[],ft:"90+2"},
+  "Colombia|Congo DR":{venue:"BC Place",location:"Vancouver, CAN",scorers:[{name:"James Rodriguez",team:"home",min:55}],cards:[{name:"Yoane Wissa",team:"away",min:44,type:"Y"}],ft:"90"},
+  "Portugal|Uzbekistan":{venue:"NRG Stadium",location:"Houston, TX",scorers:[{name:"Cristiano Ronaldo",team:"home",min:8},{name:"Joao Cancelo",team:"home",min:22},{name:"Bruno Fernandes",team:"home",min:44},{name:"Joao Neves",team:"home",min:61},{name:"Rafael Leao",team:"home",min:78}],cards:[],ft:"90"},
+  "England|Croatia":{venue:"AT&T Stadium",location:"Arlington, TX",scorers:[{name:"Harry Kane",team:"home",min:11},{name:"Jude Bellingham",team:"home",min:34},{name:"Harry Kane",team:"home",min:66},{name:"Phil Foden",team:"home",min:85},{name:"Martin Baturina",team:"away",min:44},{name:"Petar Musa",team:"away",min:71}],cards:[],ft:"90"},
+  "Ghana|Panama":{venue:"Estadio BBVA",location:"Monterrey, MEX",scorers:[{name:"Jordan Ayew",team:"home",min:55}],cards:[{name:"Adalberto Carrasquilla",team:"away",min:67,type:"Y"}],ft:"90"},
+  "England|Ghana":{venue:"Mercedes-Benz Stadium",location:"Atlanta, GA",scorers:[],cards:[{name:"Thomas Partey",team:"away",min:44,type:"Y"}],ft:"90"},
+  "Panama|Croatia":{venue:"Lumen Field",location:"Seattle, WA",scorers:[{name:"Martin Baturina",team:"away",min:67}],cards:[],ft:"90"},
+};
+
+// ── MATCH DETAIL MODAL ───────────────────────────────────────────────────
+function MatchDetailModal({match, onClose}){
+  if(!match) return null;
+  const key1=`${match.home}|${match.away}`;
+  const key2=`${match.away}|${match.home}`;
+  // Try live scorers first, then static
+  const liveScorers = match.scorers||[];
+  const liveCards = match.cards||[];
+  const detail = MATCH_DETAILS[key1] || MATCH_DETAILS[key2] || {};
+  const isFlipped = !MATCH_DETAILS[key1] && !!MATCH_DETAILS[key2];
+  const scorers = liveScorers.length ? liveScorers : (detail.scorers||[]);
+  const cards = liveCards.length ? liveCards : (detail.cards||[]);
+  const venue = match.venue || detail.venue || "";
+  const location = match.venueLocation || detail.location || "";
+  const ft = detail.ft || "90";
+  const fin = match.status==="final";
+  const live = match.status==="in_progress";
+
+  // Group scorers by team
+  const homeScorers = scorers.filter(s=> isFlipped ? s.team==="away" : s.team==="home");
+  const awayScorers = scorers.filter(s=> isFlipped ? s.team==="home" : s.team==="away");
+  const homeCards = cards.filter(s=> isFlipped ? s.team==="away" : s.team==="home");
+  const awayCards = cards.filter(s=> isFlipped ? s.team==="home" : s.team==="away");
+
+  const cardIcon = t => t==="R"?"🟥":t==="Y2"?"🟨🟥":"🟨";
+
+  return(
+    <div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.88)",zIndex:1001,display:"flex",alignItems:"center",justifyContent:"center",padding:16,overflowY:"auto"}}>
+      <div onClick={e=>e.stopPropagation()} style={{background:"#0a1020",border:`1px solid ${C.border}`,borderRadius:16,width:"100%",maxWidth:500,maxHeight:"92vh",overflowY:"auto",padding:20}}>
+        {/* Header */}
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
+          <div style={{fontSize:10,fontWeight:700,color:C.muted,letterSpacing:2,textTransform:"uppercase"}}>Match Details</div>
+          <button onClick={onClose} style={{background:"rgba(255,255,255,0.08)",border:`1px solid ${C.border}`,color:C.sub,borderRadius:8,width:32,height:32,cursor:"pointer",fontSize:18}}>✕</button>
+        </div>
+
+        {/* Scoreboard */}
+        <div style={{background:"#060d1a",borderRadius:12,padding:"16px 12px",marginBottom:14,textAlign:"center",border:`1px solid ${C.border}`}}>
+          <div style={{fontSize:10,color:fin?C.green:live?C.orange:C.gold,fontWeight:700,letterSpacing:2,marginBottom:10}}>
+            {fin?`⏱ FT · ${ft}'`:live?`● LIVE ${match.clock||""}`:match.kickoff||""}
+          </div>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8}}>
+            <div style={{flex:1,textAlign:"right"}}>
+              <div style={{fontSize:26}}>{fl(match.home)||"🏳"}</div>
+              <div style={{fontSize:14,fontWeight:700,color:C.text,marginTop:4}}>{match.home}</div>
+              <RankBadge name={match.home} style={{display:"inline-block",marginTop:4}}/>
+            </div>
+            <div style={{minWidth:80,textAlign:"center"}}>
+              {match.hg!==null?
+                <div style={{fontSize:36,fontWeight:900,color:"#fff",letterSpacing:4}}>{match.hg}<span style={{color:C.muted,fontSize:24}}>–</span>{match.ag}</div>
+                :<div style={{fontSize:20,fontWeight:700,color:C.muted}}>vs</div>}
+            </div>
+            <div style={{flex:1,textAlign:"left"}}>
+              <div style={{fontSize:26}}>{fl(match.away)||"🏳"}</div>
+              <div style={{fontSize:14,fontWeight:700,color:C.text,marginTop:4}}>{match.away}</div>
+              <RankBadge name={match.away} style={{display:"inline-block",marginTop:4}}/>
+            </div>
+          </div>
+        </div>
+
+        {/* Venue */}
+        {(venue||location)&&<div style={{display:"flex",alignItems:"center",gap:8,background:C.card,borderRadius:10,padding:"10px 14px",marginBottom:14,border:`1px solid ${C.border}`}}>
+          <span style={{fontSize:16}}>🏟️</span>
+          <div>
+            {venue&&<div style={{fontSize:13,fontWeight:600,color:C.text}}>{venue}</div>}
+            {location&&<div style={{fontSize:11,color:C.dim}}>{location}</div>}
+          </div>
+        </div>}
+
+        {/* Scorers */}
+        {scorers.length>0&&<div style={{marginBottom:14}}>
+          <div style={{fontSize:10,fontWeight:700,color:C.muted,letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>⚽ Goals</div>
+          <div style={{background:C.card,borderRadius:10,overflow:"hidden",border:`1px solid ${C.border}`}}>
+            {scorers.map((s,i)=>{
+              const isHome = isFlipped ? s.team==="away" : s.team==="home";
+              const teamName = isHome ? match.home : match.away;
+              return(
+                <div key={i} style={{display:"flex",alignItems:"center",justifyContent:isHome?"flex-start":"flex-end",
+                  padding:"9px 14px",borderBottom:i<scorers.length-1?`1px solid #0d1428`:"none",
+                  background:i%2===0?C.card:"#0a1228"}}>
+                  {isHome&&<><span style={{fontSize:16,marginRight:8}}>{fl(teamName)||"⚽"}</span>
+                    <span style={{fontSize:12,fontWeight:600,color:C.text}}>{s.name||s.player}</span>
+                    {s.extra==="OG"&&<span style={{fontSize:10,color:C.red,marginLeft:6,background:C.red+"22",padding:"1px 5px",borderRadius:4}}>OG</span>}
+                    {(s.extra==="pen"||s.type==="Penalty - Scored")&&<span style={{fontSize:10,color:C.blue,marginLeft:6,background:C.blue+"22",padding:"1px 5px",borderRadius:4}}>pen</span>}
+                    {s.extra==="hat"&&<span style={{fontSize:10,color:C.gold,marginLeft:6}}>🎩</span>}
+                    <span style={{marginLeft:"auto",fontSize:11,fontWeight:700,color:C.gold}}>{s.min||s.clock}&apos;</span>
+                  </>}
+                  {!isHome&&<><span style={{marginRight:"auto",fontSize:11,fontWeight:700,color:C.gold}}>{s.min||s.clock}&apos;</span>
+                    {s.extra==="OG"&&<span style={{fontSize:10,color:C.red,marginRight:6,background:C.red+"22",padding:"1px 5px",borderRadius:4}}>OG</span>}
+                    {(s.extra==="pen"||s.type==="Penalty - Scored")&&<span style={{fontSize:10,color:C.blue,marginRight:6,background:C.blue+"22",padding:"1px 5px",borderRadius:4}}>pen</span>}
+                    {s.extra==="hat"&&<span style={{fontSize:10,color:C.gold,marginRight:6}}>🎩</span>}
+                    <span style={{fontSize:12,fontWeight:600,color:C.text}}>{s.name||s.player}</span>
+                    <span style={{fontSize:16,marginLeft:8}}>{fl(teamName)||"⚽"}</span>
+                  </>}
+                </div>
+              );
+            })}
+          </div>
+        </div>}
+
+        {/* Cards */}
+        {cards.length>0&&<div style={{marginBottom:14}}>
+          <div style={{fontSize:10,fontWeight:700,color:C.muted,letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>🟨 Bookings</div>
+          <div style={{background:C.card,borderRadius:10,overflow:"hidden",border:`1px solid ${C.border}`}}>
+            {cards.map((c,i)=>{
+              const isHome = isFlipped ? c.team==="away" : c.team==="home";
+              const teamName = isHome ? match.home : match.away;
+              return(
+                <div key={i} style={{display:"flex",alignItems:"center",justifyContent:isHome?"flex-start":"flex-end",
+                  padding:"8px 14px",borderBottom:i<cards.length-1?`1px solid #0d1428`:"none"}}>
+                  {isHome&&<><span style={{fontSize:16,marginRight:8}}>{fl(teamName)||"🏳"}</span>
+                    <span style={{fontSize:12,color:C.text}}>{c.name||c.player}</span>
+                    <span style={{marginLeft:8}}>{cardIcon(c.type)}</span>
+                    <span style={{marginLeft:"auto",fontSize:11,color:C.muted}}>{c.min||c.clock}&apos;</span>
+                  </>}
+                  {!isHome&&<><span style={{marginRight:"auto",fontSize:11,color:C.muted}}>{c.min||c.clock}&apos;</span>
+                    <span style={{marginRight:8}}>{cardIcon(c.type)}</span>
+                    <span style={{fontSize:12,color:C.text}}>{c.name||c.player}</span>
+                    <span style={{fontSize:16,marginLeft:8}}>{fl(teamName)||"🏳"}</span>
+                  </>}
+                </div>
+              );
+            })}
+          </div>
+        </div>}
+
+        {/* No events */}
+        {fin&&scorers.length===0&&cards.length===0&&<div style={{textAlign:"center",padding:"20px",color:C.muted,fontSize:12}}>No goals or cards recorded</div>}
+        {!fin&&!live&&<div style={{textAlign:"center",padding:"16px",color:C.muted,fontSize:12}}>Match details will appear here once kicked off</div>}
+      </div>
+    </div>
+  );
+}
+
 // ── DEMO RESULTS (static baseline) ───────────────────────────────────────
 const DEMO_RESULTS=[
   {group:"A",home:"Mexico",away:"South Africa",hg:2,ag:0,status:"final",kickoff:"Jun 11 · 8:00 PM ET"},
@@ -675,6 +881,7 @@ export default function WorldCup2026(){
   const[error,setError]=useState(null);
   const[lastUpdated,setLastUpdated]=useState(null);
   const[selectedTeam,setSelectedTeam]=useState(null);
+  const[selectedMatch,setSelectedMatch]=useState(null);
   const[liveStatus,setLiveStatus]=useState("idle"); // idle | fetching | live | offline
   const prevResultsRef=useRef(null);
 
@@ -749,6 +956,7 @@ export default function WorldCup2026(){
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}} *{box-sizing:border-box}`}</style>
 
       {selectedTeam&&<CountryModal team={selectedTeam} onClose={()=>setSelectedTeam(null)} standings={standings} results={results}/>}
+      {selectedMatch&&<MatchDetailModal match={selectedMatch} onClose={()=>setSelectedMatch(null)}/>}
 
       {/* Header */}
       <div style={{background:"linear-gradient(180deg,#0d1428 0%,#060d1a 100%)",borderBottom:`1px solid ${C.border}`,padding:"18px 18px 0"}}>
@@ -777,8 +985,8 @@ export default function WorldCup2026(){
       {/* Content */}
       <div style={{maxWidth:820,margin:"0 auto",padding:"20px 14px",flex:1,width:"100%"}}>
         {view==="live"&&<div>
-          {finalGames.length>0&&<CollapsibleSection title="✅ Results" count={finalGames.length} defaultOpen={false} accent={C.green}>{finalGames.map((g,i)=><MatchRow key={i} {...g} compact onSelect={setSelectedTeam}/>)}</CollapsibleSection>}
-          {liveGames.length>0&&<CollapsibleSection title="🔴 In Progress" count={liveGames.length} defaultOpen={true} accent={C.orange}>{liveGames.map((g,i)=><MatchRow key={i} {...g} onSelect={setSelectedTeam}/>)}</CollapsibleSection>}
+          {finalGames.length>0&&<CollapsibleSection title="✅ Results" count={finalGames.length} defaultOpen={false} accent={C.green}>{finalGames.map((g,i)=><MatchRow key={i} {...g} compact onSelect={setSelectedTeam} onMatchClick={setSelectedMatch}/>)}</CollapsibleSection>}
+          {liveGames.length>0&&<CollapsibleSection title="🔴 In Progress" count={liveGames.length} defaultOpen={true} accent={C.orange}>{liveGames.map((g,i)=><MatchRow key={i} {...g} onSelect={setSelectedTeam} onMatchClick={setSelectedMatch}/>)}</CollapsibleSection>}
           {scheduledGames.length>0&&<CollapsibleSection title="🕐 Upcoming" count={scheduledGames.length} defaultOpen={true} accent={C.blue}>{scheduledGames.map((g,i)=><MatchRow key={i} {...g} onSelect={setSelectedTeam}/>)}</CollapsibleSection>}
         </div>}
 
@@ -787,7 +995,7 @@ export default function WorldCup2026(){
             {"ABCDEFGHIJKL".split("").map(g=><button key={g} onClick={()=>setActiveGroup(g)} style={{padding:"6px 12px",borderRadius:8,border:"none",cursor:"pointer",fontWeight:700,fontSize:13,background:activeGroup===g?C.blue:"#111827",color:activeGroup===g?"#fff":C.dim}}>{g}</button>)}
           </div>
           <StandingsTable teams={groupTeams} onSelect={setSelectedTeam}/>
-          <div style={{marginTop:12}}>{results.filter(g=>g.group===activeGroup).map((g,i)=><MatchRow key={i} {...g} compact onSelect={setSelectedTeam}/>)}</div>
+          <div style={{marginTop:12}}>{results.filter(g=>g.group===activeGroup).map((g,i)=><MatchRow key={i} {...g} compact onSelect={setSelectedTeam} onMatchClick={setSelectedMatch}/>)}</div>
         </div>}
 
         {view==="scorers"&&<div>

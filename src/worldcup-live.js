@@ -1,7 +1,6 @@
 /**
  * worldcup-live.js
  * Fetches live World Cup scores via our own /api/scores proxy (Vercel serverless)
- * No CORS issues, no API key, free.
  */
 
 const PROXY_URL = "/api/scores";
@@ -63,10 +62,6 @@ function formatKickoff(dateStr) {
   }
 }
 
-/**
- * Fetch live scores from our Vercel proxy
- * Returns array of match objects or null on failure
- */
 export async function fetchLiveScores() {
   try {
     const res = await fetch(PROXY_URL, {
@@ -86,6 +81,10 @@ export async function fetchLiveScores() {
       kickoff: formatKickoff(e.date),
       clock: e.clock || "",
       espnId: e.id,
+      venue: e.venue || "",
+      venueLocation: e.venueLocation || "",
+      scorers: e.scorers || [],
+      cards: e.cards || [],
     })).filter(r => r.home && r.away);
   } catch (err) {
     console.warn("[worldcup-live] fetch failed:", err.message);
@@ -99,9 +98,6 @@ function extractGroup(text) {
   return m ? m[1].toUpperCase() : null;
 }
 
-/**
- * Returns true if data has changed — avoids unnecessary re-renders
- */
 export function diffResults(prev, next) {
   if (!prev || !next) return true;
   if (prev.length !== next.length) return true;
@@ -112,18 +108,12 @@ export function diffResults(prev, next) {
   return false;
 }
 
-/**
- * Merge live ESPN data onto static DEMO_RESULTS
- * Static data is source of truth for groups/kickoffs; live data updates scores/status
- */
 export function mergeResults(staticResults, liveResults) {
   if (!liveResults || liveResults.length === 0) return staticResults;
 
-  // Build lookup by home|away team names
   const liveMap = {};
   for (const r of liveResults) {
     liveMap[`${r.home}|${r.away}`] = r;
-    // Also index reversed in case ESPN flips home/away
     liveMap[`${r.away}|${r.home}`] = { ...r, hg: r.ag, ag: r.hg };
   }
 
@@ -131,14 +121,19 @@ export function mergeResults(staticResults, liveResults) {
     const key = `${s.home}|${s.away}`;
     const live = liveMap[key];
     if (!live) return s;
-    // Only update if live has actual score data
-    const hasScore = live.hg !== null && live.ag !== null;
+    // Only update scores if live data is NOT scheduled (prevents 0-0 contaminating upcoming)
+    const hasScore = live.hg !== null && live.ag !== null && live.status !== "scheduled";
     return {
       ...s,
       hg: hasScore ? live.hg : s.hg,
       ag: hasScore ? live.ag : s.ag,
       status: live.status !== "scheduled" ? live.status : s.status,
       clock: live.clock || s.clock,
+      // Merge in rich detail from live when available
+      venue: live.venue || s.venue || "",
+      venueLocation: live.venueLocation || s.venueLocation || "",
+      scorers: live.scorers?.length ? live.scorers : (s.scorers || []),
+      cards: live.cards?.length ? live.cards : (s.cards || []),
     };
   });
 }
