@@ -39,6 +39,8 @@ function mapStatus(espnStatus) {
   if (espnStatus === "STATUS_FINAL" || espnStatus === "STATUS_FULL_TIME") return "final";
   if (
     espnStatus === "STATUS_IN_PROGRESS" ||
+    espnStatus === "STATUS_FIRST_HALF" ||
+    espnStatus === "STATUS_SECOND_HALF" ||
     espnStatus === "STATUS_HALFTIME" ||
     espnStatus === "STATUS_EXTRA_TIME" ||
     espnStatus === "STATUS_PENALTIES"
