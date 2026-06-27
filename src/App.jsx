@@ -177,28 +177,48 @@ const SEED = {
 };
 
 // ── KNOCKOUT FIXTURES ─────────────────────────────────────────────────────
+// ── ROUND OF 32 — exact FIFA bracket (Match numbers from official bracket) ─
 const R32_FIXTURE = [
-  {match:73,home:"2A",away:"2B",kickoff:"Jun 28 · 3:00 PM ET · SoFi Stadium, LA"},
-  {match:74,home:"1E",away:"3ABCDF",kickoff:"Jun 29 · 4:30 PM ET · Gillette Stadium, Boston"},
-  {match:75,home:"1F",away:"2C",kickoff:"Jun 29 · 1:00 PM ET · NRG Stadium, Houston"},
-  {match:76,home:"1C",away:"2F",kickoff:"Jun 29 · 9:00 PM ET · Estadio BBVA, Monterrey"},
-  {match:77,home:"1I",away:"3CDFGH",kickoff:"Jun 30 · 5:00 PM ET · MetLife Stadium, NY/NJ"},
-  {match:78,home:"2E",away:"2I",kickoff:"Jun 30 · 1:00 PM ET · AT&T Stadium, Dallas"},
-  {match:79,home:"1A",away:"3CEFHI",kickoff:"Jun 30 · 9:00 PM ET · Estadio Azteca, Mexico City"},
-  {match:80,home:"1L",away:"3EHIJK",kickoff:"Jul 1 · 12:00 PM ET · Mercedes-Benz, Atlanta"},
-  {match:81,home:"1D",away:"3BEFIJ",kickoff:"Jul 1 · 8:00 PM ET · Levi's Stadium, San Francisco"},
-  {match:82,home:"1G",away:"3AEHIJ",kickoff:"Jul 1 · 4:00 PM ET · Lumen Field, Seattle"},
-  {match:83,home:"2K",away:"2L",kickoff:"Jul 2 · 7:00 PM ET · BMO Field, Toronto"},
-  {match:84,home:"1H",away:"2J",kickoff:"Jul 2 · 3:00 PM ET · SoFi Stadium, LA"},
-  {match:85,home:"1B",away:"3EFGIJ",kickoff:"Jul 2 · 11:00 PM ET · BC Place, Vancouver"},
-  {match:86,home:"1J",away:"2H",kickoff:"Jul 3 · 6:00 PM ET · Hard Rock Stadium, Miami"},
-  {match:87,home:"1K",away:"3DEIJL",kickoff:"Jul 3 · 9:30 PM ET · Arrowhead Stadium, Kansas City"},
-  {match:88,home:"2D",away:"2G",kickoff:"Jul 3 · 2:00 PM ET · AT&T Stadium, Dallas"},
+  // ── LEFT SIDE of bracket ──
+  {match:74,home:"Germany",      away:"Paraguay",             kickoff:"Jun 29 · 4:30 PM ET · Gillette Stadium, Boston"},
+  {match:77,home:"France",       away:"Sweden",               kickoff:"Jun 30 · 5:00 PM ET · MetLife Stadium, NY/NJ"},
+  {match:73,home:"South Africa", away:"Canada",               kickoff:"Jun 28 · 3:00 PM ET · SoFi Stadium, LA"},
+  {match:75,home:"Netherlands",  away:"Morocco",              kickoff:"Jun 29 · 9:00 PM ET · Estadio BBVA, Monterrey"},
+  {match:83,home:"2K",           away:"2L",                   kickoff:"Jul 2 · 7:00 PM ET · BMO Field, Toronto"},
+  {match:84,home:"Spain",        away:"2J",                   kickoff:"Jul 2 · 3:00 PM ET · SoFi Stadium, LA"},
+  {match:81,home:"USA",          away:"Bosnia and Herzegovina",kickoff:"Jul 1 · 8:00 PM ET · Levi's Stadium, San Francisco"},
+  {match:82,home:"Belgium",      away:"3AEHIJ",               kickoff:"Jul 1 · 4:00 PM ET · Lumen Field, Seattle"},
+  // ── RIGHT SIDE of bracket ──
+  {match:76,home:"Brazil",       away:"Japan",                kickoff:"Jun 29 · 1:00 PM ET · NRG Stadium, Houston"},
+  {match:78,home:"Ivory Coast",  away:"Norway",               kickoff:"Jun 30 · 1:00 PM ET · AT&T Stadium, Dallas"},
+  {match:79,home:"Mexico",       away:"Ecuador",              kickoff:"Jun 30 · 9:00 PM ET · Estadio Azteca, Mexico City"},
+  {match:80,home:"1L",           away:"Senegal",              kickoff:"Jul 1 · 12:00 PM ET · Mercedes-Benz Stadium, Atlanta"},
+  {match:86,home:"Argentina",    away:"Cape Verde",           kickoff:"Jul 3 · 6:00 PM ET · Hard Rock Stadium, Miami"},
+  {match:88,home:"Australia",    away:"Egypt",                kickoff:"Jul 3 · 2:00 PM ET · AT&T Stadium, Dallas"},
+  {match:85,home:"Switzerland",  away:"3EFGIJ",               kickoff:"Jul 2 · 11:00 PM ET · BC Place, Vancouver"},
+  {match:87,home:"1K",           away:"Croatia",              kickoff:"Jul 3 · 9:30 PM ET · Arrowhead Stadium, Kansas City"},
 ];
-const R16_FIXTURE=[{match:89,home:"W74",away:"W77",kickoff:"Jul 4 · 5:00 PM ET"},{match:90,home:"W73",away:"W75",kickoff:"Jul 4 · 1:00 PM ET"},{match:91,home:"W76",away:"W78",kickoff:"Jul 5 · 4:00 PM ET"},{match:92,home:"W79",away:"W80",kickoff:"Jul 5 · 8:00 PM ET"},{match:93,home:"W83",away:"W84",kickoff:"Jul 6 · 3:00 PM ET"},{match:94,home:"W81",away:"W82",kickoff:"Jul 6 · 8:00 PM ET"},{match:95,home:"W86",away:"W88",kickoff:"Jul 7 · 12:00 PM ET"},{match:96,home:"W85",away:"W87",kickoff:"Jul 7 · 4:00 PM ET"}];
-const QF_FIXTURE=[{match:97,home:"W89",away:"W90",kickoff:"Jul 9 · 4:00 PM ET"},{match:98,home:"W93",away:"W94",kickoff:"Jul 10 · 3:00 PM ET"},{match:99,home:"W91",away:"W92",kickoff:"Jul 11 · 5:00 PM ET"},{match:100,home:"W95",away:"W96",kickoff:"Jul 11 · 9:00 PM ET"}];
-const SF_FIXTURE=[{match:101,home:"W97",away:"W98",kickoff:"Jul 14 · 3:00 PM ET"},{match:102,home:"W99",away:"W100",kickoff:"Jul 15 · 3:00 PM ET"}];
-const THIRD_FIXTURE=[{match:103,home:"L101",away:"L102",kickoff:"Jul 18 · 5:00 PM ET"}];
+const R16_FIXTURE=[
+  {match:89,home:"W74",away:"W77",kickoff:"Jul 4 · 5:00 PM ET"},
+  {match:90,home:"W73",away:"W75",kickoff:"Jul 4 · 1:00 PM ET"},
+  {match:91,home:"W76",away:"W78",kickoff:"Jul 5 · 4:00 PM ET"},
+  {match:92,home:"W79",away:"W80",kickoff:"Jul 5 · 8:00 PM ET"},
+  {match:93,home:"W83",away:"W84",kickoff:"Jul 6 · 3:00 PM ET"},
+  {match:94,home:"W81",away:"W82",kickoff:"Jul 6 · 8:00 PM ET"},
+  {match:95,home:"W86",away:"W88",kickoff:"Jul 7 · 12:00 PM ET"},
+  {match:96,home:"W85",away:"W87",kickoff:"Jul 7 · 4:00 PM ET"},
+];
+const QF_FIXTURE=[
+  {match:97,home:"W89",away:"W90",kickoff:"Jul 9 · 4:00 PM ET"},
+  {match:98,home:"W93",away:"W94",kickoff:"Jul 10 · 3:00 PM ET"},
+  {match:99,home:"W91",away:"W92",kickoff:"Jul 11 · 5:00 PM ET"},
+  {match:100,home:"W95",away:"W96",kickoff:"Jul 11 · 9:00 PM ET"},
+];
+const SF_FIXTURE=[
+  {match:101,home:"W97",away:"W98",kickoff:"Jul 14 · 3:00 PM ET"},
+  {match:102,home:"W99",away:"W100",kickoff:"Jul 15 · 3:00 PM ET"},
+];
+const THIRD_FIXTURE=[{match:103,home:"L101",away:"L102",kickoff:"Jul 18 · 5:00 PM ET · AT&T Stadium, Dallas"}];
 const FINAL_FIXTURE=[{match:104,home:"W101",away:"W102",kickoff:"Jul 19 · 3:00 PM ET · MetLife Stadium, NY/NJ"}];
 
 // ── HELPERS ───────────────────────────────────────────────────────────────
@@ -264,6 +284,8 @@ function buildSlotMap(standings, thirds, results) {
 }
 
 function resolveSlot(slot,slotMap){
+  // If slot is already a real team name (not a code like "1A","2B","3XYZ","WNN","LNN")
+  if(slot && !/^[123WL]\w/.test(slot)) return{label:slot,team:slot,confirmed:true};
   if(slotMap[slot])return{label:slotMap[slot],team:slotMap[slot],confirmed:true};
   return{label:slot,team:null,confirmed:false};
 }
