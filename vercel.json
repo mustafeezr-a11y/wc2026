@@ -1,8 +1,7 @@
 {
   "functions": {
-    "api/scores.js": {
-      "memory": 128,
-      "maxDuration": 10
-    }
+    "api/scores.js":  { "memory": 128, "maxDuration": 10 },
+    "api/results.js": { "memory": 128, "maxDuration": 10 },
+    "api/admin.js":   { "memory": 128, "maxDuration": 30 }
   }
 }

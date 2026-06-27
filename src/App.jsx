@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { fetchLiveScores, diffResults, mergeResults } from "./worldcup-live";
+import { fetchLiveScores, fetchStoredResults, diffResults, mergeResults, buildScorerLeaderboard } from "./worldcup-live";
 
 // ── CONFIG ────────────────────────────────────────────────────────────────
 const SHEET_CSV_URL = "YOUR_GOOGLE_SHEET_CSV_URL_HERE";
@@ -413,6 +413,8 @@ function PinchZoom({children}){
         s.initMidX=m.x;
         s.initMidY=m.y;
       } else if(e.touches.length===1 && s.scale>1.05){
+        // Only intercept single-touch when zoomed in
+        e.preventDefault();
         s.panning=true;
         s.pinching=false;
         s.startX=e.touches[0].clientX;
@@ -479,6 +481,10 @@ function PinchZoom({children}){
     s.scale=newScale; s.tx=clamped.tx; s.ty=clamped.ty;
     applyTransform(s.scale,s.tx,s.ty);
     setScale(newScale);
+    // Update touchAction so scroll works at scale=1
+    if(containerRef.current) {
+      containerRef.current.style.touchAction = newScale > 1.05 ? "none" : "pan-y";
+    }
   };
 
   const doReset=()=>{
@@ -486,6 +492,8 @@ function PinchZoom({children}){
     s.scale=1; s.tx=0; s.ty=0;
     applyTransform(1,0,0);
     setScale(1);
+    // Restore page scroll by resetting touchAction
+    if(containerRef.current) containerRef.current.style.touchAction="pan-y";
   };
 
   const btnStyle=(disabled)=>({
@@ -509,7 +517,7 @@ function PinchZoom({children}){
         {Math.round(scale*100)}%
       </div>}
       <div ref={containerRef}
-        style={{overflow:"hidden",touchAction:"none",userSelect:"none",WebkitUserSelect:"none",cursor:scale>1?"grab":"default"}}>
+        style={{overflow:"hidden",touchAction:scale>1.05?"none":"pan-y",userSelect:"none",WebkitUserSelect:"none",cursor:scale>1?"grab":"default"}}>
         <div ref={contentRef}
           style={{transformOrigin:"0 0",willChange:"transform",display:"inline-block",minWidth:"100%"}}>
           {children}
@@ -979,51 +987,45 @@ export default function WorldCup2026(){
   const[error,setError]=useState(null);
   const[lastUpdated,setLastUpdated]=useState(null);
   const[selectedTeam,setSelectedTeam]=useState(null);
+  const[kvMatches,setKvMatches]=useState([]);
+  const[kvScorers,setKvScorers]=useState([]);
   const[selectedMatch,setSelectedMatch]=useState(null);
   const[liveStatus,setLiveStatus]=useState("idle"); // idle | fetching | live | offline
   const prevResultsRef=useRef(null);
 
-  // ── LIVE SCORE FETCH (ESPN free API) ────────────────────────────────────
+  // ── SYNC: fetch KV stored results + live ESPN feed ───────────────────────
   const fetchLive=useCallback(async()=>{
     setLiveStatus("fetching");
     try{
-      const liveData=await fetchLiveScores();
-      if(liveData&&liveData.length>0){
-        const merged=mergeResults(DEMO_RESULTS,liveData);
-        // Only update state if data actually changed
-        if(diffResults(prevResultsRef.current,merged)){
-          prevResultsRef.current=merged;
-          setResults(merged);
-          setLastUpdated(new Date().toLocaleTimeString("en-CA",{hour:"2-digit",minute:"2-digit",timeZoneName:"short"}));
-        }
-        setLiveStatus("live");
-      } else {
-        setLiveStatus("offline");
+      // Run both in parallel
+      const [stored, liveData] = await Promise.allSettled([
+        fetchStoredResults(),
+        fetchLiveScores(),
+      ]);
+
+      const kv = stored.status==="fulfilled" ? stored.value : null;
+      const live = liveData.status==="fulfilled" ? liveData.value : null;
+
+      // Update KV scorers if we got them
+      if(kv?.scorers?.length){
+        setKvScorers(kv.scorers);
       }
+      const kvM = kv?.matches||[];
+      if(kvM.length) setKvMatches(kvM);
+
+      const merged = mergeResults(DEMO_RESULTS, kvM, live);
+      if(diffResults(prevResultsRef.current, merged)){
+        prevResultsRef.current=merged;
+        setResults(merged);
+        setLastUpdated(new Date().toLocaleTimeString("en-CA",{hour:"2-digit",minute:"2-digit",timeZoneName:"short"}));
+      }
+      setLiveStatus(live?"live":"offline");
     }catch{
       setLiveStatus("offline");
     }
   },[]);
 
-  // ── GOOGLE SHEET FETCH (manual override) ────────────────────────────────
-  const fetchSheet=useCallback(async()=>{
-    if(isDemo) return fetchLive();
-    setLoading(true);setError(null);
-    try{
-      const res=await fetch(`${SHEET_CSV_URL}&t=${Date.now()}`);
-      if(!res.ok)throw new Error("Sheet fetch failed");
-      const text=await res.text();
-      const parsed=parseCSV(text);
-      if(parsed.length>0){
-        if(diffResults(prevResultsRef.current,parsed)){
-          prevResultsRef.current=parsed;
-          setResults(parsed);
-          setLastUpdated(new Date().toLocaleTimeString("en-CA",{hour:"2-digit",minute:"2-digit",timeZoneName:"short"}));
-        }
-      }
-    }catch(e){setError(e.message);}
-    finally{setLoading(false);}
-  },[fetchLive]);
+
 
   useEffect(()=>{fetchLive();},[fetchLive]);
   useEffect(()=>{
@@ -1109,24 +1111,39 @@ export default function WorldCup2026(){
           <div style={{marginTop:12}}>{results.filter(g=>g.group===activeGroup).map((g,i)=><MatchRow key={i} {...g} compact onSelect={setSelectedTeam} onMatchClick={setSelectedMatch}/>)}</div>
         </div>}
 
-        {view==="scorers"&&<div>
-          <div style={{background:"#f57f1710",border:"1px solid #f57f1730",borderRadius:10,padding:"10px 14px",marginBottom:14,fontSize:12,color:"#ffb74d"}}>🥅 Golden Boot Race · Updated through Matchday 3 (A–I) · Tap flag to view team</div>
-          <div style={{background:C.card,borderRadius:12,overflow:"hidden",border:`1px solid ${C.border}`}}>
-            <div style={{display:"grid",gridTemplateColumns:"28px 1fr 60px 50px 50px",padding:"8px 12px",background:"#0a1020",borderBottom:`1px solid ${C.border}`}}>
-              {["#","Player","Team","Goals","HT"].map((h,i)=><div key={h} style={{fontSize:9,fontWeight:700,color:C.muted,textAlign:i>1?"center":"left",textTransform:"uppercase",letterSpacing:1}}>{h}</div>)}
+        {view==="scorers"&&(()=>{
+          // Use live KV scorers if available, else fall back to static SCORERS
+          const scorerList = kvScorers.length>0
+            ? buildScorerLeaderboard(kvScorers)
+            : [...SCORERS].sort((a,b)=>b.goals-a.goals||b.hattricks-a.hattricks);
+          const isLive = kvScorers.length>0;
+          return(
+          <div>
+            <div style={{background:"#f57f1710",border:"1px solid #f57f1730",borderRadius:10,padding:"10px 14px",marginBottom:14,fontSize:12,color:"#ffb74d",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+              <span>🥅 Golden Boot Race · {scorerList.length} players · Tap flag to view team</span>
+              <span style={{fontSize:10,color:isLive?"#00e676":C.muted,fontWeight:700}}>{isLive?"● Live from KV":"● Static"}</span>
             </div>
-            {[...SCORERS].sort((a,b)=>b.goals-a.goals||b.hattricks-a.hattricks).map((s,idx)=>(
-              <div key={s.name} style={{display:"grid",gridTemplateColumns:"28px 1fr 60px 50px 50px",padding:"11px 12px",alignItems:"center",borderBottom:idx<SCORERS.length-1?"1px solid #0d1428":"none",background:idx%2===0?C.card:"#0a1228"}}>
-                <div style={{fontSize:11,color:idx===0?C.gold:C.muted,fontWeight:700}}>{idx+1}</div>
-                <div style={{display:"flex",flexDirection:"column",gap:2}}><span style={{fontSize:13,fontWeight:600,color:idx<3?C.text:C.sub}}>{s.name}</span><span style={{fontSize:10,color:C.dim}}>{s.pos}</span></div>
-                <div style={{textAlign:"center"}}><span onClick={()=>setSelectedTeam(s.team)} style={{fontSize:20,cursor:"pointer"}}>{fl(s.team)||"🏳"}</span></div>
-                <div style={{textAlign:"center"}}><span style={{fontSize:16,fontWeight:800,color:idx===0?C.gold:idx<3?"#fff":C.text}}>{s.goals}</span></div>
-                <div style={{textAlign:"center"}}>{s.hattricks>0?<span style={{fontSize:11,fontWeight:700,color:C.gold,background:C.gold+"22",borderRadius:4,padding:"2px 6px"}}>🎩×{s.hattricks}</span>:<span style={{fontSize:11,color:C.muted}}>–</span>}</div>
+            <div style={{background:C.card,borderRadius:12,overflow:"hidden",border:`1px solid ${C.border}`}}>
+              <div style={{display:"grid",gridTemplateColumns:"28px 1fr 60px 50px 50px",padding:"8px 12px",background:"#0a1020",borderBottom:`1px solid ${C.border}`}}>
+                {["#","Player","Team","Goals","HT"].map((h,i)=><div key={h} style={{fontSize:9,fontWeight:700,color:C.muted,textAlign:i>1?"center":"left",textTransform:"uppercase",letterSpacing:1}}>{h}</div>)}
               </div>
-            ))}
+              {scorerList.map((s,idx)=>(
+                <div key={s.name+idx} style={{display:"grid",gridTemplateColumns:"28px 1fr 60px 50px 50px",padding:"11px 12px",alignItems:"center",borderBottom:idx<scorerList.length-1?"1px solid #0d1428":"none",background:idx%2===0?C.card:"#0a1228"}}>
+                  <div style={{fontSize:11,color:idx===0?C.gold:C.muted,fontWeight:700}}>{idx+1}</div>
+                  <div style={{display:"flex",flexDirection:"column",gap:2}}>
+                    <span style={{fontSize:13,fontWeight:600,color:idx<3?C.text:C.sub}}>{s.name}</span>
+                    <span style={{fontSize:10,color:C.dim}}>{s.pens>0?`${s.pens} pen`:""}{s.ogs>0?` ${s.ogs} og`:""}{!s.pens&&!s.ogs?"FW":""}</span>
+                  </div>
+                  <div style={{textAlign:"center"}}><span onClick={()=>setSelectedTeam(s.team)} style={{fontSize:20,cursor:"pointer"}}>{fl(s.team)||"🏳"}</span></div>
+                  <div style={{textAlign:"center"}}><span style={{fontSize:16,fontWeight:800,color:idx===0?C.gold:idx<3?"#fff":C.text}}>{s.total||s.goals}</span></div>
+                  <div style={{textAlign:"center"}}>{(s.hattricks>0||(s.goals||0)>=3)?<span style={{fontSize:11,fontWeight:700,color:C.gold,background:C.gold+"22",borderRadius:4,padding:"2px 6px"}}>🎩</span>:<span style={{fontSize:11,color:C.muted}}>–</span>}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{fontSize:10,color:C.muted,textAlign:"center",marginTop:10}}>Tap a flag to view full team profile · Data sourced from ESPN via Vercel KV</div>
           </div>
-          <div style={{fontSize:10,color:C.muted,textAlign:"center",marginTop:10}}>Tap a flag to view full team profile</div>
-        </div>}
+          );
+        })()}
 
         {view==="thirds"&&<div>
           <div style={{background:"#f57f1710",border:"1px solid #f57f1730",borderRadius:10,padding:"10px 14px",marginBottom:14,fontSize:12,color:"#ffb74d"}}>Top 8 of 12 third-place teams advance to the Round of 32.</div>
