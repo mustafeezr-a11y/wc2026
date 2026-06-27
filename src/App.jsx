@@ -199,24 +199,24 @@ const R32_FIXTURE = [
   {match:87,home:"1K",           away:"Croatia",              kickoff:"Jul 3 · 9:30 PM ET · Arrowhead Stadium, Kansas City"},
 ];
 const R16_FIXTURE=[
-  {match:89,home:"W74",away:"W77",kickoff:"Jul 4 · 5:00 PM ET"},
-  {match:90,home:"W73",away:"W75",kickoff:"Jul 4 · 1:00 PM ET"},
-  {match:91,home:"W76",away:"W78",kickoff:"Jul 5 · 4:00 PM ET"},
-  {match:92,home:"W79",away:"W80",kickoff:"Jul 5 · 8:00 PM ET"},
-  {match:93,home:"W83",away:"W84",kickoff:"Jul 6 · 3:00 PM ET"},
-  {match:94,home:"W81",away:"W82",kickoff:"Jul 6 · 8:00 PM ET"},
-  {match:95,home:"W86",away:"W88",kickoff:"Jul 7 · 12:00 PM ET"},
-  {match:96,home:"W85",away:"W87",kickoff:"Jul 7 · 4:00 PM ET"},
+  {match:89,home:"W74",away:"W77",kickoff:"Jul 4 · 5:00 PM ET · Gillette Stadium, Boston"},
+  {match:90,home:"W73",away:"W75",kickoff:"Jul 4 · 1:00 PM ET · SoFi Stadium, LA"},
+  {match:91,home:"W76",away:"W78",kickoff:"Jul 5 · 4:00 PM ET · NRG Stadium, Houston"},
+  {match:92,home:"W79",away:"W80",kickoff:"Jul 5 · 8:00 PM ET · MetLife Stadium, NY/NJ"},
+  {match:93,home:"W83",away:"W84",kickoff:"Jul 6 · 3:00 PM ET · SoFi Stadium, LA"},
+  {match:94,home:"W81",away:"W82",kickoff:"Jul 6 · 8:00 PM ET · Lumen Field, Seattle"},
+  {match:95,home:"W86",away:"W88",kickoff:"Jul 7 · 12:00 PM ET · Hard Rock Stadium, Miami"},
+  {match:96,home:"W85",away:"W87",kickoff:"Jul 7 · 4:00 PM ET · BC Place, Vancouver"},
 ];
 const QF_FIXTURE=[
-  {match:97,home:"W89",away:"W90",kickoff:"Jul 9 · 4:00 PM ET"},
-  {match:98,home:"W93",away:"W94",kickoff:"Jul 10 · 3:00 PM ET"},
-  {match:99,home:"W91",away:"W92",kickoff:"Jul 11 · 5:00 PM ET"},
-  {match:100,home:"W95",away:"W96",kickoff:"Jul 11 · 9:00 PM ET"},
+  {match:97,home:"W89",away:"W90",kickoff:"Jul 9 · 4:00 PM ET · Gillette Stadium, Boston"},
+  {match:98,home:"W93",away:"W94",kickoff:"Jul 10 · 3:00 PM ET · Lumen Field, Seattle"},
+  {match:99,home:"W91",away:"W92",kickoff:"Jul 11 · 5:00 PM ET · NRG Stadium, Houston"},
+  {match:100,home:"W95",away:"W96",kickoff:"Jul 11 · 9:00 PM ET · AT&T Stadium, Dallas"},
 ];
 const SF_FIXTURE=[
-  {match:101,home:"W97",away:"W98",kickoff:"Jul 14 · 3:00 PM ET"},
-  {match:102,home:"W99",away:"W100",kickoff:"Jul 15 · 3:00 PM ET"},
+  {match:101,home:"W97",away:"W98",kickoff:"Jul 14 · 3:00 PM ET · MetLife Stadium, NY/NJ"},
+  {match:102,home:"W99",away:"W100",kickoff:"Jul 15 · 3:00 PM ET · SoFi Stadium, LA"},
 ];
 const THIRD_FIXTURE=[{match:103,home:"L101",away:"L102",kickoff:"Jul 18 · 5:00 PM ET · AT&T Stadium, Dallas"}];
 const FINAL_FIXTURE=[{match:104,home:"W101",away:"W102",kickoff:"Jul 19 · 3:00 PM ET · MetLife Stadium, NY/NJ"}];
@@ -678,17 +678,85 @@ function KnockoutMatchRow({r,slotMap,divider,accent,onSelect}){
   );
 }
 
+// Extract date portion from kickoff string e.g. "Jun 29 · 4:30 PM ET · ..." → "Jun 29"
+function kickoffDate(kickoff){
+  if(!kickoff) return "TBD";
+  const m=kickoff.match(/^([A-Za-z]+ \d+)/);
+  return m?m[1]:"TBD";
+}
+function kickoffTime(kickoff){
+  if(!kickoff) return "";
+  const m=kickoff.match(/(\d+:\d+ [AP]M ET)/);
+  return m?m[1]:"";
+}
+function kickoffVenue(kickoff){
+  if(!kickoff) return "";
+  // Everything after the second ·
+  const parts=kickoff.split(" · ");
+  return parts.length>=3?parts.slice(2).join(" · "):"";
+}
+
+// Sort key for kickoff — converts "Jun 28 · 3:00 PM ET" to comparable number
+function kickoffSortKey(kickoff){
+  if(!kickoff) return 9999;
+  const months={Jan:1,Feb:2,Mar:3,Apr:4,May:5,Jun:6,Jul:7,Aug:8,Sep:9,Oct:10,Nov:11,Dec:12};
+  const dm=kickoff.match(/([A-Za-z]+) (\d+)/);
+  const tm=kickoff.match(/(\d+):(\d+) ([AP]M)/);
+  if(!dm) return 9999;
+  const day=parseInt(dm[2]);
+  const mon=months[dm[1]]||0;
+  let hour=tm?parseInt(tm[1]):0;
+  const min=tm?parseInt(tm[2]):0;
+  if(tm&&tm[3]==="PM"&&hour!==12) hour+=12;
+  if(tm&&tm[3]==="AM"&&hour===12) hour=0;
+  return mon*10000+day*100+hour+min/100;
+}
+
 function KnockoutGrid({rounds,slotMap,accent=C.blue,title,info,onSelect,pinchable}){
-  const pairs=[];for(let i=0;i<rounds.length;i+=2)pairs.push(rounds.slice(i,i+2));
+  // Sort all matches by date+time
+  const sorted=[...rounds].sort((a,b)=>kickoffSortKey(a.kickoff)-kickoffSortKey(b.kickoff));
+
+  // Group by date
+  const byDate={};
+  for(const r of sorted){
+    const d=kickoffDate(r.kickoff);
+    if(!byDate[d]) byDate[d]=[];
+    byDate[d].push(r);
+  }
+  const dates=Object.keys(byDate);
+
   const content=(
     <div style={{marginBottom:20}}>
-      {title&&<div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}><div style={{width:3,height:18,background:accent,borderRadius:2}}/><span style={{fontSize:12,fontWeight:800,color:C.text,letterSpacing:1}}>{title}</span></div>}
+      {title&&<div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
+        <div style={{width:3,height:18,background:accent,borderRadius:2}}/>
+        <span style={{fontSize:12,fontWeight:800,color:C.text,letterSpacing:1}}>{title}</span>
+      </div>}
       {info&&<div style={{background:"#1a237e18",border:`1px solid ${C.border}`,borderRadius:10,padding:"9px 13px",marginBottom:12,fontSize:12,color:C.sub}}>{info}</div>}
-      <div style={{display:"flex",flexDirection:"column",gap:10}}>
-        {pairs.map((pair,pi)=>(
-          <div key={pi} style={{background:"#0a1020",borderRadius:12,border:`1px solid ${C.border}`,overflow:"hidden"}}>
-            {pair.map((r,ri)=><KnockoutMatchRow key={r.match} r={r} slotMap={slotMap} divider={ri<pair.length-1} accent={accent} onSelect={onSelect}/>)}
-          </div>
+      <div style={{display:"flex",flexDirection:"column",gap:14}}>
+        {dates.map(date=>(
+          <CollapsibleSection key={date} title={`📅 ${date}`} count={byDate[date].length} defaultOpen={true} accent={accent}>
+            <div style={{display:"flex",flexDirection:"column",gap:8,paddingTop:4}}>
+              {byDate[date].map(r=>{
+                const homeRes=resolveSlot(r.home,slotMap),awayRes=resolveSlot(r.away,slotMap);
+                const time=kickoffTime(r.kickoff);
+                const venue=kickoffVenue(r.kickoff);
+                return(
+                  <div key={r.match} style={{background:"#0a1020",borderRadius:12,border:`1px solid ${C.border}`,overflow:"hidden"}}>
+                    <div style={{display:"flex",alignItems:"center",gap:8,padding:"8px 14px 0",flexWrap:"wrap"}}>
+                      <span style={{fontSize:9,fontWeight:700,color:accent,background:accent+"18",borderRadius:4,padding:"2px 7px"}}>#{r.match}</span>
+                      {time&&<span style={{fontSize:10,fontWeight:700,color:C.gold}}>🕐 {time}</span>}
+                      {venue&&<span style={{fontSize:10,color:C.muted}}>📍 {venue}</span>}
+                    </div>
+                    <div style={{display:"flex",alignItems:"center",padding:"9px 14px 10px",gap:8}}>
+                      <TeamSlot res={homeRes} align="right" onSelect={onSelect}/>
+                      <div style={{minWidth:36,textAlign:"center",fontSize:10,fontWeight:700,color:C.muted,borderLeft:`1px solid ${C.border}`,borderRight:`1px solid ${C.border}`,padding:"4px 6px"}}>vs</div>
+                      <TeamSlot res={awayRes} align="left" onSelect={onSelect}/>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CollapsibleSection>
         ))}
       </div>
     </div>
