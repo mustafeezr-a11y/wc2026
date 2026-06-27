@@ -743,6 +743,23 @@ const MATCH_DETAILS = {
     {name:"Thelo Aasgaard",team:"home",min:24},{name:"Ousmane Dembele",team:"away",min:32,extra:"hat"},
     {name:"Desire Doue",team:"away",min:89}
   ],cards:[{name:"Thelo Aasgaard",team:"home",min:67,type:"Y"}],ft:"90+2"},
+  // ── Jun 26 MD3 night matches ──
+  "New Zealand|Belgium":{venue:"BC Place",location:"Vancouver, CAN",scorers:[
+    {name:"Elijah Just",team:"home",min:84},{name:"Leandro Trossard",team:"away",min:23,extra:"pen"},{name:"Leandro Trossard",team:"away",min:52},
+    {name:"Kevin De Bruyne",team:"away",min:66},{name:"Romelu Lukaku",team:"away",min:86},{name:"Alexis Saelemaekers",team:"away",min:90}
+  ],cards:[{name:"Finn Surman",team:"home",min:23,type:"Y"}],ft:"90+3"},
+  "Belgium|New Zealand":{venue:"BC Place",location:"Vancouver, CAN",scorers:[
+    {name:"Leandro Trossard",team:"home",min:23,extra:"pen"},{name:"Leandro Trossard",team:"home",min:52},
+    {name:"Kevin De Bruyne",team:"home",min:66},{name:"Romelu Lukaku",team:"home",min:86},
+    {name:"Alexis Saelemaekers",team:"home",min:90},{name:"Elijah Just",team:"away",min:84}
+  ],cards:[{name:"Finn Surman",team:"away",min:23,type:"Y"}],ft:"90+3"},
+  "Egypt|Iran":{venue:"Lumen Field",location:"Seattle, WA",scorers:[
+    {name:"Mahmoud Saber",team:"home",min:5},{name:"Ramin Rezaeian",team:"away",min:14}
+  ],cards:[{name:"Mehdi Taremi",team:"away",min:55,extra:"pen missed"}],ft:"90+6"},
+  "Cape Verde|Saudi Arabia":{venue:"NRG Stadium",location:"Houston, TX",scorers:[],cards:[],ft:"90+4"},
+  "Uruguay|Spain":{venue:"Estadio Akron",location:"Guadalajara, MEX",scorers:[
+    {name:"Alex Baena",team:"away",min:8}
+  ],cards:[{name:"Rodrigo Bentancur",team:"home",min:45,type:"Y"}],ft:"90+5"},
   "Senegal|Iraq":{venue:"BMO Field",location:"Toronto, CAN",scorers:[
     {name:"Habib Diarra",team:"home",min:4},{name:"Ismaila Sarr",team:"home",min:56},
     {name:"Pape Gueye",team:"home",min:61},{name:"Pape Gueye",team:"home",min:69},
@@ -949,10 +966,10 @@ const DEMO_RESULTS=[
   // ── UPCOMING MD3 Jun 26-27 ──
   {group:"I",home:"Norway",away:"France",hg:1,ag:4,status:"final",kickoff:"Jun 26 · 3:00 PM ET"},
   {group:"I",home:"Senegal",away:"Iraq",hg:5,ag:0,status:"final",kickoff:"Jun 26 · 3:00 PM ET"},
-  {group:"H",home:"Uruguay",away:"Spain",hg:null,ag:null,status:"scheduled",kickoff:"Jun 26 · 8:00 PM ET",prob_home:14.3,prob_away:64.1},
-  {group:"H",home:"Cape Verde",away:"Saudi Arabia",hg:null,ag:null,status:"scheduled",kickoff:"Jun 26 · 8:00 PM ET",prob_home:36.7,prob_away:34.7},
-  {group:"G",home:"Egypt",away:"Iran",hg:null,ag:null,status:"scheduled",kickoff:"Jun 26 · 11:00 PM ET"},
-  {group:"G",home:"New Zealand",away:"Belgium",hg:null,ag:null,status:"scheduled",kickoff:"Jun 26 · 11:00 PM ET"},
+  {group:"H",home:"Uruguay",away:"Spain",hg:0,ag:1,status:"final",kickoff:"Jun 26 · 8:00 PM ET",prob_home:14.3,prob_away:64.1},
+  {group:"H",home:"Cape Verde",away:"Saudi Arabia",hg:0,ag:0,status:"final",kickoff:"Jun 26 · 8:00 PM ET",prob_home:36.7,prob_away:34.7},
+  {group:"G",home:"Egypt",away:"Iran",hg:1,ag:1,status:"final",kickoff:"Jun 26 · 11:00 PM ET"},
+  {group:"G",home:"New Zealand",away:"Belgium",hg:1,ag:5,status:"final",kickoff:"Jun 26 · 11:00 PM ET"},
   {group:"J",home:"Argentina",away:"Jordan",hg:null,ag:null,status:"scheduled",kickoff:"Jun 27 · 3:00 PM ET"},
   {group:"J",home:"Austria",away:"Algeria",hg:null,ag:null,status:"scheduled",kickoff:"Jun 27 · 3:00 PM ET"},
   {group:"L",home:"Panama",away:"England",hg:null,ag:null,status:"scheduled",kickoff:"Jun 27 · 5:00 PM ET"},

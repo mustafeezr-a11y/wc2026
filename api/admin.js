@@ -71,6 +71,12 @@ const HISTORICAL_MATCHES = [
   {group:"L",home:"England",away:"Croatia",hg:4,ag:2,date:"2026-06-17",venue:"AT&T Stadium",venueCity:"Arlington",venueState:"TX",scorers:[{player:"Harry Kane",team:"home",clock:"11",type:"goal"},{player:"Jude Bellingham",team:"home",clock:"34",type:"goal"},{player:"Harry Kane",team:"home",clock:"66",type:"goal"},{player:"Phil Foden",team:"home",clock:"85",type:"goal"},{player:"Martin Baturina",team:"away",clock:"44",type:"goal"},{player:"Petar Musa",team:"away",clock:"71",type:"goal"}],cards:[]},
   {group:"L",home:"Ghana",away:"Panama",hg:1,ag:0,date:"2026-06-17",venue:"Estadio BBVA",venueCity:"Monterrey",venueState:"MEX",scorers:[{player:"Jordan Ayew",team:"home",clock:"55",type:"goal"}],cards:[]},
   {group:"L",home:"England",away:"Ghana",hg:0,ag:0,date:"2026-06-22",venue:"Mercedes-Benz Stadium",venueCity:"Atlanta",venueState:"GA",scorers:[],cards:[]},
+  // Group G MD3
+  {group:"G",home:"New Zealand",away:"Belgium",hg:1,ag:5,date:"2026-06-26",venue:"BC Place",venueCity:"Vancouver",venueState:"CAN",scorers:[{player:"Elijah Just",team:"home",clock:"84",type:"goal"},{player:"Leandro Trossard",team:"away",clock:"23",type:"pen"},{player:"Leandro Trossard",team:"away",clock:"52",type:"goal"},{player:"Kevin De Bruyne",team:"away",clock:"66",type:"goal"},{player:"Romelu Lukaku",team:"away",clock:"86",type:"goal"},{player:"Alexis Saelemaekers",team:"away",clock:"90",type:"goal"}],cards:[]},
+  {group:"G",home:"Egypt",away:"Iran",hg:1,ag:1,date:"2026-06-26",venue:"Lumen Field",venueCity:"Seattle",venueState:"WA",scorers:[{player:"Mahmoud Saber",team:"home",clock:"5",type:"goal"},{player:"Ramin Rezaeian",team:"away",clock:"14",type:"goal"}],cards:[]},
+  // Group H MD3
+  {group:"H",home:"Cape Verde",away:"Saudi Arabia",hg:0,ag:0,date:"2026-06-26",venue:"NRG Stadium",venueCity:"Houston",venueState:"TX",scorers:[],cards:[]},
+  {group:"H",home:"Uruguay",away:"Spain",hg:0,ag:1,date:"2026-06-26",venue:"Estadio Akron",venueCity:"Guadalajara",venueState:"MEX",scorers:[{player:"Alex Baena",team:"away",clock:"8",type:"goal"}],cards:[]},
   {group:"L",home:"Panama",away:"Croatia",hg:0,ag:1,date:"2026-06-22",venue:"Lumen Field",venueCity:"Seattle",venueState:"WA",scorers:[{player:"Martin Baturina",team:"away",clock:"67",type:"goal"}],cards:[]},
 ];
 
