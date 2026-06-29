@@ -153,3 +153,65 @@ const ALL_MATCHES = [
   // Sun Jul 19
   {round:"final",matchNum:104,home:"W101",away:"W102",hg:null,ag:null,date:"2026-07-19T19:00:00Z",venue:"MetLife Stadium",venueCity:"East Rutherford",venueState:"NJ",scorers:[],cards:[]},
 ];
+export default async function handler(req, res) {
+  const { action, secret } = req.query;
+  if (secret !== SECRET) return res.status(401).json({ error: "Unauthorized" });
+
+  if (action === "cron") {
+    try {
+      const lastRun = await redis.get("cron:lastRun");
+      const keys = await redis.keys("match:*");
+      return res.status(200).json({
+        lastCronRun: lastRun ? JSON.parse(lastRun) : "never",
+        totalMatchesStored: keys.length,
+      });
+    } catch(err) {
+      return res.status(500).json({ error: err.message });
+    }
+  }
+
+  if (action === "stats") {
+    try {
+      const keys = await redis.keys("match:*");
+      return res.status(200).json({ matchesStored: keys.length, sampleKeys: keys.slice(0, 5) });
+    } catch(err) {
+      return res.status(500).json({ error: err.message });
+    }
+  }
+
+  if (action === "flush") {
+    try {
+      const keys = await redis.keys("match:*");
+      if (keys.length > 0) {
+        const p = redis.pipeline();
+        for (const k of keys) p.del(k);
+        await p.exec();
+      }
+      return res.status(200).json({ deleted: keys.length });
+    } catch(err) {
+      return res.status(500).json({ error: err.message });
+    }
+  }
+
+  if (action === "backfill") {
+    try {
+      const pipeline = redis.pipeline();
+      for (const m of ALL_MATCHES) {
+        const status = m.hg !== null ? "final" : "scheduled";
+        const doc = {
+          ...m, status,
+          venueLocation: [m.venueCity, m.venueState].filter(Boolean).join(", "),
+          updatedAt: Date.now(),
+        };
+        const key = `match:${m.round}:${m.home}|${m.away}`;
+        pipeline.set(key, JSON.stringify(doc), { ex: 60 * 60 * 24 * 90 });
+      }
+      await pipeline.exec();
+      return res.status(200).json({ ok: true, written: ALL_MATCHES.length });
+    } catch(err) {
+      return res.status(500).json({ error: err.message });
+    }
+  }
+
+  return res.status(400).json({ error: "Use: backfill | stats | flush | cron" });
+}
