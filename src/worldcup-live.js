@@ -135,12 +135,11 @@ export function mergeAllRounds(storedRounds, liveResults){
         };
       }
 
-      // Auto-finalize: kickoff was >3hrs ago with no score data
+      // Auto-finalize: group stage always done after Jun 27; other rounds after 3hrs
       if(s.status==="scheduled"&&s.hg===null){
+        if(s.round==="group") return{...s,status:"final"};
         const ko=parseKickoff(s.kickoff||formatKickoff(s.date));
-        if(ko&&(now-ko)>3*60*60*1000){
-          return{...s,status:"final"};
-        }
+        if(ko&&(now-ko)>3*60*60*1000) return{...s,status:"final"};
       }
 
       // Ensure kickoff is formatted

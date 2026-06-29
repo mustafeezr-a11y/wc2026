@@ -178,26 +178,30 @@ const SEED = {
 };
 
 // ── KNOCKOUT FIXTURES ─────────────────────────────────────────────────────
-// ── ROUND OF 32 — exact FIFA bracket (Match numbers from official bracket) ─
+// ── ROUND OF 32 — exact FIFA schedule ─────────────────────────────────────
 const R32_FIXTURE = [
-  // ── LEFT SIDE of bracket ──
-  {match:74,home:"Germany",      away:"Paraguay",             kickoff:"Jun 29 · 4:30 PM ET · Gillette Stadium, Boston"},
-  {match:77,home:"France",       away:"Sweden",               kickoff:"Jun 30 · 5:00 PM ET · MetLife Stadium, NY/NJ"},
-  {match:73,home:"South Africa", away:"Canada",               kickoff:"Jun 28 · 3:00 PM ET · SoFi Stadium, LA", hg:0,ag:1,status:"final",scorers:[{name:"Stephen Eustaquio",team:"away",min:90,extra:"+5",type:"goal"}],cards:[]},
-  {match:75,home:"Netherlands",  away:"Morocco",              kickoff:"Jun 29 · 9:00 PM ET · Estadio BBVA, Monterrey"},
-  {match:83,home:"Portugal",     away:"Croatia",              kickoff:"Jul 2 · 7:00 PM ET · BMO Field, Toronto"},
-  {match:84,home:"Spain",        away:"Austria",              kickoff:"Jul 2 · 3:00 PM ET · SoFi Stadium, LA"},
-  {match:81,home:"USA",          away:"Bosnia and Herzegovina",kickoff:"Jul 1 · 8:00 PM ET · Levi's Stadium, San Francisco"},
-  {match:82,home:"Belgium",      away:"Senegal",              kickoff:"Jul 1 · 4:00 PM ET · Lumen Field, Seattle"},
-  // ── RIGHT SIDE of bracket ──
-  {match:76,home:"Brazil",       away:"Japan",                kickoff:"Jun 29 · 1:00 PM ET · NRG Stadium, Houston"},
-  {match:78,home:"Ivory Coast",  away:"Norway",               kickoff:"Jun 30 · 1:00 PM ET · AT&T Stadium, Dallas"},
-  {match:79,home:"Mexico",       away:"Ecuador",              kickoff:"Jun 30 · 9:00 PM ET · Estadio Azteca, Mexico City"},
-  {match:80,home:"England",      away:"Congo DR",             kickoff:"Jul 1 · 12:00 PM ET · Mercedes-Benz Stadium, Atlanta"},
-  {match:86,home:"Argentina",    away:"Cape Verde",           kickoff:"Jul 3 · 6:00 PM ET · Hard Rock Stadium, Miami"},
-  {match:88,home:"Australia",    away:"Egypt",                kickoff:"Jul 3 · 2:00 PM ET · AT&T Stadium, Dallas"},
-  {match:85,home:"Switzerland",  away:"Algeria",              kickoff:"Jul 2 · 11:00 PM ET · BC Place, Vancouver"},
-  {match:87,home:"Colombia",     away:"Ghana",                kickoff:"Jul 3 · 9:30 PM ET · Arrowhead Stadium, Kansas City"},
+  // Jun 28
+  {match:73,home:"South Africa",away:"Canada",               hg:0,ag:1,status:"final",kickoff:"Jun 28 · 3:00 PM ET · SoFi Stadium, Inglewood CA",scorers:[{name:"Stephen Eustaquio",team:"away",min:90,extra:"+5",type:"goal"}],cards:[]},
+  // Jun 29
+  {match:76,home:"Brazil",      away:"Japan",                hg:null,ag:null,status:"scheduled",kickoff:"Jun 29 · 1:00 PM ET · NRG Stadium, Houston TX"},
+  {match:74,home:"Germany",     away:"Paraguay",             hg:null,ag:null,status:"scheduled",kickoff:"Jun 29 · 4:30 PM ET · Gillette Stadium, Boston MA"},
+  {match:75,home:"Netherlands", away:"Morocco",              hg:null,ag:null,status:"scheduled",kickoff:"Jun 29 · 9:00 PM ET · Estadio BBVA, Monterrey MEX"},
+  // Jun 30
+  {match:78,home:"Ivory Coast", away:"Norway",               hg:null,ag:null,status:"scheduled",kickoff:"Jun 30 · 1:00 PM ET · AT&T Stadium, Dallas TX"},
+  {match:77,home:"France",      away:"Sweden",               hg:null,ag:null,status:"scheduled",kickoff:"Jun 30 · 5:00 PM ET · MetLife Stadium, East Rutherford NJ"},
+  {match:79,home:"Mexico",      away:"Ecuador",              hg:null,ag:null,status:"scheduled",kickoff:"Jun 30 · 9:00 PM ET · Estadio Azteca, Mexico City MEX"},
+  // Jul 1
+  {match:80,home:"England",     away:"Congo DR",             hg:null,ag:null,status:"scheduled",kickoff:"Jul 1 · 12:00 PM ET · Mercedes-Benz Stadium, Atlanta GA"},
+  {match:82,home:"Belgium",     away:"Senegal",              hg:null,ag:null,status:"scheduled",kickoff:"Jul 1 · 4:00 PM ET · Lumen Field, Seattle WA"},
+  {match:81,home:"USA",         away:"Bosnia and Herzegovina",hg:null,ag:null,status:"scheduled",kickoff:"Jul 1 · 8:00 PM ET · Levi's Stadium, Santa Clara CA"},
+  // Jul 2
+  {match:84,home:"Spain",       away:"Austria",              hg:null,ag:null,status:"scheduled",kickoff:"Jul 2 · 3:00 PM ET · SoFi Stadium, Inglewood CA"},
+  {match:83,home:"Portugal",    away:"Croatia",              hg:null,ag:null,status:"scheduled",kickoff:"Jul 2 · 7:00 PM ET · BMO Field, Toronto CAN"},
+  {match:85,home:"Switzerland", away:"Algeria",              hg:null,ag:null,status:"scheduled",kickoff:"Jul 2 · 11:00 PM ET · BC Place, Vancouver CAN"},
+  // Jul 3
+  {match:88,home:"Australia",   away:"Egypt",                hg:null,ag:null,status:"scheduled",kickoff:"Jul 3 · 2:00 PM ET · AT&T Stadium, Arlington TX"},
+  {match:86,home:"Argentina",   away:"Cape Verde",           hg:null,ag:null,status:"scheduled",kickoff:"Jul 3 · 6:00 PM ET · Hard Rock Stadium, Miami FL"},
+  {match:87,home:"Colombia",    away:"Ghana",                hg:null,ag:null,status:"scheduled",kickoff:"Jul 3 · 9:30 PM ET · Arrowhead Stadium, Kansas City MO"},
 ];
 const R16_FIXTURE=[
   {match:89,home:"W74",away:"W77",kickoff:"Jul 4 · 5:00 PM ET · Gillette Stadium, Boston"},
@@ -691,8 +695,8 @@ function KnockoutMatchRow({r,slotMap,divider,accent,onSelect}){
 // Extract date portion from kickoff string e.g. "Jun 29 · 4:30 PM ET · ..." → "Jun 29"
 function kickoffDate(kickoff){
   if(!kickoff) return "TBD";
-  const m=kickoff.match(/^([A-Za-z]+ \d+)/);
-  return m?m[1]:"TBD";
+  // Format: "Jun 29 · 1:00 PM ET · Venue" — take first segment
+  return kickoff.split(" · ")[0].trim()||"TBD";
 }
 function kickoffTime(kickoff){
   if(!kickoff) return "";
@@ -1306,14 +1310,29 @@ export default function WorldCup2026(){
               );
             })}
 
-            {/* 🕐 Upcoming — oldest rounds first */}
-            {ROUND_ORDER.filter(r=>upcomingByRound[r]?.length>0).map(r=>(
-              <CollapsibleSection key={r} title={`🕐 Upcoming · ${ROUND_LABELS[r]}`} count={upcomingByRound[r].length} defaultOpen={true} accent={ROUND_ACCENT[r]||C.blue}>
-                {upcomingByRound[r].map((g,i)=>(
-                  <MatchRow key={i} {...g} compact onSelect={setSelectedTeam}/>
-                ))}
-              </CollapsibleSection>
-            ))}
+            {/* 🕐 Upcoming — grouped by round then by date */}
+            {ROUND_ORDER.filter(r=>r!=="group"&&upcomingByRound[r]?.length>0).map(r=>{
+              // Sub-group by date within round
+              const byDate={};
+              for(const m of upcomingByRound[r]){
+                const dateKey=m.kickoff?m.kickoff.split(" · ")[0]:(m.date?m.date.slice(5).replace("-"," "):"TBD");
+                if(!byDate[dateKey]) byDate[dateKey]=[];
+                byDate[dateKey].push(m);
+              }
+              const dates=Object.keys(byDate);
+              return(
+                <CollapsibleSection key={r} title={`🕐 Upcoming · ${ROUND_LABELS[r]}`} count={upcomingByRound[r].length} defaultOpen={true} accent={ROUND_ACCENT[r]||C.blue}>
+                  {dates.map(date=>(
+                    <div key={date}>
+                      <div style={{fontSize:10,fontWeight:700,color:C.gold,padding:"8px 4px 4px",letterSpacing:1}}>📅 {date}</div>
+                      {byDate[date].map((g,i)=>(
+                        <MatchRow key={i} {...g} compact onSelect={setSelectedTeam}/>
+                      ))}
+                    </div>
+                  ))}
+                </CollapsibleSection>
+              );
+            })}
           </div>
           );
         })()}

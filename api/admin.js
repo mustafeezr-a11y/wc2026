@@ -96,22 +96,28 @@ const ALL_MATCHES = [
   {round:"group",group:"L",home:"Croatia",away:"Ghana",hg:2,ag:1,date:"2026-06-27",venue:"Arrowhead Stadium",venueCity:"Kansas City",venueState:"MO",scorers:[{player:"Petar Sucic",team:"home",clock:"31",type:"goal"},{player:"Nikola Vlasic",team:"home",clock:"83",type:"goal"},{player:"Donyell Luckassen",team:"away",clock:"73",type:"goal"}],cards:[]},
 
   // ════════════════ ROUND OF 32 ════════════════
-  {round:"r32",matchNum:73,home:"South Africa",away:"Canada",hg:0,ag:1,date:"2026-06-28",venue:"SoFi Stadium",venueCity:"Inglewood",venueState:"CA",scorers:[{player:"Stephen Eustaquio",team:"away",clock:"90+5",type:"goal"}],cards:[{player:"Mbekezeli Mbokazi",team:"home",clock:"67",type:"Y"}]},
-  {round:"r32",matchNum:76,home:"Brazil",away:"Japan",hg:null,ag:null,date:"2026-06-29",venue:"NRG Stadium",venueCity:"Houston",venueState:"TX",scorers:[],cards:[]},
-  {round:"r32",matchNum:74,home:"Germany",away:"Paraguay",hg:null,ag:null,date:"2026-06-29",venue:"Gillette Stadium",venueCity:"Foxborough",venueState:"MA",scorers:[],cards:[]},
-  {round:"r32",matchNum:75,home:"Netherlands",away:"Morocco",hg:null,ag:null,date:"2026-06-29",venue:"Estadio BBVA",venueCity:"Monterrey",venueState:"MEX",scorers:[],cards:[]},
-  {round:"r32",matchNum:78,home:"Ivory Coast",away:"Norway",hg:null,ag:null,date:"2026-06-30",venue:"AT&T Stadium",venueCity:"Arlington",venueState:"TX",scorers:[],cards:[]},
-  {round:"r32",matchNum:77,home:"France",away:"Sweden",hg:null,ag:null,date:"2026-06-30",venue:"MetLife Stadium",venueCity:"East Rutherford",venueState:"NJ",scorers:[],cards:[]},
-  {round:"r32",matchNum:79,home:"Mexico",away:"Ecuador",hg:null,ag:null,date:"2026-06-30",venue:"Estadio Azteca",venueCity:"Mexico City",venueState:"MEX",scorers:[],cards:[]},
-  {round:"r32",matchNum:80,home:"England",away:"Congo DR",hg:null,ag:null,date:"2026-07-01",venue:"Mercedes-Benz Stadium",venueCity:"Atlanta",venueState:"GA",scorers:[],cards:[]},
-  {round:"r32",matchNum:82,home:"Belgium",away:"Senegal",hg:null,ag:null,date:"2026-07-01",venue:"Lumen Field",venueCity:"Seattle",venueState:"WA",scorers:[],cards:[]},
-  {round:"r32",matchNum:81,home:"USA",away:"Bosnia and Herzegovina",hg:null,ag:null,date:"2026-07-01",venue:"Levi's Stadium",venueCity:"Santa Clara",venueState:"CA",scorers:[],cards:[]},
-  {round:"r32",matchNum:84,home:"Spain",away:"Austria",hg:null,ag:null,date:"2026-07-02",venue:"SoFi Stadium",venueCity:"Inglewood",venueState:"CA",scorers:[],cards:[]},
-  {round:"r32",matchNum:83,home:"Portugal",away:"Croatia",hg:null,ag:null,date:"2026-07-02",venue:"BMO Field",venueCity:"Toronto",venueState:"CAN",scorers:[],cards:[]},
-  {round:"r32",matchNum:85,home:"Switzerland",away:"Algeria",hg:null,ag:null,date:"2026-07-02",venue:"BC Place",venueCity:"Vancouver",venueState:"CAN",scorers:[],cards:[]},
-  {round:"r32",matchNum:88,home:"Australia",away:"Egypt",hg:null,ag:null,date:"2026-07-03",venue:"AT&T Stadium",venueCity:"Arlington",venueState:"TX",scorers:[],cards:[]},
-  {round:"r32",matchNum:86,home:"Argentina",away:"Cape Verde",hg:null,ag:null,date:"2026-07-03",venue:"Hard Rock Stadium",venueCity:"Miami",venueState:"FL",scorers:[],cards:[]},
-  {round:"r32",matchNum:87,home:"Colombia",away:"Ghana",hg:null,ag:null,date:"2026-07-03",venue:"Arrowhead Stadium",venueCity:"Kansas City",venueState:"MO",scorers:[],cards:[]},
+  // Jun 28
+  {round:"r32",matchNum:73,home:"South Africa",away:"Canada",hg:0,ag:1,date:"2026-06-28T19:00:00Z",venue:"SoFi Stadium",venueCity:"Inglewood",venueState:"CA",scorers:[{player:"Stephen Eustaquio",team:"away",clock:"90+5",type:"goal"}],cards:[{player:"Mbekezeli Mbokazi",team:"home",clock:"67",type:"Y"}]},
+  // Jun 29
+  {round:"r32",matchNum:76,home:"Brazil",away:"Japan",hg:null,ag:null,date:"2026-06-29T17:00:00Z",venue:"NRG Stadium",venueCity:"Houston",venueState:"TX",scorers:[],cards:[]},
+  {round:"r32",matchNum:74,home:"Germany",away:"Paraguay",hg:null,ag:null,date:"2026-06-29T20:30:00Z",venue:"Gillette Stadium",venueCity:"Boston",venueState:"MA",scorers:[],cards:[]},
+  {round:"r32",matchNum:75,home:"Netherlands",away:"Morocco",hg:null,ag:null,date:"2026-06-30T01:00:00Z",venue:"Estadio BBVA",venueCity:"Monterrey",venueState:"MEX",scorers:[],cards:[]},
+  // Jun 30
+  {round:"r32",matchNum:78,home:"Ivory Coast",away:"Norway",hg:null,ag:null,date:"2026-06-30T17:00:00Z",venue:"AT&T Stadium",venueCity:"Arlington",venueState:"TX",scorers:[],cards:[]},
+  {round:"r32",matchNum:77,home:"France",away:"Sweden",hg:null,ag:null,date:"2026-06-30T21:00:00Z",venue:"MetLife Stadium",venueCity:"East Rutherford",venueState:"NJ",scorers:[],cards:[]},
+  {round:"r32",matchNum:79,home:"Mexico",away:"Ecuador",hg:null,ag:null,date:"2026-07-01T01:00:00Z",venue:"Estadio Azteca",venueCity:"Mexico City",venueState:"MEX",scorers:[],cards:[]},
+  // Jul 1
+  {round:"r32",matchNum:80,home:"England",away:"Congo DR",hg:null,ag:null,date:"2026-07-01T16:00:00Z",venue:"Mercedes-Benz Stadium",venueCity:"Atlanta",venueState:"GA",scorers:[],cards:[]},
+  {round:"r32",matchNum:82,home:"Belgium",away:"Senegal",hg:null,ag:null,date:"2026-07-01T20:00:00Z",venue:"Lumen Field",venueCity:"Seattle",venueState:"WA",scorers:[],cards:[]},
+  {round:"r32",matchNum:81,home:"USA",away:"Bosnia and Herzegovina",hg:null,ag:null,date:"2026-07-02T00:00:00Z",venue:"Levi's Stadium",venueCity:"Santa Clara",venueState:"CA",scorers:[],cards:[]},
+  // Jul 2
+  {round:"r32",matchNum:84,home:"Spain",away:"Austria",hg:null,ag:null,date:"2026-07-02T19:00:00Z",venue:"SoFi Stadium",venueCity:"Inglewood",venueState:"CA",scorers:[],cards:[]},
+  {round:"r32",matchNum:83,home:"Portugal",away:"Croatia",hg:null,ag:null,date:"2026-07-02T23:00:00Z",venue:"BMO Field",venueCity:"Toronto",venueState:"CAN",scorers:[],cards:[]},
+  {round:"r32",matchNum:85,home:"Switzerland",away:"Algeria",hg:null,ag:null,date:"2026-07-03T03:00:00Z",venue:"BC Place",venueCity:"Vancouver",venueState:"CAN",scorers:[],cards:[]},
+  // Jul 3
+  {round:"r32",matchNum:88,home:"Australia",away:"Egypt",hg:null,ag:null,date:"2026-07-03T18:00:00Z",venue:"AT&T Stadium",venueCity:"Arlington",venueState:"TX",scorers:[],cards:[]},
+  {round:"r32",matchNum:86,home:"Argentina",away:"Cape Verde",hg:null,ag:null,date:"2026-07-03T22:00:00Z",venue:"Hard Rock Stadium",venueCity:"Miami",venueState:"FL",scorers:[],cards:[]},
+  {round:"r32",matchNum:87,home:"Colombia",away:"Ghana",hg:null,ag:null,date:"2026-07-04T01:30:00Z",venue:"Arrowhead Stadium",venueCity:"Kansas City",venueState:"MO",scorers:[],cards:[]},
 
   // ════════════════ ROUND OF 16 ════════════════
   {round:"r16",matchNum:90,home:"W73",away:"W75",hg:null,ag:null,date:"2026-07-04",venue:"NRG Stadium",venueCity:"Houston",venueState:"TX",scorers:[],cards:[]},
