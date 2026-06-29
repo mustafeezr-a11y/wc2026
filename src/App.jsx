@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { fetchLiveScores, fetchStoredResults, diffResults, mergeResults, buildScorerLeaderboard } from "./worldcup-live";
+import { fetchLiveScores, fetchStoredResults, diffResults, mergeAllRounds, buildScorerLeaderboard } from "./worldcup-live";
 
 // ── CONFIG ────────────────────────────────────────────────────────────────
 const SHEET_CSV_URL = "YOUR_GOOGLE_SHEET_CSV_URL_HERE";
@@ -712,7 +712,7 @@ function kickoffSortKey(kickoff){
   return mon*10000+day*100+hour+min/100;
 }
 
-function KnockoutGrid({rounds,slotMap,accent=C.blue,title,info,onSelect,pinchable}){
+function KnockoutGrid({rounds,slotMap,accent=C.blue,title,info,onSelect,onMatchClick,pinchable}){
   // Sort all matches by date+time
   const sorted=[...rounds].sort((a,b)=>kickoffSortKey(a.kickoff)-kickoffSortKey(b.kickoff));
 
@@ -741,15 +741,20 @@ function KnockoutGrid({rounds,slotMap,accent=C.blue,title,info,onSelect,pinchabl
                 const time=kickoffTime(r.kickoff);
                 const venue=kickoffVenue(r.kickoff);
                 return(
-                  <div key={r.match} style={{background:"#0a1020",borderRadius:12,border:`1px solid ${C.border}`,overflow:"hidden"}}>
+                  <div key={r.match}
+                    onClick={r.hg!==null&&onMatchClick?()=>onMatchClick({...r,home:homeRes.team||r.home,away:awayRes.team||r.away,scorers:r.scorers||[],cards:r.cards||[]}):undefined}
+                    style={{background:"#0a1020",borderRadius:12,border:`1px solid ${r.status==="final"?"#3d5afe44":C.border}`,overflow:"hidden",cursor:r.hg!==null&&onMatchClick?"pointer":"default"}}>
                     <div style={{display:"flex",alignItems:"center",gap:8,padding:"8px 14px 0",flexWrap:"wrap"}}>
                       <span style={{fontSize:9,fontWeight:700,color:accent,background:accent+"18",borderRadius:4,padding:"2px 7px"}}>#{r.match}</span>
-                      {time&&<span style={{fontSize:10,fontWeight:700,color:C.gold}}>🕐 {time}</span>}
+                      {time&&<span style={{fontSize:10,fontWeight:700,color:r.status==="final"?C.muted:C.gold}}>🕐 {time}</span>}
+                      {r.status==="final"&&r.hg!==null&&<span style={{fontSize:10,fontWeight:900,color:"#fff",letterSpacing:1}}>{r.hg} – {r.ag} <span style={{fontSize:9,color:C.green}}>FT</span></span>}
+                      {r.status==="in_progress"&&<span style={{fontSize:9,color:C.orange,fontWeight:700}}>● LIVE {r.clock}</span>}
                       {venue&&<span style={{fontSize:10,color:C.muted}}>📍 {venue}</span>}
+                      {r.hg!==null&&onMatchClick&&<span style={{marginLeft:"auto",fontSize:9,color:C.blue}}>tap for details ›</span>}
                     </div>
                     <div style={{display:"flex",alignItems:"center",padding:"9px 14px 10px",gap:8}}>
                       <TeamSlot res={homeRes} align="right" onSelect={onSelect}/>
-                      <div style={{minWidth:36,textAlign:"center",fontSize:10,fontWeight:700,color:C.muted,borderLeft:`1px solid ${C.border}`,borderRight:`1px solid ${C.border}`,padding:"4px 6px"}}>vs</div>
+                      <div style={{minWidth:40,textAlign:"center",fontSize:10,fontWeight:700,color:C.muted,borderLeft:`1px solid ${C.border}`,borderRight:`1px solid ${C.border}`,padding:"4px 6px"}}>vs</div>
                       <TeamSlot res={awayRes} align="left" onSelect={onSelect}/>
                     </div>
                   </div>
@@ -1116,7 +1121,7 @@ export default function WorldCup2026(){
   const[error,setError]=useState(null);
   const[lastUpdated,setLastUpdated]=useState(null);
   const[selectedTeam,setSelectedTeam]=useState(null);
-  const[kvMatches,setKvMatches]=useState([]);
+  const[allRounds,setAllRounds]=useState({group:[],r32:[],r16:[],qf:[],sf:[],third:[],final:[]});
   const[kvScorers,setKvScorers]=useState([]);
   const[selectedMatch,setSelectedMatch]=useState(null);
   const[liveStatus,setLiveStatus]=useState("idle"); // idle | fetching | live | offline
@@ -1126,26 +1131,29 @@ export default function WorldCup2026(){
   const fetchLive=useCallback(async()=>{
     setLiveStatus("fetching");
     try{
-      // Run both in parallel
       const [stored, liveData] = await Promise.allSettled([
         fetchStoredResults(),
         fetchLiveScores(),
       ]);
-
-      const kv = stored.status==="fulfilled" ? stored.value : null;
+      const kv   = stored.status==="fulfilled"   ? stored.value   : null;
       const live = liveData.status==="fulfilled" ? liveData.value : null;
 
-      // Update KV scorers if we got them
-      if(kv?.scorers?.length){
-        setKvScorers(kv.scorers);
-      }
-      const kvM = kv?.matches||[];
-      if(kvM.length) setKvMatches(kvM);
+      if(kv?.scorers?.length) setKvScorers(kv.scorers);
 
-      const merged = mergeResults(DEMO_RESULTS, kvM, live);
-      if(diffResults(prevResultsRef.current, merged)){
-        prevResultsRef.current=merged;
-        setResults(merged);
+      // Merge all rounds
+      const storedRounds = kv?.rounds || {group:[],r32:[],r16:[],qf:[],sf:[],third:[],final:[]};
+      // Fallback: if Redis empty, seed group round from DEMO_RESULTS
+      if(!storedRounds.group?.length){
+        storedRounds.group = DEMO_RESULTS.map(m=>({...m,round:"group",kickoff:m.kickoff||""}));
+      }
+      const merged = mergeAllRounds(storedRounds, live);
+      setAllRounds(merged);
+
+      // Keep backward compat: results = group stage matches
+      const groupMatches = merged.group||[];
+      if(diffResults(prevResultsRef.current, groupMatches)){
+        prevResultsRef.current=groupMatches;
+        setResults(groupMatches);
         setLastUpdated(new Date().toLocaleTimeString("en-CA",{hour:"2-digit",minute:"2-digit",timeZoneName:"short"}));
       }
       setLiveStatus(live?"live":"offline");
@@ -1226,11 +1234,50 @@ export default function WorldCup2026(){
 
       {/* Content */}
       <div style={{maxWidth:820,margin:"0 auto",padding:"20px 14px",flex:1,width:"100%"}}>
-        {view==="live"&&<div>
-          {finalGames.length>0&&<CollapsibleSection title="✅ Results" count={finalGames.length} defaultOpen={false} accent={C.green}>{finalGames.map((g,i)=><MatchRow key={i} {...g} compact onSelect={setSelectedTeam} onMatchClick={setSelectedMatch}/>)}</CollapsibleSection>}
-          {liveGames.length>0&&<CollapsibleSection title="🔴 In Progress" count={liveGames.length} defaultOpen={true} accent={C.orange}>{liveGames.map((g,i)=><MatchRow key={i} {...g} onSelect={setSelectedTeam} onMatchClick={setSelectedMatch}/>)}</CollapsibleSection>}
-          {scheduledGames.length>0&&<CollapsibleSection title="🕐 Upcoming" count={scheduledGames.length} defaultOpen={true} accent={C.blue}>{scheduledGames.map((g,i)=><MatchRow key={i} {...g} onSelect={setSelectedTeam}/>)}</CollapsibleSection>}
-        </div>}
+        {view==="live"&&(()=>{
+          const ROUND_ORDER=["group","r32","r16","qf","sf","third","final"];
+          const ROUND_LABELS={group:"Group Stage",r32:"Round of 32",r16:"Round of 16",qf:"Quarterfinals",sf:"Semifinals",third:"3rd Place Playoff",final:"🏆 Final"};
+          const ROUND_ACCENT={group:C.blue,r32:"#7c3aed",r16:"#0891b2",qf:"#d97706",sf:"#dc2626",third:"#6b7280",final:C.gold};
+
+          // Collect all matches across all rounds
+          const allMatches=ROUND_ORDER.flatMap(r=>(allRounds[r]||[]).map(m=>({...m,round:r})));
+          const liveAll=allMatches.filter(g=>g.status==="in_progress");
+          const finalAll=[...allMatches.filter(g=>g.status==="final")].sort((a,b)=>new Date(b.date)-new Date(a.date));
+          const upcomingAll=[...allMatches.filter(g=>g.status==="scheduled")].sort((a,b)=>new Date(a.date)-new Date(b.date));
+
+          // Group upcoming by round section
+          const upcomingByRound={};
+          for(const m of upcomingAll){
+            if(!upcomingByRound[m.round]) upcomingByRound[m.round]=[];
+            upcomingByRound[m.round].push(m);
+          }
+
+          return(
+          <div>
+            {liveAll.length>0&&<CollapsibleSection title="🔴 Live Now" count={liveAll.length} defaultOpen={true} accent={C.orange}>
+              {liveAll.map((g,i)=><MatchRow key={i} {...g} onSelect={setSelectedTeam} onMatchClick={setSelectedMatch}/>)}
+            </CollapsibleSection>}
+
+            {/* Upcoming grouped by round */}
+            {ROUND_ORDER.filter(r=>upcomingByRound[r]?.length>0).map(r=>(
+              <CollapsibleSection key={r} title={`🕐 Upcoming · ${ROUND_LABELS[r]}`} count={upcomingByRound[r].length} defaultOpen={true} accent={ROUND_ACCENT[r]||C.blue}>
+                {upcomingByRound[r].map((g,i)=><MatchRow key={i} {...g} compact onSelect={setSelectedTeam}/>)}
+              </CollapsibleSection>
+            ))}
+
+            {/* Results grouped by round */}
+            {ROUND_ORDER.slice().reverse().filter(r=>(allRounds[r]||[]).some(g=>g.status==="final")).map(r=>{
+              const roundFinals=[...(allRounds[r]||[]).filter(g=>g.status==="final")].sort((a,b)=>new Date(b.date)-new Date(a.date));
+              if(!roundFinals.length) return null;
+              return(
+                <CollapsibleSection key={r} title={`✅ Results · ${ROUND_LABELS[r]}`} count={roundFinals.length} defaultOpen={r!=="group"} accent={ROUND_ACCENT[r]||C.green}>
+                  {roundFinals.map((g,i)=><MatchRow key={i} {...g} compact onSelect={setSelectedTeam} onMatchClick={setSelectedMatch}/>)}
+                </CollapsibleSection>
+              );
+            })}
+          </div>
+          );
+        })()}
 
         {view==="groups"&&<div>
           <div style={{display:"flex",gap:5,flexWrap:"wrap",marginBottom:14}}>
@@ -1279,12 +1326,12 @@ export default function WorldCup2026(){
           <BestThirdsTable thirds={thirds} onSelect={setSelectedTeam}/>
         </div>}
 
-        {view==="r32"&&<KnockoutGrid rounds={R32_FIXTURE} slotMap={slotMap} accent={C.blue} title="Round of 32" info="Jun 28 – Jul 3 · Qualifiers shown only after group stage completes · Pinch to zoom" onSelect={setSelectedTeam} pinchable={true}/>}
-        {view==="r16"&&<KnockoutGrid rounds={R16_FIXTURE} slotMap={slotMap} accent={C.blue} title="Round of 16" info="Jul 4 – Jul 7" onSelect={setSelectedTeam} pinchable={true}/>}
-        {view==="qf"&&<KnockoutGrid rounds={QF_FIXTURE} slotMap={slotMap} accent="#7c4dff" title="Quarterfinals" info="Jul 9 – Jul 11" onSelect={setSelectedTeam} pinchable={true}/>}
+        {view==="r32"&&<KnockoutGrid rounds={allRounds.r32?.length?allRounds.r32.map(m=>({...m,kickoff:m.kickoff||formatKickoff(m.date)})):R32_FIXTURE} slotMap={slotMap} accent="#7c3aed" title="Round of 32" info="Jun 28 – Jul 3 · Tap completed matches for details" onSelect={setSelectedTeam} onMatchClick={setSelectedMatch} pinchable={true}/>}
+        {view==="r16"&&<KnockoutGrid rounds={allRounds.r16?.length?allRounds.r16.map(m=>({...m,kickoff:m.kickoff||formatKickoff(m.date)})):R16_FIXTURE} slotMap={slotMap} accent="#0891b2" title="Round of 16" info="Jul 4 – Jul 7" onSelect={setSelectedTeam} onMatchClick={setSelectedMatch} pinchable={true}/>}
+        {view==="qf"&&<KnockoutGrid rounds={allRounds.qf?.length?allRounds.qf.map(m=>({...m,kickoff:m.kickoff||formatKickoff(m.date)})):QF_FIXTURE} slotMap={slotMap} accent="#d97706" title="Quarterfinals" info="Jul 9 – Jul 11" onSelect={setSelectedTeam} onMatchClick={setSelectedMatch} pinchable={true}/>}
         {view==="sf"&&<div>
-          <KnockoutGrid rounds={SF_FIXTURE} slotMap={slotMap} accent="#aa00ff" title="Semifinals" onSelect={setSelectedTeam} pinchable={true}/>
-          <KnockoutGrid rounds={THIRD_FIXTURE} slotMap={slotMap} accent={C.gold} title="3rd Place Match" onSelect={setSelectedTeam}/>
+          <KnockoutGrid rounds={allRounds.sf?.length?allRounds.sf.map(m=>({...m,kickoff:m.kickoff||formatKickoff(m.date)})):SF_FIXTURE} slotMap={slotMap} accent="#dc2626" title="Semifinals" onSelect={setSelectedTeam} onMatchClick={setSelectedMatch} pinchable={true}/>
+          <KnockoutGrid rounds={allRounds.third?.length?allRounds.third.map(m=>({...m,kickoff:m.kickoff||formatKickoff(m.date)})):THIRD_FIXTURE} slotMap={slotMap} accent={C.gold} title="3rd Place Playoff" onSelect={setSelectedTeam} onMatchClick={setSelectedMatch}/>
         </div>}
         {view==="final"&&<div>
           <div style={{background:"#f57f1710",border:"1px solid #f57f1730",borderRadius:12,padding:"20px",marginBottom:20,textAlign:"center"}}>
@@ -1292,8 +1339,8 @@ export default function WorldCup2026(){
             <div style={{fontSize:18,fontWeight:900,color:C.gold,letterSpacing:2}}>WORLD CUP FINAL</div>
             <div style={{fontSize:12,color:C.dim,marginTop:4}}>MetLife Stadium · East Rutherford, NJ · July 19 · 3:00 PM ET</div>
           </div>
-          <KnockoutGrid rounds={FINAL_FIXTURE} slotMap={slotMap} accent={C.gold} title="The Final" onSelect={setSelectedTeam}/>
-          <KnockoutGrid rounds={THIRD_FIXTURE} slotMap={slotMap} accent={C.gold} title="3rd Place Match · Jul 18" onSelect={setSelectedTeam}/>
+          <KnockoutGrid rounds={allRounds.final?.length?allRounds.final.map(m=>({...m,kickoff:m.kickoff||formatKickoff(m.date)})):FINAL_FIXTURE} slotMap={slotMap} accent={C.gold} title="The Final" onSelect={setSelectedTeam} onMatchClick={setSelectedMatch}/>
+          <KnockoutGrid rounds={allRounds.third?.length?allRounds.third.map(m=>({...m,kickoff:m.kickoff||formatKickoff(m.date)})):THIRD_FIXTURE} slotMap={slotMap} accent={C.gold} title="3rd Place Match · Jul 18" onSelect={setSelectedTeam} onMatchClick={setSelectedMatch}/>
           <div style={{background:C.card,borderRadius:12,border:`1px solid ${C.border}`,padding:"16px"}}>
             <div style={{fontSize:11,fontWeight:700,color:C.muted,letterSpacing:2,textTransform:"uppercase",marginBottom:12}}>🏅 Honours</div>
             {[["🥇","Winner","TBD"],["🥈","Runner-up","TBD"],["🥉","3rd Place","TBD"],["👟","Golden Boot","TBD"],["⚽","Golden Ball","TBD"]].map(([icon,label,val])=>(
