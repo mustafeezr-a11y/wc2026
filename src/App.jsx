@@ -201,7 +201,7 @@ const R32_FIXTURE = [
 ];
 const R16_FIXTURE=[
   {match:89,home:"W74",away:"W77",kickoff:"Jul 4 · 5:00 PM ET · Gillette Stadium, Boston"},
-  {match:90,home:"W73",away:"W75",kickoff:"Jul 4 · 1:00 PM ET · SoFi Stadium, LA"},
+  {match:90,home:"Canada",away:"W75",kickoff:"Jul 4 · 1:00 PM ET · NRG Stadium, Houston"},
   {match:91,home:"W76",away:"W78",kickoff:"Jul 5 · 4:00 PM ET · NRG Stadium, Houston"},
   {match:92,home:"W79",away:"W80",kickoff:"Jul 5 · 8:00 PM ET · MetLife Stadium, NY/NJ"},
   {match:93,home:"W83",away:"W84",kickoff:"Jul 6 · 3:00 PM ET · SoFi Stadium, LA"},
@@ -1156,10 +1156,30 @@ export default function WorldCup2026(){
 
       // Merge all rounds
       const storedRounds = kv?.rounds || {group:[],r32:[],r16:[],qf:[],sf:[],third:[],final:[]};
-      // Fallback: if Redis empty, seed group round from DEMO_RESULTS
+      // Fallback: if Redis empty, seed group round from DEMO_RESULTS (group stage only)
       if(!storedRounds.group?.length){
-        storedRounds.group = DEMO_RESULTS.map(m=>({...m,round:"group",kickoff:m.kickoff||""}));
+        storedRounds.group = DEMO_RESULTS
+          .filter(m=>!m.round||m.round==="group")
+          .map(m=>({...m,round:"group",kickoff:m.kickoff||""}));
       }
+      // Fallback for R32 if Redis empty
+      if(!storedRounds.r32?.length){
+        storedRounds.r32 = R32_FIXTURE.map(m=>({
+          ...m, round:"r32",
+          date: m.kickoff?.match(/([A-Za-z]+ \d+)/)?.[0]
+            ? new Date(m.kickoff.match(/([A-Za-z]+ \d+)/)[0]+" 2026").toISOString().slice(0,10)
+            : "2026-06-28",
+          kickoff: m.kickoff||"",
+          hg: m.hg??null, ag: m.ag??null,
+          status: m.hg!=null?"final":"scheduled",
+          scorers: m.scorers||[], cards: m.cards||[],
+        }));
+      }
+      if(!storedRounds.r16?.length) storedRounds.r16=R16_FIXTURE.map(m=>({...m,round:"r16",status:"scheduled",hg:null,ag:null,scorers:[],cards:[]}));
+      if(!storedRounds.qf?.length)  storedRounds.qf=QF_FIXTURE.map(m=>({...m,round:"qf",status:"scheduled",hg:null,ag:null,scorers:[],cards:[]}));
+      if(!storedRounds.sf?.length)  storedRounds.sf=SF_FIXTURE.map(m=>({...m,round:"sf",status:"scheduled",hg:null,ag:null,scorers:[],cards:[]}));
+      if(!storedRounds.third?.length) storedRounds.third=THIRD_FIXTURE.map(m=>({...m,round:"third",status:"scheduled",hg:null,ag:null,scorers:[],cards:[]}));
+      if(!storedRounds.final?.length) storedRounds.final=FINAL_FIXTURE.map(m=>({...m,round:"final",status:"scheduled",hg:null,ag:null,scorers:[],cards:[]}));
       const merged = mergeAllRounds(storedRounds, live);
       setAllRounds(merged);
 
