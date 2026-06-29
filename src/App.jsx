@@ -204,26 +204,35 @@ const R32_FIXTURE = [
   {match:87,home:"Colombia",    away:"Ghana",                hg:null,ag:null,status:"scheduled",kickoff:"Jul 3 · 9:30 PM ET · Arrowhead Stadium, Kansas City MO"},
 ];
 const R16_FIXTURE=[
-  {match:89,home:"W74",away:"W77",kickoff:"Jul 4 · 5:00 PM ET · Gillette Stadium, Boston"},
-  {match:90,home:"Canada",away:"W75",kickoff:"Jul 4 · 1:00 PM ET · NRG Stadium, Houston"},
-  {match:91,home:"W76",away:"W78",kickoff:"Jul 5 · 4:00 PM ET · NRG Stadium, Houston"},
-  {match:92,home:"W79",away:"W80",kickoff:"Jul 5 · 8:00 PM ET · MetLife Stadium, NY/NJ"},
-  {match:93,home:"W83",away:"W84",kickoff:"Jul 6 · 3:00 PM ET · SoFi Stadium, LA"},
-  {match:94,home:"W81",away:"W82",kickoff:"Jul 6 · 8:00 PM ET · Lumen Field, Seattle"},
-  {match:95,home:"W86",away:"W88",kickoff:"Jul 7 · 12:00 PM ET · Hard Rock Stadium, Miami"},
-  {match:96,home:"W85",away:"W87",kickoff:"Jul 7 · 4:00 PM ET · BC Place, Vancouver"},
+  // Sat Jul 4
+  {match:90,home:"Canada",away:"W75",kickoff:"Jul 4 · 1:00 PM ET · NRG Stadium, Houston TX"},
+  {match:89,home:"W74",away:"W77",kickoff:"Jul 4 · 5:00 PM ET · Lincoln Financial Field, Philadelphia PA"},
+  // Sun Jul 5
+  {match:91,home:"W76",away:"W78",kickoff:"Jul 5 · 4:00 PM ET · MetLife Stadium, East Rutherford NJ"},
+  {match:92,home:"W79",away:"W80",kickoff:"Jul 5 · 8:00 PM ET · Estadio Azteca, Mexico City MEX"},
+  // Mon Jul 6
+  {match:93,home:"W83",away:"W84",kickoff:"Jul 6 · 3:00 PM ET · AT&T Stadium, Arlington TX"},
+  {match:94,home:"W81",away:"W82",kickoff:"Jul 6 · 8:00 PM ET · Lumen Field, Seattle WA"},
+  // Tue Jul 7
+  {match:95,home:"W86",away:"W88",kickoff:"Jul 7 · 12:00 PM ET · Mercedes-Benz Stadium, Atlanta GA"},
+  {match:96,home:"W85",away:"W87",kickoff:"Jul 7 · 4:00 PM ET · BC Place, Vancouver CAN"},
 ];
 const QF_FIXTURE=[
-  {match:97,home:"W89",away:"W90",kickoff:"Jul 9 · 4:00 PM ET · Gillette Stadium, Boston"},
-  {match:98,home:"W93",away:"W94",kickoff:"Jul 10 · 3:00 PM ET · Lumen Field, Seattle"},
-  {match:99,home:"W91",away:"W92",kickoff:"Jul 11 · 5:00 PM ET · NRG Stadium, Houston"},
-  {match:100,home:"W95",away:"W96",kickoff:"Jul 11 · 9:00 PM ET · AT&T Stadium, Dallas"},
+  // Thu Jul 9
+  {match:97,home:"W89",away:"W90",kickoff:"Jul 9 · 4:00 PM ET · Gillette Stadium, Philadelphia PA"},
+  // Fri Jul 10
+  {match:98,home:"W93",away:"W94",kickoff:"Jul 10 · 3:00 PM ET · SoFi Stadium, Inglewood CA"},
+  // Sat Jul 11
+  {match:99,home:"W91",away:"W92",kickoff:"Jul 11 · 5:00 PM ET · Hard Rock Stadium, Miami FL"},
+  {match:100,home:"W95",away:"W96",kickoff:"Jul 11 · 9:00 PM ET · Arrowhead Stadium, Kansas City MO"},
 ];
 const SF_FIXTURE=[
-  {match:101,home:"W97",away:"W98",kickoff:"Jul 14 · 3:00 PM ET · MetLife Stadium, NY/NJ"},
-  {match:102,home:"W99",away:"W100",kickoff:"Jul 15 · 3:00 PM ET · SoFi Stadium, LA"},
+  // Tue Jul 14
+  {match:101,home:"W97",away:"W98",kickoff:"Jul 14 · 3:00 PM ET · AT&T Stadium, Arlington TX"},
+  // Wed Jul 15
+  {match:102,home:"W99",away:"W100",kickoff:"Jul 15 · 3:00 PM ET · Mercedes-Benz Stadium, Atlanta GA"},
 ];
-const THIRD_FIXTURE=[{match:103,home:"L101",away:"L102",kickoff:"Jul 18 · 5:00 PM ET · AT&T Stadium, Dallas"}];
+const THIRD_FIXTURE=[{match:103,home:"L101",away:"L102",kickoff:"Jul 18 · 5:00 PM ET · Hard Rock Stadium, Miami FL"}];
 const FINAL_FIXTURE=[{match:104,home:"W101",away:"W102",kickoff:"Jul 19 · 3:00 PM ET · MetLife Stadium, NY/NJ"}];
 
 // ── HELPERS ───────────────────────────────────────────────────────────────
@@ -265,6 +274,23 @@ function isGroupComplete(group, results) {
   const grpResults = results.filter(r => r.group === group && r.hg !== null && r.ag !== null);
   // 4 teams × 3 games each / 2 = 6 matches total per group
   return grpResults.length >= 6;
+}
+
+// Build knockout winner slots from completed matches
+function buildKnockoutSlotMap(allRounds){
+  const map={};
+  const rounds=["r32","r16","qf","sf"];
+  for(const round of rounds){
+    for(const m of (allRounds[round]||[])){
+      if(m.status==="final"&&m.hg!==null&&m.ag!==null&&m.matchNum){
+        const winner=m.hg>m.ag?m.home:(m.ag>m.hg?m.away:null);
+        const loser=m.hg>m.ag?m.away:(m.ag>m.hg?m.home:null);
+        if(winner) map[`W${m.matchNum}`]=winner;
+        if(loser)  map[`L${m.matchNum}`]=loser;
+      }
+    }
+  }
+  return map;
 }
 
 function buildSlotMap(standings, thirds, results) {
@@ -1179,8 +1205,8 @@ export default function WorldCup2026(){
           scorers: m.scorers||[], cards: m.cards||[],
         }));
       }
-      if(!storedRounds.r16?.length) storedRounds.r16=R16_FIXTURE.map(m=>({...m,round:"r16",status:"scheduled",hg:null,ag:null,scorers:[],cards:[]}));
-      if(!storedRounds.qf?.length)  storedRounds.qf=QF_FIXTURE.map(m=>({...m,round:"qf",status:"scheduled",hg:null,ag:null,scorers:[],cards:[]}));
+      if(!storedRounds.r16?.length) storedRounds.r16=R16_FIXTURE.map(m=>({...m,round:"r16",status:m.hg!=null?"final":"scheduled",scorers:m.scorers||[],cards:m.cards||[]}));
+      if(!storedRounds.qf?.length)  storedRounds.qf=QF_FIXTURE.map(m=>({...m,round:"qf",status:m.hg!=null?"final":"scheduled",scorers:m.scorers||[],cards:m.cards||[]}));
       if(!storedRounds.sf?.length)  storedRounds.sf=SF_FIXTURE.map(m=>({...m,round:"sf",status:"scheduled",hg:null,ag:null,scorers:[],cards:[]}));
       if(!storedRounds.third?.length) storedRounds.third=THIRD_FIXTURE.map(m=>({...m,round:"third",status:"scheduled",hg:null,ag:null,scorers:[],cards:[]}));
       if(!storedRounds.final?.length) storedRounds.final=FINAL_FIXTURE.map(m=>({...m,round:"final",status:"scheduled",hg:null,ag:null,scorers:[],cards:[]}));
@@ -1212,6 +1238,9 @@ export default function WorldCup2026(){
   const standings=buildStandings(SEED,results);
   const thirds=getBestThirds(standings);
   const slotMap=buildSlotMap(standings,thirds,results);
+  const knockoutSlotMap=buildKnockoutSlotMap(allRounds);
+  // Merge both maps — knockout winners take priority
+  const fullSlotMap={...slotMap,...knockoutSlotMap};
   const liveGames=results.filter(g=>g.status==="in_progress");
   const finalGames=[...results].filter(g=>g.status==="final").reverse();
   const scheduledGames=[...results.filter(g=>g.status==="scheduled")].sort((a,b)=>kickoffOrder(a.kickoff)-kickoffOrder(b.kickoff));
@@ -1250,8 +1279,12 @@ export default function WorldCup2026(){
                 <span style={{fontSize:10,color:liveStatus==="live"?"#00e676":liveStatus==="fetching"?"#ffb74d":liveStatus==="offline"?C.orange:C.dim,fontWeight:700}}>
                   {liveStatus==="live"?"🟢 Live":liveStatus==="fetching"?"⟳ Syncing…":liveStatus==="offline"?"📡 Offline":""}
                 </span>
-                {lastUpdated&&<span style={{fontSize:10,color:C.muted}}>Synced {lastUpdated}</span>}
+
               </div>
+              {lastUpdated&&<div style={{fontSize:9,color:C.muted,textAlign:"right"}}>
+                <div>Last sync: {lastUpdated}</div>
+                <div style={{color:"#4ade8044"}}>⚙ Auto-updates every 15min</div>
+              </div>}
               <button onClick={fetchLive} disabled={liveStatus==="fetching"}
                 style={{display:"flex",alignItems:"center",gap:5,padding:"6px 13px",borderRadius:20,
                   border:`1px solid ${liveStatus==="fetching"?C.muted:C.blue}`,
@@ -1381,12 +1414,12 @@ export default function WorldCup2026(){
 
 
 
-        {view==="r32"&&<KnockoutGrid rounds={allRounds.r32?.length?allRounds.r32.map(m=>({...m,kickoff:m.kickoff||formatKickoff(m.date)})):R32_FIXTURE} slotMap={slotMap} accent="#7c3aed" title="Round of 32" info="Jun 28 – Jul 3 · Tap completed matches for details" onSelect={setSelectedTeam} onMatchClick={setSelectedMatch} pinchable={true}/>}
-        {view==="r16"&&<KnockoutGrid rounds={allRounds.r16?.length?allRounds.r16.map(m=>({...m,kickoff:m.kickoff||formatKickoff(m.date)})):R16_FIXTURE} slotMap={slotMap} accent="#0891b2" title="Round of 16" info="Jul 4 – Jul 7" onSelect={setSelectedTeam} onMatchClick={setSelectedMatch} pinchable={true}/>}
-        {view==="qf"&&<KnockoutGrid rounds={allRounds.qf?.length?allRounds.qf.map(m=>({...m,kickoff:m.kickoff||formatKickoff(m.date)})):QF_FIXTURE} slotMap={slotMap} accent="#d97706" title="Quarterfinals" info="Jul 9 – Jul 11" onSelect={setSelectedTeam} onMatchClick={setSelectedMatch} pinchable={true}/>}
+        {view==="r32"&&<KnockoutGrid rounds={allRounds.r32?.length?allRounds.r32.map(m=>({...m,kickoff:m.kickoff||formatKickoff(m.date)})):R32_FIXTURE} slotMap={fullSlotMap} accent="#7c3aed" title="Round of 32" info="Jun 28 – Jul 3 · Tap completed matches for details" onSelect={setSelectedTeam} onMatchClick={setSelectedMatch} pinchable={true}/>}
+        {view==="r16"&&<KnockoutGrid rounds={allRounds.r16?.length?allRounds.r16.map(m=>({...m,kickoff:m.kickoff||formatKickoff(m.date)})):R16_FIXTURE} slotMap={fullSlotMap} accent="#0891b2" title="Round of 16" info="Jul 4 – Jul 7" onSelect={setSelectedTeam} onMatchClick={setSelectedMatch} pinchable={true}/>}
+        {view==="qf"&&<KnockoutGrid rounds={allRounds.qf?.length?allRounds.qf.map(m=>({...m,kickoff:m.kickoff||formatKickoff(m.date)})):QF_FIXTURE} slotMap={fullSlotMap} accent="#d97706" title="Quarterfinals" info="Jul 9 – Jul 11" onSelect={setSelectedTeam} onMatchClick={setSelectedMatch} pinchable={true}/>}
         {view==="sf"&&<div>
-          <KnockoutGrid rounds={allRounds.sf?.length?allRounds.sf.map(m=>({...m,kickoff:m.kickoff||formatKickoff(m.date)})):SF_FIXTURE} slotMap={slotMap} accent="#dc2626" title="Semifinals" onSelect={setSelectedTeam} onMatchClick={setSelectedMatch} pinchable={true}/>
-          <KnockoutGrid rounds={allRounds.third?.length?allRounds.third.map(m=>({...m,kickoff:m.kickoff||formatKickoff(m.date)})):THIRD_FIXTURE} slotMap={slotMap} accent={C.gold} title="3rd Place Playoff" onSelect={setSelectedTeam} onMatchClick={setSelectedMatch}/>
+          <KnockoutGrid rounds={allRounds.sf?.length?allRounds.sf.map(m=>({...m,kickoff:m.kickoff||formatKickoff(m.date)})):SF_FIXTURE} slotMap={fullSlotMap} accent="#dc2626" title="Semifinals" onSelect={setSelectedTeam} onMatchClick={setSelectedMatch} pinchable={true}/>
+          <KnockoutGrid rounds={allRounds.third?.length?allRounds.third.map(m=>({...m,kickoff:m.kickoff||formatKickoff(m.date)})):THIRD_FIXTURE} slotMap={fullSlotMap} accent={C.gold} title="3rd Place Playoff" onSelect={setSelectedTeam} onMatchClick={setSelectedMatch}/>
         </div>}
         {view==="final"&&<div>
           <div style={{background:"#f57f1710",border:"1px solid #f57f1730",borderRadius:12,padding:"20px",marginBottom:20,textAlign:"center"}}>
@@ -1394,8 +1427,8 @@ export default function WorldCup2026(){
             <div style={{fontSize:18,fontWeight:900,color:C.gold,letterSpacing:2}}>WORLD CUP FINAL</div>
             <div style={{fontSize:12,color:C.dim,marginTop:4}}>MetLife Stadium · East Rutherford, NJ · July 19 · 3:00 PM ET</div>
           </div>
-          <KnockoutGrid rounds={allRounds.final?.length?allRounds.final.map(m=>({...m,kickoff:m.kickoff||formatKickoff(m.date)})):FINAL_FIXTURE} slotMap={slotMap} accent={C.gold} title="The Final" onSelect={setSelectedTeam} onMatchClick={setSelectedMatch}/>
-          <KnockoutGrid rounds={allRounds.third?.length?allRounds.third.map(m=>({...m,kickoff:m.kickoff||formatKickoff(m.date)})):THIRD_FIXTURE} slotMap={slotMap} accent={C.gold} title="3rd Place Match · Jul 18" onSelect={setSelectedTeam} onMatchClick={setSelectedMatch}/>
+          <KnockoutGrid rounds={allRounds.final?.length?allRounds.final.map(m=>({...m,kickoff:m.kickoff||formatKickoff(m.date)})):FINAL_FIXTURE} slotMap={fullSlotMap} accent={C.gold} title="The Final" onSelect={setSelectedTeam} onMatchClick={setSelectedMatch}/>
+          <KnockoutGrid rounds={allRounds.third?.length?allRounds.third.map(m=>({...m,kickoff:m.kickoff||formatKickoff(m.date)})):THIRD_FIXTURE} slotMap={fullSlotMap} accent={C.gold} title="3rd Place Match · Jul 18" onSelect={setSelectedTeam} onMatchClick={setSelectedMatch}/>
           <div style={{background:C.card,borderRadius:12,border:`1px solid ${C.border}`,padding:"16px"}}>
             <div style={{fontSize:11,fontWeight:700,color:C.muted,letterSpacing:2,textTransform:"uppercase",marginBottom:12}}>🏅 Honours</div>
             {[["🥇","Winner","TBD"],["🥈","Runner-up","TBD"],["🥉","3rd Place","TBD"],["👟","Golden Boot","TBD"],["⚽","Golden Ball","TBD"]].map(([icon,label,val])=>(

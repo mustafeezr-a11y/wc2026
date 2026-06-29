@@ -120,66 +120,36 @@ const ALL_MATCHES = [
   {round:"r32",matchNum:87,home:"Colombia",away:"Ghana",hg:null,ag:null,date:"2026-07-04T01:30:00Z",venue:"Arrowhead Stadium",venueCity:"Kansas City",venueState:"MO",scorers:[],cards:[]},
 
   // ════════════════ ROUND OF 16 ════════════════
-  {round:"r16",matchNum:90,home:"W73",away:"W75",hg:null,ag:null,date:"2026-07-04",venue:"NRG Stadium",venueCity:"Houston",venueState:"TX",scorers:[],cards:[]},
-  {round:"r16",matchNum:89,home:"W74",away:"W77",hg:null,ag:null,date:"2026-07-04",venue:"Lincoln Financial Field",venueCity:"Philadelphia",venueState:"PA",scorers:[],cards:[]},
-  {round:"r16",matchNum:91,home:"W76",away:"W78",hg:null,ag:null,date:"2026-07-05",venue:"MetLife Stadium",venueCity:"East Rutherford",venueState:"NJ",scorers:[],cards:[]},
-  {round:"r16",matchNum:92,home:"W79",away:"W80",hg:null,ag:null,date:"2026-07-05",venue:"Estadio Azteca",venueCity:"Mexico City",venueState:"MEX",scorers:[],cards:[]},
-  {round:"r16",matchNum:93,home:"W83",away:"W84",hg:null,ag:null,date:"2026-07-06",venue:"AT&T Stadium",venueCity:"Arlington",venueState:"TX",scorers:[],cards:[]},
-  {round:"r16",matchNum:94,home:"W81",away:"W82",hg:null,ag:null,date:"2026-07-06",venue:"Lumen Field",venueCity:"Seattle",venueState:"WA",scorers:[],cards:[]},
-  {round:"r16",matchNum:95,home:"W86",away:"W88",hg:null,ag:null,date:"2026-07-07",venue:"Mercedes-Benz Stadium",venueCity:"Atlanta",venueState:"GA",scorers:[],cards:[]},
-  {round:"r16",matchNum:96,home:"W85",away:"W87",hg:null,ag:null,date:"2026-07-07",venue:"BC Place",venueCity:"Vancouver",venueState:"CAN",scorers:[],cards:[]},
-
+  // Sat Jul 4
+  {round:"r16",matchNum:90,home:"Canada",away:"W75",hg:null,ag:null,date:"2026-07-04T17:00:00Z",venue:"NRG Stadium",venueCity:"Houston",venueState:"TX",scorers:[],cards:[]},
+  {round:"r16",matchNum:89,home:"W74",away:"W77",hg:null,ag:null,date:"2026-07-04T21:00:00Z",venue:"Lincoln Financial Field",venueCity:"Philadelphia",venueState:"PA",scorers:[],cards:[]},
+  // Sun Jul 5
+  {round:"r16",matchNum:91,home:"W76",away:"W78",hg:null,ag:null,date:"2026-07-05T20:00:00Z",venue:"MetLife Stadium",venueCity:"East Rutherford",venueState:"NJ",scorers:[],cards:[]},
+  {round:"r16",matchNum:92,home:"W79",away:"W80",hg:null,ag:null,date:"2026-07-06T00:00:00Z",venue:"Estadio Azteca",venueCity:"Mexico City",venueState:"MEX",scorers:[],cards:[]},
+  // Mon Jul 6
+  {round:"r16",matchNum:93,home:"W83",away:"W84",hg:null,ag:null,date:"2026-07-06T19:00:00Z",venue:"AT&T Stadium",venueCity:"Arlington",venueState:"TX",scorers:[],cards:[]},
+  {round:"r16",matchNum:94,home:"W81",away:"W82",hg:null,ag:null,date:"2026-07-07T00:00:00Z",venue:"Lumen Field",venueCity:"Seattle",venueState:"WA",scorers:[],cards:[]},
+  // Tue Jul 7
+  {round:"r16",matchNum:95,home:"W86",away:"W88",hg:null,ag:null,date:"2026-07-07T16:00:00Z",venue:"Mercedes-Benz Stadium",venueCity:"Atlanta",venueState:"GA",scorers:[],cards:[]},
+  {round:"r16",matchNum:96,home:"W85",away:"W87",hg:null,ag:null,date:"2026-07-07T20:00:00Z",venue:"BC Place",venueCity:"Vancouver",venueState:"CAN",scorers:[],cards:[]},
   // ════════════════ QUARTER FINALS ════════════════
-  {round:"qf",matchNum:97,home:"W89",away:"W90",hg:null,ag:null,date:"2026-07-09",venue:"Gillette Stadium",venueCity:"Foxborough",venueState:"MA",scorers:[],cards:[]},
-  {round:"qf",matchNum:98,home:"W93",away:"W94",hg:null,ag:null,date:"2026-07-10",venue:"SoFi Stadium",venueCity:"Inglewood",venueState:"CA",scorers:[],cards:[]},
-  {round:"qf",matchNum:99,home:"W91",away:"W92",hg:null,ag:null,date:"2026-07-11",venue:"Hard Rock Stadium",venueCity:"Miami",venueState:"FL",scorers:[],cards:[]},
-  {round:"qf",matchNum:100,home:"W95",away:"W96",hg:null,ag:null,date:"2026-07-11",venue:"Arrowhead Stadium",venueCity:"Kansas City",venueState:"MO",scorers:[],cards:[]},
-
-  // ════════════════ SEMI FINALS ════════════════
-  {round:"sf",matchNum:101,home:"W97",away:"W98",hg:null,ag:null,date:"2026-07-14",venue:"AT&T Stadium",venueCity:"Arlington",venueState:"TX",scorers:[],cards:[]},
-  {round:"sf",matchNum:102,home:"W99",away:"W100",hg:null,ag:null,date:"2026-07-15",venue:"Mercedes-Benz Stadium",venueCity:"Atlanta",venueState:"GA",scorers:[],cards:[]},
-
-  // ════════════════ THIRD PLACE ════════════════
-  {round:"third",matchNum:103,home:"L101",away:"L102",hg:null,ag:null,date:"2026-07-18",venue:"Hard Rock Stadium",venueCity:"Miami",venueState:"FL",scorers:[],cards:[]},
+  // Thu Jul 9
+  {round:"qf",matchNum:97,home:"W89",away:"W90",hg:null,ag:null,date:"2026-07-09T20:00:00Z",venue:"Gillette Stadium",venueCity:"Philadelphia",venueState:"PA",scorers:[],cards:[]},
+  // Fri Jul 10
+  {round:"qf",matchNum:98,home:"W93",away:"W94",hg:null,ag:null,date:"2026-07-10T19:00:00Z",venue:"SoFi Stadium",venueCity:"Inglewood",venueState:"CA",scorers:[],cards:[]},
+  // Sat Jul 11
+  {round:"qf",matchNum:99,home:"W91",away:"W92",hg:null,ag:null,date:"2026-07-11T21:00:00Z",venue:"Hard Rock Stadium",venueCity:"Miami",venueState:"FL",scorers:[],cards:[]},
+  {round:"qf",matchNum:100,home:"W95",away:"W96",hg:null,ag:null,date:"2026-07-12T01:00:00Z",venue:"Arrowhead Stadium",venueCity:"Kansas City",venueState:"MO",scorers:[],cards:[]},
+    // ════════════════ SEMI FINALS ════════════════
+  // Tue Jul 14
+  {round:"sf",matchNum:101,home:"W97",away:"W98",hg:null,ag:null,date:"2026-07-14T19:00:00Z",venue:"AT&T Stadium",venueCity:"Arlington",venueState:"TX",scorers:[],cards:[]},
+  // Wed Jul 15
+  {round:"sf",matchNum:102,home:"W99",away:"W100",hg:null,ag:null,date:"2026-07-15T19:00:00Z",venue:"Mercedes-Benz Stadium",venueCity:"Atlanta",venueState:"GA",scorers:[],cards:[]},
+    // ════════════════ THIRD PLACE ════════════════
+  // Sat Jul 18
+  {round:"third",matchNum:103,home:"L101",away:"L102",hg:null,ag:null,date:"2026-07-18T21:00:00Z",venue:"Hard Rock Stadium",venueCity:"Miami",venueState:"FL",scorers:[],cards:[]},
 
   // ════════════════ FINAL ════════════════
-  {round:"final",matchNum:104,home:"W101",away:"W102",hg:null,ag:null,date:"2026-07-19",venue:"MetLife Stadium",venueCity:"East Rutherford",venueState:"NJ",scorers:[],cards:[]},
+  // Sun Jul 19
+  {round:"final",matchNum:104,home:"W101",away:"W102",hg:null,ag:null,date:"2026-07-19T19:00:00Z",venue:"MetLife Stadium",venueCity:"East Rutherford",venueState:"NJ",scorers:[],cards:[]},
 ];
-
-export default async function handler(req,res){
-  const{action,secret}=req.query;
-  if(secret!==SECRET) return res.status(401).json({error:"Unauthorized"});
-
-  if(action==="stats"){
-    const keys=await redis.keys("match:*");
-    return res.status(200).json({matchesStored:keys.length,sampleKeys:keys.slice(0,5)});
-  }
-
-  if(action==="flush"){
-    const keys=await redis.keys("match:*");
-    if(keys.length>0){
-      const p=redis.pipeline();
-      for(const k of keys) p.del(k);
-      await p.exec();
-    }
-    return res.status(200).json({deleted:keys.length});
-  }
-
-  if(action==="backfill"){
-    const pipeline=redis.pipeline();
-    for(const m of ALL_MATCHES){
-      const status = m.hg!==null ? "final" : "scheduled";
-      const doc={
-        ...m, status,
-        venueLocation:[m.venueCity,m.venueState].filter(Boolean).join(", "),
-        updatedAt:Date.now(),
-      };
-      const key=`match:${m.round}:${m.home}|${m.away}`;
-      pipeline.set(key, JSON.stringify(doc), {ex:60*60*24*90});
-    }
-    await pipeline.exec();
-    return res.status(200).json({ok:true,written:ALL_MATCHES.length});
-  }
-
-  return res.status(400).json({error:"Use: backfill | stats | flush"});
-}
