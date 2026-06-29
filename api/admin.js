@@ -96,7 +96,7 @@ const ALL_MATCHES = [
   {round:"group",group:"L",home:"Croatia",away:"Ghana",hg:2,ag:1,date:"2026-06-27",venue:"Arrowhead Stadium",venueCity:"Kansas City",venueState:"MO",scorers:[{player:"Petar Sucic",team:"home",clock:"31",type:"goal"},{player:"Nikola Vlasic",team:"home",clock:"83",type:"goal"},{player:"Donyell Luckassen",team:"away",clock:"73",type:"goal"}],cards:[]},
 
   // ════════════════ ROUND OF 32 ════════════════
-  {round:"r32",matchNum:73,home:"South Africa",away:"Canada",hg:null,ag:null,date:"2026-06-28",venue:"SoFi Stadium",venueCity:"Inglewood",venueState:"CA",scorers:[],cards:[]},
+  {round:"r32",matchNum:73,home:"South Africa",away:"Canada",hg:0,ag:1,date:"2026-06-28",venue:"SoFi Stadium",venueCity:"Inglewood",venueState:"CA",scorers:[{player:"Stephen Eustaquio",team:"away",clock:"90+5",type:"goal"}],cards:[{player:"Mbekezeli Mbokazi",team:"home",clock:"67",type:"Y"}]},
   {round:"r32",matchNum:76,home:"Brazil",away:"Japan",hg:null,ag:null,date:"2026-06-29",venue:"NRG Stadium",venueCity:"Houston",venueState:"TX",scorers:[],cards:[]},
   {round:"r32",matchNum:74,home:"Germany",away:"Paraguay",hg:null,ag:null,date:"2026-06-29",venue:"Gillette Stadium",venueCity:"Foxborough",venueState:"MA",scorers:[],cards:[]},
   {round:"r32",matchNum:75,home:"Netherlands",away:"Morocco",hg:null,ag:null,date:"2026-06-29",venue:"Estadio BBVA",venueCity:"Monterrey",venueState:"MEX",scorers:[],cards:[]},

@@ -44,6 +44,7 @@ const SCORERS = [
   {name:"Ismaila Sarr",          team:"Senegal",     goals:3, hattricks:0, pos:"FW"},
   {name:"Cristiano Ronaldo",     team:"Portugal",    goals:2, hattricks:0, pos:"FW"},
   {name:"Cyle Larin",            team:"Canada",      goals:2, hattricks:0, pos:"FW"},
+  {name:"Stephen Eustaquio",     team:"Canada",      goals:1, hattricks:0, pos:"MF"},
   {name:"Ayase Ueda",            team:"Japan",       goals:2, hattricks:0, pos:"FW"},
   {name:"Daichi Kamada",         team:"Japan",       goals:2, hattricks:0, pos:"MF"},
   {name:"Kai Havertz",           team:"Germany",     goals:2, hattricks:0, pos:"FW"},
@@ -182,7 +183,7 @@ const R32_FIXTURE = [
   // ── LEFT SIDE of bracket ──
   {match:74,home:"Germany",      away:"Paraguay",             kickoff:"Jun 29 · 4:30 PM ET · Gillette Stadium, Boston"},
   {match:77,home:"France",       away:"Sweden",               kickoff:"Jun 30 · 5:00 PM ET · MetLife Stadium, NY/NJ"},
-  {match:73,home:"South Africa", away:"Canada",               kickoff:"Jun 28 · 3:00 PM ET · SoFi Stadium, LA"},
+  {match:73,home:"South Africa", away:"Canada",               kickoff:"Jun 28 · 3:00 PM ET · SoFi Stadium, LA", hg:0,ag:1,status:"final",scorers:[{name:"Stephen Eustaquio",team:"away",min:90,extra:"+5",type:"goal"}],cards:[]},
   {match:75,home:"Netherlands",  away:"Morocco",              kickoff:"Jun 29 · 9:00 PM ET · Estadio BBVA, Monterrey"},
   {match:83,home:"Portugal",     away:"Croatia",              kickoff:"Jul 2 · 7:00 PM ET · BMO Field, Toronto"},
   {match:84,home:"Spain",        away:"Austria",              kickoff:"Jul 2 · 3:00 PM ET · SoFi Stadium, LA"},
@@ -552,7 +553,16 @@ function PinchZoom({children}){
 // ── UI COMPONENTS ─────────────────────────────────────────────────────────
 function Tab({label,active,onClick}){return<button onClick={onClick} style={{padding:"7px 13px",borderRadius:8,border:"none",cursor:"pointer",fontSize:12,fontWeight:700,whiteSpace:"nowrap",background:active?C.blue:"#111827",color:active?"#fff":C.dim}}>{label}</button>;}
 function RankBadge({name,style={}}){const r=rank(name);if(!r)return null;return<span style={{fontSize:9,fontWeight:700,color:"#607d8b",background:"#0a1428",border:"1px solid #1e2a4a",borderRadius:3,padding:"1px 4px",lineHeight:1,whiteSpace:"nowrap",...style}}>{r}</span>;}
-function ClickableFlag({name,onSelect}){const emoji=fl(name);if(!emoji)return null;return<span onClick={e=>{e.stopPropagation();onSelect&&onSelect(name);}} style={{fontSize:20,cursor:"pointer",userSelect:"none"}} title={`View ${name}`}>{emoji}</span>;}
+function ClickableFlag({name,onSelect}){
+  const emoji=fl(name);
+  if(!emoji){
+    if(name&&"WL23".includes(name[0])){
+      return<span style={{width:28,height:28,borderRadius:"50%",background:"#1e2a3a",border:"1px solid #2d3748",display:"inline-flex",alignItems:"center",justifyContent:"center",fontSize:8,color:"#6b7280",fontWeight:700,flexShrink:0}}>{name}</span>;
+    }
+    return null;
+  }
+  return<span onClick={e=>{e.stopPropagation();onSelect&&onSelect(name);}} style={{fontSize:20,cursor:"pointer",userSelect:"none"}} title={"View "+name}>{emoji}</span>;
+}
 function TeamName({name,align="right",bold=false,onSelect}){const isRight=align==="right";return(
   <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:isRight?"flex-end":"flex-start",gap:5}}>
     {isRight&&<><RankBadge name={name}/><span style={{fontSize:13,fontWeight:bold?700:500,color:bold?C.text:C.sub,textAlign:"right"}}>{name}</span><ClickableFlag name={name} onSelect={onSelect}/></>}
@@ -833,6 +843,10 @@ const MATCH_DETAILS = {
   "England|Ghana":{venue:"Mercedes-Benz Stadium",location:"Atlanta, GA",scorers:[],cards:[{name:"Thomas Partey",team:"away",min:44,type:"Y"}],ft:"90"},
   "Panama|Croatia":{venue:"Lumen Field",location:"Seattle, WA",scorers:[{name:"Martin Baturina",team:"away",min:67}],cards:[],ft:"90"},
   // ── Jun 26 MD3 ──
+  // ── Round of 32 ──
+  "South Africa|Canada":{venue:"SoFi Stadium",location:"Inglewood, CA",scorers:[
+    {name:"Stephen Eustaquio",team:"away",min:90,extra:"+5",type:"goal"}
+  ],cards:[{name:"Mbekezeli Mbokazi",team:"home",min:67,type:"Y"}],ft:"90+5"},
   "Norway|France":{venue:"Gillette Stadium",location:"Foxborough, MA",scorers:[
     {name:"Ousmane Dembele",team:"away",min:8},{name:"Ousmane Dembele",team:"away",min:22,extra:"hat"},
     {name:"Thelo Aasgaard",team:"home",min:24},{name:"Ousmane Dembele",team:"away",min:32,extra:"hat"},
@@ -1181,8 +1195,8 @@ export default function WorldCup2026(){
 
   const TABS=[
     {id:"live",label:"⚡ Live"},{id:"groups",label:"📊 Groups"},
-    {id:"scorers",label:"🥅 Scorers"},{id:"thirds",label:"🥉 Best 3rds"},
-    {id:"r32",label:"Round of 32"},{id:"r16",label:"Round of 16"},
+    {id:"scorers",label:"🥅 Scorers"},
+    {id:"r16",label:"Round of 16"},
     {id:"qf",label:"Quarterfinals"},{id:"sf",label:"Semifinals"},{id:"final",label:"🏆 Final"},
   ];
 
@@ -1237,44 +1251,49 @@ export default function WorldCup2026(){
         {view==="live"&&(()=>{
           const ROUND_ORDER=["group","r32","r16","qf","sf","third","final"];
           const ROUND_LABELS={group:"Group Stage",r32:"Round of 32",r16:"Round of 16",qf:"Quarterfinals",sf:"Semifinals",third:"3rd Place Playoff",final:"🏆 Final"};
-          const ROUND_ACCENT={group:C.blue,r32:"#7c3aed",r16:"#0891b2",qf:"#d97706",sf:"#dc2626",third:"#6b7280",final:C.gold};
+          const ROUND_ACCENT={group:"#16a34a",r32:"#7c3aed",r16:"#0891b2",qf:"#d97706",sf:"#dc2626",third:"#6b7280",final:C.gold};
 
-          // Collect all matches across all rounds
           const allMatches=ROUND_ORDER.flatMap(r=>(allRounds[r]||[]).map(m=>({...m,round:r})));
           const liveAll=allMatches.filter(g=>g.status==="in_progress");
-          const finalAll=[...allMatches.filter(g=>g.status==="final")].sort((a,b)=>new Date(b.date)-new Date(a.date));
-          const upcomingAll=[...allMatches.filter(g=>g.status==="scheduled")].sort((a,b)=>new Date(a.date)-new Date(b.date));
 
-          // Group upcoming by round section
+          // Upcoming: sorted oldest first, grouped by round
+          const upcomingAll=[...allMatches.filter(g=>g.status==="scheduled")].sort((a,b)=>new Date(a.date)-new Date(b.date));
           const upcomingByRound={};
           for(const m of upcomingAll){
             if(!upcomingByRound[m.round]) upcomingByRound[m.round]=[];
             upcomingByRound[m.round].push(m);
           }
 
+          // Results: newest rounds first (final→sf→qf→r32→group), within each round newest match first
+          const resultsRoundOrder=["final","third","sf","qf","r16","r32","group"];
+
           return(
           <div>
+            {/* 🔴 Live matches always on top */}
             {liveAll.length>0&&<CollapsibleSection title="🔴 Live Now" count={liveAll.length} defaultOpen={true} accent={C.orange}>
               {liveAll.map((g,i)=><MatchRow key={i} {...g} onSelect={setSelectedTeam} onMatchClick={setSelectedMatch}/>)}
             </CollapsibleSection>}
 
-            {/* Upcoming grouped by round */}
-            {ROUND_ORDER.filter(r=>upcomingByRound[r]?.length>0).map(r=>(
-              <CollapsibleSection key={r} title={`🕐 Upcoming · ${ROUND_LABELS[r]}`} count={upcomingByRound[r].length} defaultOpen={true} accent={ROUND_ACCENT[r]||C.blue}>
-                {upcomingByRound[r].map((g,i)=><MatchRow key={i} {...g} compact onSelect={setSelectedTeam}/>)}
-              </CollapsibleSection>
-            ))}
-
-            {/* Results grouped by round */}
-            {ROUND_ORDER.slice().reverse().filter(r=>(allRounds[r]||[]).some(g=>g.status==="final")).map(r=>{
+            {/* ✅ Results — newest rounds at top */}
+            {resultsRoundOrder.filter(r=>(allRounds[r]||[]).some(g=>g.status==="final")).map(r=>{
               const roundFinals=[...(allRounds[r]||[]).filter(g=>g.status==="final")].sort((a,b)=>new Date(b.date)-new Date(a.date));
               if(!roundFinals.length) return null;
+              const isGroup=r==="group";
               return(
-                <CollapsibleSection key={r} title={`✅ Results · ${ROUND_LABELS[r]}`} count={roundFinals.length} defaultOpen={r!=="group"} accent={ROUND_ACCENT[r]||C.green}>
+                <CollapsibleSection key={r} title={`✅ Results · ${ROUND_LABELS[r]}`} count={roundFinals.length} defaultOpen={!isGroup} accent={ROUND_ACCENT[r]||"#16a34a"}>
                   {roundFinals.map((g,i)=><MatchRow key={i} {...g} compact onSelect={setSelectedTeam} onMatchClick={setSelectedMatch}/>)}
                 </CollapsibleSection>
               );
             })}
+
+            {/* 🕐 Upcoming — oldest rounds first */}
+            {ROUND_ORDER.filter(r=>upcomingByRound[r]?.length>0).map(r=>(
+              <CollapsibleSection key={r} title={`🕐 Upcoming · ${ROUND_LABELS[r]}`} count={upcomingByRound[r].length} defaultOpen={true} accent={ROUND_ACCENT[r]||C.blue}>
+                {upcomingByRound[r].map((g,i)=>(
+                  <MatchRow key={i} {...g} compact onSelect={setSelectedTeam}/>
+                ))}
+              </CollapsibleSection>
+            ))}
           </div>
           );
         })()}
@@ -1321,10 +1340,7 @@ export default function WorldCup2026(){
           );
         })()}
 
-        {view==="thirds"&&<div>
-          <div style={{background:"#f57f1710",border:"1px solid #f57f1730",borderRadius:10,padding:"10px 14px",marginBottom:14,fontSize:12,color:"#ffb74d"}}>Top 8 of 12 third-place teams advance to the Round of 32.</div>
-          <BestThirdsTable thirds={thirds} onSelect={setSelectedTeam}/>
-        </div>}
+
 
         {view==="r32"&&<KnockoutGrid rounds={allRounds.r32?.length?allRounds.r32.map(m=>({...m,kickoff:m.kickoff||formatKickoff(m.date)})):R32_FIXTURE} slotMap={slotMap} accent="#7c3aed" title="Round of 32" info="Jun 28 – Jul 3 · Tap completed matches for details" onSelect={setSelectedTeam} onMatchClick={setSelectedMatch} pinchable={true}/>}
         {view==="r16"&&<KnockoutGrid rounds={allRounds.r16?.length?allRounds.r16.map(m=>({...m,kickoff:m.kickoff||formatKickoff(m.date)})):R16_FIXTURE} slotMap={slotMap} accent="#0891b2" title="Round of 16" info="Jul 4 – Jul 7" onSelect={setSelectedTeam} onMatchClick={setSelectedMatch} pinchable={true}/>}
