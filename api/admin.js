@@ -99,8 +99,8 @@ const ALL_MATCHES = [
   // Jun 28
   {round:"r32",matchNum:73,home:"South Africa",away:"Canada",hg:0,ag:1,date:"2026-06-28T19:00:00Z",venue:"SoFi Stadium",venueCity:"Inglewood",venueState:"CA",scorers:[{player:"Stephen Eustaquio",team:"away",clock:"90+5",type:"goal"}],cards:[{player:"Mbekezeli Mbokazi",team:"home",clock:"67",type:"Y"}]},
   // Jun 29
-  {round:"r32",matchNum:76,home:"Brazil",away:"Japan",hg:null,ag:null,date:"2026-06-29T17:00:00Z",venue:"NRG Stadium",venueCity:"Houston",venueState:"TX",scorers:[],cards:[]},
-  {round:"r32",matchNum:74,home:"Germany",away:"Paraguay",hg:null,ag:null,date:"2026-06-29T20:30:00Z",venue:"Gillette Stadium",venueCity:"Boston",venueState:"MA",scorers:[],cards:[]},
+  {round:"r32",matchNum:76,home:"Brazil",away:"Japan",hg:2,ag:1,date:"2026-06-29T17:00:00Z",venue:"NRG Stadium",venueCity:"Houston",venueState:"TX",scorers:[{player:"Kaishu Sano",team:"away",clock:"29",type:"goal"},{player:"Casemiro",team:"home",clock:"47",type:"goal"},{player:"Gabriel Martinelli",team:"home",clock:"90+3",type:"goal"}],cards:[]},
+  {round:"r32",matchNum:74,home:"Germany",away:"Paraguay",hg:1,ag:1,date:"2026-06-29T20:30:00Z",venue:"Gillette Stadium",venueCity:"Boston",venueState:"MA",scorers:[{player:"Julio Enciso",team:"away",clock:"78",type:"goal"},{player:"Kai Havertz",team:"home",clock:"97",type:"goal"}],cards:[],aet:true,pens:"Paraguay 4-3"},
   {round:"r32",matchNum:75,home:"Netherlands",away:"Morocco",hg:null,ag:null,date:"2026-06-30T01:00:00Z",venue:"Estadio BBVA",venueCity:"Monterrey",venueState:"MEX",scorers:[],cards:[]},
   // Jun 30
   {round:"r32",matchNum:78,home:"Ivory Coast",away:"Norway",hg:null,ag:null,date:"2026-06-30T17:00:00Z",venue:"AT&T Stadium",venueCity:"Arlington",venueState:"TX",scorers:[],cards:[]},

@@ -45,6 +45,11 @@ const SCORERS = [
   {name:"Cristiano Ronaldo",     team:"Portugal",    goals:2, hattricks:0, pos:"FW"},
   {name:"Cyle Larin",            team:"Canada",      goals:2, hattricks:0, pos:"FW"},
   {name:"Stephen Eustaquio",     team:"Canada",      goals:1, hattricks:0, pos:"MF"},
+  {name:"Casemiro",               team:"Brazil",      goals:1, hattricks:0, pos:"MF"},
+  {name:"Gabriel Martinelli",     team:"Brazil",      goals:1, hattricks:0, pos:"FW"},
+  {name:"Kaishu Sano",            team:"Japan",       goals:1, hattricks:0, pos:"MF"},
+  {name:"Julio Enciso",           team:"Paraguay",    goals:1, hattricks:0, pos:"MF"},
+  {name:"Kai Havertz",            team:"Germany",     goals:3, hattricks:1, pos:"FW"},
   {name:"Ayase Ueda",            team:"Japan",       goals:2, hattricks:0, pos:"FW"},
   {name:"Daichi Kamada",         team:"Japan",       goals:2, hattricks:0, pos:"MF"},
   {name:"Kai Havertz",           team:"Germany",     goals:2, hattricks:0, pos:"FW"},
@@ -183,8 +188,8 @@ const R32_FIXTURE = [
   // Jun 28
   {match:73,home:"South Africa",away:"Canada",               hg:0,ag:1,status:"final",kickoff:"Jun 28 · 3:00 PM ET · SoFi Stadium, Inglewood CA",scorers:[{name:"Stephen Eustaquio",team:"away",min:90,extra:"+5",type:"goal"}],cards:[]},
   // Jun 29
-  {match:76,home:"Brazil",      away:"Japan",                hg:null,ag:null,status:"scheduled",kickoff:"Jun 29 · 1:00 PM ET · NRG Stadium, Houston TX"},
-  {match:74,home:"Germany",     away:"Paraguay",             hg:null,ag:null,status:"scheduled",kickoff:"Jun 29 · 4:30 PM ET · Gillette Stadium, Boston MA"},
+  {match:76,home:"Brazil",      away:"Japan",                hg:2,ag:1,status:"final",kickoff:"Jun 29 · 1:00 PM ET · NRG Stadium, Houston TX",scorers:[{name:"Kaishu Sano",team:"away",min:29,type:"goal"},{name:"Casemiro",team:"home",min:47,type:"goal"},{name:"Gabriel Martinelli",team:"home",min:90,extra:"+3",type:"goal"}],cards:[]},
+  {match:74,home:"Germany",     away:"Paraguay",             hg:1,ag:1,status:"final",kickoff:"Jun 29 · 4:30 PM ET · Gillette Stadium, Boston MA",aet:true,pens:{home:3,away:4},winner:"Paraguay",scorers:[{name:"Kai Havertz",team:"home",min:97,type:"goal"},{name:"Julio Enciso",team:"away",min:78,type:"goal"}],cards:[]},
   {match:75,home:"Netherlands", away:"Morocco",              hg:null,ag:null,status:"scheduled",kickoff:"Jun 29 · 9:00 PM ET · Estadio BBVA, Monterrey MEX"},
   // Jun 30
   {match:78,home:"Ivory Coast", away:"Norway",               hg:null,ag:null,status:"scheduled",kickoff:"Jun 30 · 1:00 PM ET · AT&T Stadium, Dallas TX"},
@@ -206,9 +211,9 @@ const R32_FIXTURE = [
 const R16_FIXTURE=[
   // Sat Jul 4
   {match:90,home:"Canada",away:"W75",kickoff:"Jul 4 · 1:00 PM ET · NRG Stadium, Houston TX"},
-  {match:89,home:"W74",away:"W77",kickoff:"Jul 4 · 5:00 PM ET · Lincoln Financial Field, Philadelphia PA"},
+  {match:89,home:"Paraguay",away:"W77",kickoff:"Jul 4 · 5:00 PM ET · Lincoln Financial Field, Philadelphia PA"},
   // Sun Jul 5
-  {match:91,home:"W76",away:"W78",kickoff:"Jul 5 · 4:00 PM ET · MetLife Stadium, East Rutherford NJ"},
+  {match:91,home:"Brazil",away:"W78",kickoff:"Jul 5 · 4:00 PM ET · MetLife Stadium, East Rutherford NJ"},
   {match:92,home:"W79",away:"W80",kickoff:"Jul 5 · 8:00 PM ET · Estadio Azteca, Mexico City MEX"},
   // Mon Jul 6
   {match:93,home:"W83",away:"W84",kickoff:"Jul 6 · 3:00 PM ET · AT&T Stadium, Arlington TX"},
@@ -874,6 +879,16 @@ const MATCH_DETAILS = {
   "Panama|Croatia":{venue:"Lumen Field",location:"Seattle, WA",scorers:[{name:"Martin Baturina",team:"away",min:67}],cards:[],ft:"90"},
   // ── Jun 26 MD3 ──
   // ── Round of 32 ──
+  // ── Round of 32 completed ──
+  "Brazil|Japan":{venue:"NRG Stadium",location:"Houston, TX",scorers:[
+    {name:"Kaishu Sano",team:"away",min:29,type:"goal"},
+    {name:"Casemiro",team:"home",min:47,type:"goal"},
+    {name:"Gabriel Martinelli",team:"home",min:90,extra:"+3",type:"goal"}
+  ],cards:[{name:"Kaishu Sano",team:"away",min:55,type:"Y"}],ft:"90+3"},
+  "Germany|Paraguay":{venue:"Gillette Stadium",location:"Boston, MA",scorers:[
+    {name:"Julio Enciso",team:"away",min:78,type:"goal"},
+    {name:"Kai Havertz",team:"home",min:97,type:"goal"}
+  ],cards:[],ft:"120",pens:"Paraguay won 4-3 on penalties"},
   "South Africa|Canada":{venue:"SoFi Stadium",location:"Inglewood, CA",scorers:[
     {name:"Stephen Eustaquio",team:"away",min:90,extra:"+5",type:"goal"}
   ],cards:[{name:"Mbekezeli Mbokazi",team:"home",min:67,type:"Y"}],ft:"90+5"},
